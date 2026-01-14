@@ -7,22 +7,30 @@ import SignupPage from "./pages/SignupPage";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import DashboardPage from "./pages/DashboardPage";
+import YearlyPage from "./pages/YearlyPage";
+import MonthlyPage from "./pages/MonthlyPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   return (
     <MantineProvider
       defaultColorScheme="dark"
       theme={{
-        defaultRadius: "xl",
+        defaultRadius: "md",
         primaryColor: "lime",
       }}
     >
       <NavBar />
       <Routes>
+        ``
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/reports/:year" element={<YearlyPage />}>
+          <Route path=":month" element={<MonthlyPage />} />
+        </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Footer />
     </MantineProvider>

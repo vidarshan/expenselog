@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mantine/charts": "^8.3.12",
     "@mantine/core": "^8.3.11",
     "@mantine/dates": "^8.3.12",
     "@mantine/hooks": "^8.3.11",
@@ -18,7 +19,9 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-icons": "^5.5.0",
-    "react-router-dom": "^7.12.0"
+    "react-is": "^19.2.3",
+    "react-router-dom": "^7.12.0",
+    "recharts": "^3.6.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

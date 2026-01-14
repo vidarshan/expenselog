@@ -12,9 +12,11 @@ import {
 import Login from "./Login";
 import { useDisclosure } from "@mantine/hooks";
 import { IoLogInOutline, IoPersonOutline } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 const NavBar = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const loggedIn = true;
+  const navigate = useNavigate();
   return (
     <Flex
       h={64}
@@ -32,7 +34,7 @@ const NavBar = () => {
       }}
     >
       <Login opened={opened} close={close} />
-      <Logo logoSize={30} titleSize={3} />
+      <Logo logoSize={30} titleSize={3} onClick={() => navigate("/")} />
       {loggedIn ? (
         <Popover width={200} position="bottom" withArrow shadow="md">
           <Popover.Target>
