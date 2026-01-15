@@ -318,19 +318,18 @@ const DashboardPage = () => {
             {yearlyMonthlyReports.map((yearReport) => {
               console.log(yearReport);
               if (yearReport.year.toString() === year) {
-                return yearReport.months.map(
-                  ({ month, income, expenses, logs }) => {
-                    return (
-                      <MonthCard
-                        key={yearReport.year.toString() + "-" + month}
-                        month={month}
-                        amount={income}
-                        logs={logs}
-                        //isCurrent={isCurrent}
-                      />
-                    );
-                  }
-                );
+                return yearReport.months.map(({ month, income, logs }) => {
+                  return (
+                    <MonthCard
+                      key={yearReport.year.toString() + "-" + month}
+                      month={month}
+                      year={yearReport.year.toString()}
+                      amount={income}
+                      logs={logs}
+                      //isCurrent={isCurrent}
+                    />
+                  );
+                });
               }
             })}
             <Flex justify="center">

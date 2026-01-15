@@ -12,7 +12,7 @@ import React, { useState } from "react";
 import { IoRemoveOutline, IoTriangle } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 
-const MonthCard = ({ month, amount, logs, isCurrent }) => {
+const MonthCard = ({ month, year, amount, logs, isCurrent }) => {
   const [opened, setOpened] = useState(false);
   const navigate = useNavigate();
 
@@ -30,7 +30,7 @@ const MonthCard = ({ month, amount, logs, isCurrent }) => {
         withBorder
         mb="xs"
         style={{ cursor: "pointer" }}
-        onClick={() => navigate(`/month/${month.toLowerCase()}`)}
+        onClick={() => navigate(`/reports/${year}/${month.toLowerCase()}`)}
       >
         <Flex
           align="center"
@@ -60,7 +60,7 @@ const MonthCard = ({ month, amount, logs, isCurrent }) => {
           {/* Trend Icons */}
           <Group spacing="xs">
             <IoTriangle color="#66A80F" size={18} /> {/* Up */}
-            <IoTriangle color="#FF8787" size={18} /> {/* Down */}
+            <IoTriangle color="#FF8787" size={18} rotate="35" /> {/* Down */}
             <IoRemoveOutline color="#adb5bd" size={18} /> {/* Neutral */}
           </Group>
 

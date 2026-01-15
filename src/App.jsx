@@ -16,20 +16,18 @@ function App() {
     <MantineProvider
       defaultColorScheme="dark"
       theme={{
-        defaultRadius: "md",
+        defaultRadius: "lg",
         primaryColor: "lime",
       }}
     >
       <NavBar />
       <Routes>
-        ``
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/reports/:year" element={<YearlyPage />}>
-          <Route path=":month" element={<MonthlyPage />} />
-        </Route>
+        <Route path="/reports/:year" element={<YearlyPage />} />
+        <Route path="/reports/:year/:month" element={<MonthlyPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Footer />

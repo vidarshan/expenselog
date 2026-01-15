@@ -75,3 +75,16 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.hoverGroup {
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.hoverGroup:hover {
+  background-color: var(--mantine-color-gray-0);
+  transform: translateY(-2px);
+}
+
+.hoverGroup:hover * {
+  color: var(--mantine-color-dark-9);
+}
