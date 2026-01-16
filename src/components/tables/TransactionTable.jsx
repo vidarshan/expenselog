@@ -161,7 +161,7 @@ const TransactionTable = () => {
         <Text fw={700}>Transactions</Text>
         <Flex align="center">
           <Button
-            size="xs"
+            size="sm"
             mr="xs"
             leftSection={<IoAddSharp />}
             onClick={() => setExpenseOpened(true)}

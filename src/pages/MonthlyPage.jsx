@@ -9,7 +9,9 @@ import {
   Flex,
   Grid,
   Group,
+  Modal,
   Popover,
+  TextInput,
   Title,
   Transition,
 } from "@mantine/core";
@@ -25,12 +27,33 @@ import TransactionTable from "../components/tables/TransactionTable";
 import ComparisonChart from "../components/charts/ComparisonChart";
 import ContributionChart from "../components/charts/ContributionChart";
 import OverviewCard from "../components/OverviewCard";
+import { useState } from "react";
 
 const MonthlyPage = () => {
   const [scroll, scrollTo] = useWindowScroll();
+  const [categoryOpened, setCategoryOpened] = useState(false);
 
   return (
     <Container size="xl" pt={NAVBAR_HEIGHT + 32}>
+      <Modal
+        opened={categoryOpened}
+        onClose={() => setCategoryOpened(false)}
+        title="Add Category"
+        centered
+        closeOnClickOutside={false}
+      >
+        <TextInput
+          mt="md"
+          label="Category Name"
+          placeholder="Enter Cateogory Name"
+        />
+        <Flex justify="flex-end" mt="md">
+          <Button variant="light" mr="xs">
+            Cancel
+          </Button>
+          <Button>Create</Button>
+        </Flex>
+      </Modal>
       <Group justify="space-between" mb="xl">
         <Box>
           <Title order={2}>January 2025</Title>
@@ -43,7 +66,11 @@ const MonthlyPage = () => {
             </ActionIcon>
           </Popover.Target>
           <Popover.Dropdown>
-            <Button leftSection={<IoAppsOutline />} fullWidth>
+            <Button
+              leftSection={<IoAppsOutline />}
+              onClick={() => setCategoryOpened(true)}
+              fullWidth
+            >
               Create category
             </Button>
             <Button mt="sm" leftSection={<IoDocumentOutline />} fullWidth>

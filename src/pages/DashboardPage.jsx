@@ -54,7 +54,7 @@ import MonthCard from "../components/MonthCard";
 import { nanoid } from "nanoid";
 
 const DashboardPage = () => {
-  const [activeTab, setActiveTab] = useState("finance");
+
   const [incomeOptions, setIncomeOptions] = useState("fixed");
   const [incomeSources, setIncomeSources] = useState([
     {
@@ -63,7 +63,7 @@ const DashboardPage = () => {
       salary: 0,
     },
   ]);
-  const [categoryOpened, setCategoryOpened] = useState(false);
+
   const [recordOpened, setRecordOpened] = useState(false);
 
   const [year, setYear] = useState("2025");
@@ -173,72 +173,6 @@ const DashboardPage = () => {
           <Button>Create</Button>
         </Flex>
       </Modal>
-
-      <Modal
-        opened={categoryOpened}
-        onClose={() => setCategoryOpened(false)}
-        title="Add Category"
-        centered
-        closeOnClickOutside={false}
-      >
-        <TextInput
-          mt="md"
-          label="Category Name"
-          placeholder="Enter Cateogory Name"
-        />
-        <Text mt="lg" size="sm" fw={500}>
-          Category Icon
-        </Text>
-        <Tabs
-          mt="xs"
-          orientation="vertical"
-          variant="pills"
-          value={activeTab}
-          onChange={setActiveTab}
-        >
-          <Tabs.List>
-            {categoryTabs.map(({ value, label, Icon }) => (
-              <Tabs.Tab
-                key={value}
-                value={value}
-                leftSection={<Icon size={16} />}
-              >
-                {label}
-              </Tabs.Tab>
-            ))}
-          </Tabs.List>
-          <Tabs.Panel ml="xs" value={activeTab}>
-            {" "}
-            {/* or the category value */}
-            <Flex wrap="wrap" gap="sm">
-              {categoryIcons
-                .filter((icon) => icon.category === activeTab)
-                .map(({ key, label, Icon }) => (
-                  <ActionIcon
-                    key={key}
-                    variant="light"
-                    size="lg"
-                    aria-label={label}
-                  >
-                    <Icon />
-                  </ActionIcon>
-                ))}
-            </Flex>
-          </Tabs.Panel>
-        </Tabs>
-
-        <Flex justify="flex-end" mt="md">
-          <Button variant="light" mr="xs">
-            Cancel
-          </Button>
-          <Button>Create</Button>
-        </Flex>
-      </Modal>
-      {/* <Expense
-        closeExpenses={() => setExpenseOpened(true)}
-        openedExpenses={expenseOpened}
-        title="Add Expense"
-      /> */}
       <Card>
         <Flex align="center" justify="space-between">
           <Flex gap="xs">
