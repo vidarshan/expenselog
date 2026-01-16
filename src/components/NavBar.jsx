@@ -38,7 +38,7 @@ const NavBar = () => {
       {loggedIn ? (
         <Popover width={200} position="bottom" withArrow shadow="md">
           <Popover.Target>
-            <Avatar color="cyan" radius="xl">
+            <Avatar style={{ cursor: "pointer" }} color="cyan" radius="xl">
               VR
             </Avatar>
           </Popover.Target>

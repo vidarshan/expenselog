@@ -54,7 +54,6 @@ import MonthCard from "../components/MonthCard";
 import { nanoid } from "nanoid";
 
 const DashboardPage = () => {
-  const [expenseOpened, setExpenseOpened] = useState(false);
   const [activeTab, setActiveTab] = useState("finance");
   const [incomeOptions, setIncomeOptions] = useState("fixed");
   const [incomeSources, setIncomeSources] = useState([
@@ -66,7 +65,7 @@ const DashboardPage = () => {
   ]);
   const [categoryOpened, setCategoryOpened] = useState(false);
   const [recordOpened, setRecordOpened] = useState(false);
-  const [value, setValue] = useState(null);
+
   const [year, setYear] = useState("2025");
 
   const iconProps = {
@@ -174,86 +173,7 @@ const DashboardPage = () => {
           <Button>Create</Button>
         </Flex>
       </Modal>
-      <Modal
-        opened={expenseOpened}
-        onClose={() => setExpenseOpened(false)}
-        title="Add Record"
-        centered
-        closeOnClickOutside={false}
-      >
-        <Tabs mt="xs" variant="pills" defaultValue="expense">
-          <Tabs.List grow>
-            <Tabs.Tab value="expense" leftSection={<IoArrowDown />}>
-              Expense
-            </Tabs.Tab>
-            <Tabs.Tab value="income" leftSection={<IoArrowUp />}>
-              Income
-            </Tabs.Tab>
-          </Tabs.List>
 
-          <Tabs.Panel value="expense">
-            <TextInput mt="md" label="Amount" placeholder="Enter Amount" />
-            <Select
-              mt="sm"
-              label="Category"
-              placeholder="Select Category"
-              data={["Food", "Transport", "Shopping", "Bills"]}
-            />
-            <DatePickerInput
-              mt="sm"
-              label="Date"
-              placeholder="Select Date"
-              value={value}
-              onChange={setValue}
-            />
-            <Select
-              mt="sm"
-              label="Payment Method"
-              placeholder="Select Method"
-              data={["Cash", "Card", "Bank", "Other"]}
-            />
-            <Textarea
-              mt="sm"
-              label="Notes"
-              placeholder="Add any notes here..."
-            />
-          </Tabs.Panel>
-
-          <Tabs.Panel value="income">
-            <TextInput mt="md" label="Amount" placeholder="Enter Amount" />
-            <Select
-              mt="sm"
-              label="Category"
-              placeholder="Select Category"
-              data={["Food", "Transport", "Shopping", "Bills"]}
-            />
-            <DatePickerInput
-              mt="sm"
-              label="Date"
-              placeholder="Select Date"
-              value={value}
-              onChange={setValue}
-            />
-            <Select
-              mt="sm"
-              label="Payment Method"
-              placeholder="Select Method"
-              data={["Cash", "Card", "Bank", "Other"]}
-            />
-            <Textarea
-              mt="sm"
-              label="Notes"
-              placeholder="Add any notes here..."
-            />
-          </Tabs.Panel>
-        </Tabs>
-        <Flex justify="flex-end" mt="md">
-          <Button variant="light" mr="xs">
-            Cancel
-          </Button>
-          <Button>Create</Button>
-        </Flex>
-      </Modal>
       <Modal
         opened={categoryOpened}
         onClose={() => setCategoryOpened(false)}
@@ -341,7 +261,7 @@ const DashboardPage = () => {
               <Title c="red">$675.32</Title>
             </Card>
           </Flex>
-          <Flex direction="column">
+          {/* <Flex direction="column">
             <Button
               leftSection={<IoListOutline />}
               onClick={() => setRecordOpened(true)}
@@ -362,7 +282,7 @@ const DashboardPage = () => {
             >
               Add Category
             </Button>
-          </Flex>
+          </Flex> */}
         </Flex>
       </Card>
       <Grid mt="md">
