@@ -1,22 +1,29 @@
-import React from "react";
 import Logo from "./Logo";
 import {
   Avatar,
   Button,
-  Center,
   Flex,
   Popover,
+  Switch,
   Text,
   Title,
+  useMantineColorScheme,
 } from "@mantine/core";
 import Login from "./Login";
 import { useDisclosure } from "@mantine/hooks";
-import { IoLogInOutline, IoPersonOutline } from "react-icons/io5";
+import {
+  IoLogInOutline,
+  IoMoonOutline,
+  IoPersonOutline,
+  IoSunnyOutline,
+} from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 const NavBar = () => {
-  const [opened, { open, close }] = useDisclosure(false);
   const loggedIn = true;
   const navigate = useNavigate();
+  const [opened, { open, close }] = useDisclosure(false);
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
+
   return (
     <Flex
       h={64}
@@ -50,6 +57,23 @@ const NavBar = () => {
               <Title ta="center" order={5}>
                 Vidarshan
               </Title>
+              <Flex align="center" w="100%" justify="space-between">
+                <Text fw={700} size="sm">
+                  Theme
+                </Text>
+                <Switch
+                  my="sm"
+                  size="md"
+                  checked={colorScheme === "dark"}
+                  onLabel={<IoMoonOutline />}
+                  offLabel={<IoSunnyOutline />}
+                  onChange={(event) =>
+                    setColorScheme(
+                      event.currentTarget.checked ? "dark" : "light"
+                    )
+                  }
+                />
+              </Flex>
               <Button
                 leftSection={<IoPersonOutline />}
                 onClick={() => navigate("/profile")}
