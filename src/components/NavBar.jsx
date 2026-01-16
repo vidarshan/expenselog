@@ -50,7 +50,11 @@ const NavBar = () => {
               <Title ta="center" order={5}>
                 Vidarshan
               </Title>
-              <Button leftSection={<IoPersonOutline />} fullWidth>
+              <Button
+                leftSection={<IoPersonOutline />}
+                onClick={() => navigate("/profile")}
+                fullWidth
+              >
                 Edit Profile
               </Button>
               <Button

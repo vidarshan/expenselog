@@ -8,10 +8,14 @@ import {
   Card,
   Center,
   Container,
+  Divider,
   Flex,
   Grid,
+  Group,
   Modal,
+  NumberInput,
   Pagination,
+  Radio,
   SegmentedControl,
   Select,
   Tabs,
@@ -39,6 +43,7 @@ import {
   IoSearch,
   IoTimeOutline,
   IoTrainOutline,
+  IoTrashOutline,
   IoTriangle,
   IoTriangleOutline,
 } from "react-icons/io5";
@@ -46,11 +51,21 @@ import { DatePicker, DatePickerInput } from "@mantine/dates";
 import { categoryIcons, categoryTabs } from "../assets/dynamicIcons";
 import { PieChart } from "@mantine/charts";
 import MonthCard from "../components/MonthCard";
+import { nanoid } from "nanoid";
 
 const DashboardPage = () => {
   const [expenseOpened, setExpenseOpened] = useState(false);
   const [activeTab, setActiveTab] = useState("finance");
+  const [incomeOptions, setIncomeOptions] = useState("fixed");
+  const [incomeSources, setIncomeSources] = useState([
+    {
+      id: 1,
+      name: "",
+      salary: 0,
+    },
+  ]);
   const [categoryOpened, setCategoryOpened] = useState(false);
+  const [recordOpened, setRecordOpened] = useState(false);
   const [value, setValue] = useState(null);
   const [year, setYear] = useState("2025");
 
@@ -59,8 +74,106 @@ const DashboardPage = () => {
     size: 20,
   };
 
+  const removeIncomeSource = (id) => {
+    if (incomeSources.length > 1) {
+      const newIncomeList = incomeSources.filter((i) => {
+        return i.id !== id;
+      });
+      setIncomeSources(newIncomeList);
+    }
+  };
+
+  const addIncomeSource = () => {
+    const newIncomeList = [
+      ...incomeSources,
+      {
+        id: nanoid(),
+        name: "",
+        salary: 0,
+      },
+    ];
+    setIncomeSources(newIncomeList);
+  };
+
+  const editIncomeSource = (id, newName, newSalary) => {
+    setIncomeSources((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, name: newName, salary: newSalary } : item
+      )
+    );
+  };
+
   return (
     <Container size="xl" pt={NAVBAR_HEIGHT + 32}>
+      <Modal
+        opened={recordOpened}
+        onClose={() => setRecordOpened(false)}
+        title="How do you usually get paid?"
+        closeOnClickOutside={false}
+        centered
+      >
+        <Radio.Group
+          name="incomeTypes"
+          defaultValue={incomeOptions}
+          onChange={setIncomeOptions}
+          withAsterisk
+        >
+          <Group mt="xs">
+            <Radio
+              value="fixed"
+              label="Fixed salary (same amount every month)"
+            />
+            <Radio
+              value="variable"
+              label="Variable income (freelance / hourly / tips)"
+            />
+          </Group>
+        </Radio.Group>
+        <Divider my="md" />
+        {incomeOptions === "fixed" ? (
+          <NumberInput placeholder="Enter your salary" />
+        ) : (
+          <Card withBorder>
+            {incomeSources.map(({ id, name, salary }) => {
+              return (
+                <Flex align="center" key={id} mb="xs" gap="xs" grow>
+                  <TextInput
+                    value={name}
+                    placeholder="Source name"
+                    mr="xs"
+                    onChange={(e) =>
+                      editIncomeSource(id, e.target.value, salary)
+                    }
+                  />
+                  <NumberInput
+                    value={salary.toString()}
+                    placeholder="Salary"
+                    onChange={(e) => editIncomeSource(id, name, e.target.value)}
+                    mr="xs"
+                  />
+                  <ActionIcon
+                    color="red"
+                    onClick={() => removeIncomeSource(id)}
+                    variant="light"
+                  >
+                    <IoTrashOutline />
+                  </ActionIcon>
+                </Flex>
+              );
+            })}
+
+            <Button mt="xs" variant="light" onClick={addIncomeSource} fullWidth>
+              Add Source
+            </Button>
+          </Card>
+        )}
+        <Flex justify="flex-end" mt="md">
+          <Button variant="light" mr="xs">
+            Cancel
+          </Button>
+          <Button>Create</Button>
+        </Flex>
+      </Modal>
       <Modal
         opened={expenseOpened}
         onClose={() => setExpenseOpened(false)}
@@ -231,6 +344,13 @@ const DashboardPage = () => {
           <Flex direction="column">
             <Button
               leftSection={<IoListOutline />}
+              onClick={() => setRecordOpened(true)}
+            >
+              Add Financial Information
+            </Button>
+            <Button
+              leftSection={<IoListOutline />}
+              mt="xs"
               onClick={() => setExpenseOpened(true)}
             >
               Add Record
