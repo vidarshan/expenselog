@@ -25,11 +25,11 @@ const ContributionChart = () => {
           data={expenseData}
         />
         <Box>
-          {expenseData.map((data) => {
+          {expenseData.map(({ name, value }) => {
             return (
-              <Group mb="xs" justify="space-between">
-                <Text size="xs">{data.name}</Text>
-                <Text size="xs">{data.value}</Text>
+              <Group key={name + "-" + value} mb="xs" justify="space-between">
+                <Text size="xs">{name}</Text>
+                <Text size="xs">{value}</Text>
               </Group>
             );
           })}

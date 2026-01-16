@@ -1,12 +1,14 @@
-import React, { useState } from "react";
-import { NAVBAR_HEIGHT, yearlyMonthlyReports } from "../data/mockdata";
+import { useState } from "react";
+import {
+  NAVBAR_HEIGHT,
+  transactions,
+  yearlyMonthlyReports,
+} from "../data/mockdata";
 import {
   ActionIcon,
   Badge,
-  Box,
   Button,
   Card,
-  Center,
   Container,
   Divider,
   Flex,
@@ -16,45 +18,27 @@ import {
   NumberInput,
   Pagination,
   Radio,
-  SegmentedControl,
   Select,
-  Tabs,
   Text,
-  Textarea,
   TextInput,
-  ThemeIcon,
   Title,
 } from "@mantine/core";
-import Expense from "../forms/Expense";
 import {
-  IoArrowDown,
-  IoArrowUp,
-  IoBagHandleOutline,
-  IoBriefcaseOutline,
   IoCalendarClearOutline,
-  IoCashOutline,
-  IoEllipsisVerticalOutline,
-  IoFastFoodOutline,
   IoFilterOutline,
-  IoHomeOutline,
-  IoLayersOutline,
-  IoListOutline,
-  IoRemoveOutline,
-  IoSearch,
-  IoTimeOutline,
-  IoTrainOutline,
   IoTrashOutline,
-  IoTriangle,
-  IoTriangleOutline,
 } from "react-icons/io5";
-import { DatePicker, DatePickerInput } from "@mantine/dates";
-import { categoryIcons, categoryTabs } from "../assets/dynamicIcons";
 import { PieChart } from "@mantine/charts";
 import MonthCard from "../components/MonthCard";
 import { nanoid } from "nanoid";
+import ContributionChart from "../components/charts/ContributionChart";
+import OverviewCard from "../components/OverviewCard";
+import QuickActions from "../components/QuickActions";
+import ComparisonChart from "../components/charts/ComparisonChart";
+import moment from "moment";
+import YearCard from "../components/YearCard";
 
 const DashboardPage = () => {
-
   const [incomeOptions, setIncomeOptions] = useState("fixed");
   const [incomeSources, setIncomeSources] = useState([
     {
@@ -67,11 +51,6 @@ const DashboardPage = () => {
   const [recordOpened, setRecordOpened] = useState(false);
 
   const [year, setYear] = useState("2025");
-
-  const iconProps = {
-    style: { display: "block" },
-    size: 20,
-  };
 
   const removeIncomeSource = (id) => {
     if (incomeSources.length > 1) {
@@ -173,94 +152,54 @@ const DashboardPage = () => {
           <Button>Create</Button>
         </Flex>
       </Modal>
-      <Card>
-        <Flex align="center" justify="space-between">
-          <Flex gap="xs">
-            <Card withBorder>
-              <Text fw={600} c="cyan">
-                Current Balance
-              </Text>
-              <Title c="cyan">$4890.56</Title>
-            </Card>
-            <Card withBorder>
-              <Text fw={600} c="green">
-                Income
-              </Text>
-              <Title c="green">$1250.78</Title>
-            </Card>
-            <Card withBorder>
-              <Text fw={600} c="red">
-                Expenses
-              </Text>
-              <Title c="red">$675.32</Title>
-            </Card>
-          </Flex>
-          {/* <Flex direction="column">
-            <Button
-              leftSection={<IoListOutline />}
-              onClick={() => setRecordOpened(true)}
-            >
-              Add Financial Information
-            </Button>
-            <Button
-              leftSection={<IoListOutline />}
-              mt="xs"
-              onClick={() => setExpenseOpened(true)}
-            >
-              Add Record
-            </Button>
-            <Button
-              leftSection={<IoLayersOutline />}
-              mt="xs"
-              onClick={() => setCategoryOpened(true)}
-            >
-              Add Category
-            </Button>
-          </Flex> */}
-        </Flex>
-      </Card>
+
       <Grid mt="md">
-        <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
-          <Card>
-            <Title order={2}>Quick Overview</Title>
-            <PieChart
-              withLabelsLine
-              labelsPosition="outside"
-              labelsType="percent"
-              withLabels
-              data={[
-                { name: "USA", value: 400, color: "indigo.6" },
-                { name: "India", value: 300, color: "yellow.6" },
-                { name: "Japan", value: 300, color: "teal.6" },
-                { name: "Other", value: 200, color: "gray.6" },
-              ]}
-            />
-          </Card>
+        <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+          <OverviewCard />
         </Grid.Col>
         <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
-          <Card h="100%">
+          <ContributionChart />
+        </Grid.Col>
+        <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
+          <Card h="100%" withBorder>
             <Flex>
-              <Title order={2}>Recent Transactions</Title>
+              <Text fw={700}>Most Recent transactions</Text>
             </Flex>
-            <Card mt="xs" radius="lg" style={{ cursor: "pointer" }} withBorder>
-              <Flex align="center" justify="space-between">
-                <Flex align="center">
-                  <Text fw={600} size="lg">
-                    Dinner last night
-                  </Text>
-                  <Badge ml="xs" variant="light">
-                    Food
-                  </Badge>
-                </Flex>
-                <Text fw={700}>$40.42</Text>
-              </Flex>
-            </Card>
+            {transactions
+              .slice(0, 5)
+              .map(({ title, amount, category, date }, index) => (
+                <Card
+                  key={index + "@" + title}
+                  mt="xs"
+                  radius="lg"
+                  style={{ cursor: "pointer" }}
+                  withBorder
+                >
+                  <Flex align="center" justify="space-between">
+                    <Flex align="center">
+                      <Text fw={600} size="sm">
+                        {title}
+                      </Text>
+                      <Badge ml="xs" variant="light">
+                        {category}
+                      </Badge>
+                    </Flex>
+                    <Text></Text>
+                    <Text fw={600} size="sm">
+                      ${amount} | {moment(date).fromNow()}
+                    </Text>
+                  </Flex>
+                </Card>
+              ))}
           </Card>
         </Grid.Col>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          <Card h="100%">
+          <ComparisonChart />
+        </Grid.Col>
+        <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+          <Card h="100%" withBorder>
             <Flex mb="xl" justify="space-between" align="center">
-              <Title order={2}>Monthly Overview</Title>
+              <Text fw={700}>Past months</Text>
               <Flex gap="xs">
                 <Select
                   value={year}
@@ -275,20 +214,6 @@ const DashboardPage = () => {
                 />
               </Flex>
             </Flex>
-            {/* {yearlyMonthlyReports.map(
-              ({ id, month, income, logs, isCurrent }) => {
-                console.log(year);
-                return (
-                  <MonthCard
-                    key={id}
-                    month={month}
-                    amount={income}
-                    logs={logs}
-                    isCurrent={isCurrent}
-                  />
-                );
-              }
-            )} */}
             {yearlyMonthlyReports.map((yearReport) => {
               console.log(yearReport);
               if (yearReport.year.toString() === year) {
@@ -308,6 +233,41 @@ const DashboardPage = () => {
             })}
             <Flex justify="center">
               <Pagination mt="md" total={10} />
+            </Flex>
+          </Card>
+        </Grid.Col>
+        <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+          <Card h="100%" withBorder>
+            <Flex mb="xl" justify="space-between" align="center">
+              <Text fw={700}>Past years</Text>
+              <Flex gap="xs">
+                <Select
+                  value={year}
+                  onChange={setYear}
+                  leftSection={<IoCalendarClearOutline />}
+                  data={["2025", "2024", "2023", "2022"]}
+                />
+                <Select
+                  leftSection={<IoFilterOutline />}
+                  placeholder="Apply Filters"
+                  data={["Most Recent", "Most Gain", "Most Loss", "Break Even"]}
+                />
+              </Flex>
+            </Flex>
+            {yearlyMonthlyReports.map(({ year }) => {
+              return (
+                <YearCard
+                  key={year}
+                  month={year}
+                  year={year}
+                  amount={0}
+                  logs={"40"}
+                  //isCurrent={isCurrent}
+                />
+              );
+            })}
+            <Flex justify="center">
+              <Pagination mt="md" total={3} />
             </Flex>
           </Card>
         </Grid.Col>

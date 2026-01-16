@@ -1,93 +1,29 @@
 import { NAVBAR_HEIGHT } from "../data/mockdata";
 import {
-  ActionIcon,
   Affix,
-  Badge,
-  Box,
   Button,
   Container,
   Flex,
   Grid,
-  Group,
-  Modal,
-  Popover,
-  TextInput,
-  Title,
   Transition,
 } from "@mantine/core";
-import {
-  IoAppsOutline,
-  IoColorWandOutline,
-  IoDocumentOutline,
-  IoEllipsisVerticalOutline,
-  IoTrashOutline,
-} from "react-icons/io5";
+import { IoColorWandOutline } from "react-icons/io5";
 import { useWindowScroll } from "@mantine/hooks";
 import TransactionTable from "../components/tables/TransactionTable";
 import ComparisonChart from "../components/charts/ComparisonChart";
 import ContributionChart from "../components/charts/ContributionChart";
 import OverviewCard from "../components/OverviewCard";
-import { useState } from "react";
+import QuickActions from "../components/QuickActions";
 
 const MonthlyPage = () => {
   const [scroll, scrollTo] = useWindowScroll();
-  const [categoryOpened, setCategoryOpened] = useState(false);
 
   return (
     <Container size="xl" pt={NAVBAR_HEIGHT + 32}>
-      <Modal
-        opened={categoryOpened}
-        onClose={() => setCategoryOpened(false)}
-        title="Add Category"
-        centered
-        closeOnClickOutside={false}
-      >
-        <TextInput
-          mt="md"
-          label="Category Name"
-          placeholder="Enter Cateogory Name"
-        />
-        <Flex justify="flex-end" mt="md">
-          <Button variant="light" mr="xs">
-            Cancel
-          </Button>
-          <Button>Create</Button>
-        </Flex>
-      </Modal>
-      <Group justify="space-between" mb="xl">
-        <Box>
-          <Title order={2}>January 2025</Title>
-          <Badge>Open</Badge>
-        </Box>
-        <Popover width={200} position="bottom" withArrow shadow="md">
-          <Popover.Target>
-            <ActionIcon variant="light" size="lg">
-              <IoEllipsisVerticalOutline />
-            </ActionIcon>
-          </Popover.Target>
-          <Popover.Dropdown>
-            <Button
-              leftSection={<IoAppsOutline />}
-              onClick={() => setCategoryOpened(true)}
-              fullWidth
-            >
-              Create category
-            </Button>
-            <Button mt="sm" leftSection={<IoDocumentOutline />} fullWidth>
-              Export as PDF
-            </Button>
-            <Button
-              color="red"
-              mt="sm"
-              leftSection={<IoTrashOutline />}
-              fullWidth
-            >
-              Close Report
-            </Button>
-          </Popover.Dropdown>
-        </Popover>
-      </Group>
       <Grid>
+        <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+          <QuickActions withActions={true} title="January 2026" />
+        </Grid.Col>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
           <OverviewCard />
         </Grid.Col>
