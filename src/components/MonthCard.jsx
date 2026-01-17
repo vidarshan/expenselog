@@ -7,12 +7,18 @@ import {
   Title,
   Badge,
   Modal,
+  ActionIcon,
 } from "@mantine/core";
 import React, { useState } from "react";
-import { IoRemoveOutline, IoTriangle } from "react-icons/io5";
+import {
+  IoRemoveOutline,
+  IoTrendingDown,
+  IoTrendingUp,
+  IoTriangle,
+} from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 
-const MonthCard = ({ month, year, amount, logs, isCurrent }) => {
+const MonthCard = ({ month, year, amount, logs, isCurrent, trend = "up" }) => {
   const [opened, setOpened] = useState(false);
   const navigate = useNavigate();
 
@@ -29,45 +35,51 @@ const MonthCard = ({ month, year, amount, logs, isCurrent }) => {
       <Card
         withBorder
         mb="xs"
-        style={{ cursor: "pointer" }}
+        className="card"
         onClick={() => navigate(`/reports/${year}/${month.toLowerCase()}`)}
       >
-        <Flex
-          align="center"
-          justify="space-between"
-          withBorder
-          sx={{
-            borderRadius: 8,
-            backgroundColor: "#fff",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-          }}
-        >
-          {/* Month and Badge */}
-          <Flex align="center" gap="xs" style={{ minWidth: 120 }}>
-            <Text weight={500}>{month}</Text>
-            {isCurrent && (
-              <Badge color="green" variant="light">
-                Current
-              </Badge>
-            )}
+        <Flex align="center" justify="space-between">
+          {/* Left: Month + badge */}
+          <Flex direction="column" gap={4}>
+            <Group gap="xs">
+              <Text fw={600}>{month}</Text>
+              {isCurrent && (
+                <Badge size="xs" color="green" variant="light">
+                  Current
+                </Badge>
+              )}
+            </Group>
+            <Text size="xs" c="dimmed">
+              {logs} transaction{logs !== 1 ? "s" : ""}
+            </Text>
           </Flex>
 
-          {/* Amount */}
-          <Text weight={600} style={{ minWidth: 100 }}>
-            ${amount}
-          </Text>
+          {/* Middle: Amount */}
+          <Flex direction="column" align="flex-end">
+            <Text fw={700} size="lg">
+              ${amount}
+            </Text>
+            <Text
+              size="xs"
+              c={trend === "up" ? "green" : trend === "down" ? "red" : "dimmed"}
+            >
+              {trend === "up" && "↑ Gain"}
+              {trend === "down" && "↓ Loss"}
+              {trend === "neutral" && "No change"}
+            </Text>
+          </Flex>
 
-          {/* Trend Icons */}
-          <Group spacing="xs">
-            <IoTriangle color="#66A80F" size={18} /> {/* Up */}
-            <IoTriangle color="#FF8787" size={18} rotate="35" /> {/* Down */}
-            <IoRemoveOutline color="#adb5bd" size={18} /> {/* Neutral */}
-          </Group>
-
-          {/* Number of Logs */}
-          <Text color="dimmed" size="sm" style={{ minWidth: 80 }}>
-            {logs} transaction{logs !== 1 ? "s" : ""}
-          </Text>
+          {/* Right: Trend icon */}
+          <ActionIcon
+            variant="light"
+            color={trend === "up" ? "green" : trend === "down" ? "red" : "gray"}
+            radius="xl"
+            size="lg"
+          >
+            {trend === "up" && <IoTrendingUp />}
+            {trend === "down" && <IoTrendingDown />}
+            {trend === "neutral" && <IoRemoveOutline />}
+          </ActionIcon>
         </Flex>
       </Card>
     </>

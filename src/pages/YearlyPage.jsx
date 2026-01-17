@@ -14,22 +14,26 @@ import ContributionChart from "../components/charts/ContributionChart";
 import ComparisonChart from "../components/charts/ComparisonChart";
 import TransactionTable from "../components/tables/TransactionTable";
 import { IoColorWandOutline } from "react-icons/io5";
+import ActivityChart from "../components/charts/ActivityChart";
 
 const YearlyPage = () => {
   return (
     <Container size="xl" pt={NAVBAR_HEIGHT + 32}>
       <Grid>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          <QuickActions withActions={true} title="January 2026" />
+          <QuickActions withActions={true} title="2026" />
         </Grid.Col>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
           <OverviewCard />
         </Grid.Col>
-        <Grid.Col span={{ xs: 12, sm: 6, md: 5, lg: 5, xl: 5 }}>
+        <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
           <ContributionChart />
         </Grid.Col>
-        <Grid.Col span={{ xs: 12, sm: 6, md: 7, lg: 7, xl: 7 }}>
+        <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
           <ComparisonChart />
+        </Grid.Col>
+        <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+          <ActivityChart />
         </Grid.Col>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
           <TransactionTable />

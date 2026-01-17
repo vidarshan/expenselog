@@ -120,13 +120,6 @@ const TransactionTable = () => {
               label="Amount"
               placeholder="Enter Amount"
             />
-            <Select
-              mt="sm"
-              label="Category"
-              leftSection={<IoAppsOutline />}
-              placeholder="Select Category"
-              data={["Food", "Transport", "Shopping", "Bills"]}
-            />
             <DatePickerInput
               mt="sm"
               label="Date"
@@ -134,13 +127,6 @@ const TransactionTable = () => {
               placeholder="Select Date"
               value={value}
               onChange={setValue}
-            />
-            <Select
-              mt="sm"
-              label="Payment Method"
-              leftSection={<IoCardOutline />}
-              placeholder="Select Method"
-              data={["Cash", "Card", "Bank", "Other"]}
             />
             <Textarea
               mt="sm"
@@ -175,7 +161,7 @@ const TransactionTable = () => {
           />
         </Flex>
       </Group>
-      <Table>
+      <Table highlightOnHover>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Transaction</Table.Th>

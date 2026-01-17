@@ -9,20 +9,44 @@ import {
   Popover,
   TextInput,
   Title,
+  Text,
 } from "@mantine/core";
 import { useState } from "react";
 import {
   IoAppsOutline,
+  IoCloseOutline,
   IoDocumentOutline,
   IoEllipsisVerticalOutline,
+  IoTextOutline,
   IoTrashOutline,
 } from "react-icons/io5";
 
 const QuickActions = ({ withActions, title }) => {
   const [categoryOpened, setCategoryOpened] = useState(false);
+  const [closeReportOpened, setCloseReportOpened] = useState(false);
 
   return (
     <Group justify="space-between" mb="sm">
+      <Modal
+        opened={closeReportOpened}
+        onClose={() => setCloseReportOpened(false)}
+        title="Close Report"
+        centered
+        closeOnClickOutside={false}
+      >
+        <Text>
+          Closing will archive this report which is an irreversible action. Do
+          you wish to continue?
+        </Text>
+        <Flex justify="flex-end" mt="md">
+          <Button leftSection={<IoCloseOutline />} variant="light" mr="xs">
+            Cancel
+          </Button>
+          <Button leftSection={<IoTrashOutline />} color="red">
+            Close
+          </Button>
+        </Flex>
+      </Modal>
       <Modal
         opened={categoryOpened}
         onClose={() => setCategoryOpened(false)}
@@ -33,7 +57,8 @@ const QuickActions = ({ withActions, title }) => {
         <TextInput
           mt="md"
           label="Category Name"
-          placeholder="Enter Cateogory Name"
+          leftSection={<IoTextOutline />}
+          placeholder="Enter Category Name"
         />
         <Flex justify="flex-end" mt="md">
           <Button variant="light" mr="xs">
@@ -68,6 +93,7 @@ const QuickActions = ({ withActions, title }) => {
               color="red"
               mt="sm"
               leftSection={<IoTrashOutline />}
+              onClick={() => setCloseReportOpened(true)}
               fullWidth
             >
               Close Report

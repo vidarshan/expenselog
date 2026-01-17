@@ -39,3 +39,25 @@
 .read-the-docs {
   color: #888;
 }
+
+.card {
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    box-shadow 120ms ease,
+    transform 120ms ease;
+}
+
+.card:hover {
+  background-color: light-dark(
+    rgba(37, 99, 235, 0.04),  
+    rgba(37, 99, 235, 0.08) 
+  );
+  box-shadow: var(--mantine-shadow-sm);
+  
+}
+
+.card:active {
+  transform: translateY(0);
+  box-shadow: var(--mantine-shadow-xs);
+}

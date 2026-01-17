@@ -14,7 +14,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   return (
-    <Container size="xl">
+    <Container bg="blue" size="xl">
       <Card w={400} withBorder>
         <Title order={2}>Login</Title>
         <Text mb="md">Welcome back</Text>

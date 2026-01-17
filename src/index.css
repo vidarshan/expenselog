@@ -76,15 +76,18 @@ button:focus-visible {
   }
 }
 
-.hoverGroup {
-  transition: background-color 150ms ease, transform 150ms ease;
+.hover {
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease !important;
+  border-radius: var(--mantine-radius-md) !important;
 }
 
-.hoverGroup:hover {
-  background-color: var(--mantine-color-gray-0);
-  transform: translateY(-2px);
+/* Light mode */
+:root[data-mantine-color-scheme='light'] .hover:hover {
+  background-color: var(--mantine-color-gray-1) !important;
 }
 
-.hoverGroup:hover * {
-  color: var(--mantine-color-dark-9);
+/* Dark mode */
+:root[data-mantine-color-scheme='dark'] .hover:hover {
+  background-color: var(--mantine-color-dark-6) !important;
 }

@@ -11,6 +11,7 @@ import YearlyPage from "./pages/YearlyPage";
 import MonthlyPage from "./pages/MonthlyPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProfilePage from "./pages/ProfilePage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   const location = useLocation();
@@ -19,7 +20,7 @@ function App() {
     <MantineProvider
       defaultColorScheme="dark"
       theme={{
-        defaultRadius: "md",
+        defaultRadius: "lg",
         primaryColor: "lime",
       }}
     >
@@ -28,10 +29,38 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/reports/:year" element={<YearlyPage />} />
-        <Route path="/reports/:year/:month" element={<MonthlyPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports/:year"
+          element={
+            <ProtectedRoute>
+              <YearlyPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports/:year/:month"
+          element={
+            <ProtectedRoute>
+              <MonthlyPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       {location.pathname === "/" && <Footer />}

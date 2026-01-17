@@ -18,9 +18,12 @@ import {
   IoSunnyOutline,
 } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./hooks/useAuth";
+import { pickinitials } from "../utils/pickinitials";
 const NavBar = () => {
-  const loggedIn = true;
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
   const [opened, { open, close }] = useDisclosure(false);
   const { colorScheme, setColorScheme } = useMantineColorScheme();
 
@@ -42,17 +45,17 @@ const NavBar = () => {
     >
       <Login opened={opened} close={close} />
       <Logo logoSize={30} titleSize={3} onClick={() => navigate("/")} />
-      {loggedIn ? (
+      {user?.email ? (
         <Popover width={200} position="bottom" withArrow shadow="md">
           <Popover.Target>
             <Avatar style={{ cursor: "pointer" }} color="cyan" radius="xl">
-              VR
+              {pickinitials(user.name)}
             </Avatar>
           </Popover.Target>
           <Popover.Dropdown>
             <Flex direction="column" align="center" gap="sm">
               <Avatar color="cyan" radius="xl">
-                VR
+                {pickinitials(user.name)}
               </Avatar>
               <Title ta="center" order={5}>
                 Vidarshan
@@ -69,7 +72,7 @@ const NavBar = () => {
                   offLabel={<IoSunnyOutline />}
                   onChange={(event) =>
                     setColorScheme(
-                      event.currentTarget.checked ? "dark" : "light"
+                      event.currentTarget.checked ? "dark" : "light",
                     )
                   }
                 />
@@ -83,6 +86,7 @@ const NavBar = () => {
               </Button>
               <Button
                 leftSection={<IoLogInOutline />}
+                onClick={logout}
                 variant="light"
                 color="red"
                 fullWidth
@@ -94,7 +98,7 @@ const NavBar = () => {
         </Popover>
       ) : (
         <Button size="xs" onClick={open}>
-          Get Started
+          Login
         </Button>
       )}
     </Flex>

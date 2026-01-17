@@ -19,6 +19,7 @@ import {
   Pagination,
   Radio,
   Select,
+  Table,
   Text,
   TextInput,
   Title,
@@ -27,6 +28,7 @@ import {
   IoCalendarClearOutline,
   IoFilterOutline,
   IoTrashOutline,
+  IoTrendingUpOutline,
 } from "react-icons/io5";
 import { PieChart } from "@mantine/charts";
 import MonthCard from "../components/MonthCard";
@@ -37,8 +39,11 @@ import QuickActions from "../components/QuickActions";
 import ComparisonChart from "../components/charts/ComparisonChart";
 import moment from "moment";
 import YearCard from "../components/YearCard";
+import YearAndMonthly from "../components/tables/YearAndMonthly";
+import { useNavigate } from "react-router-dom";
 
 const DashboardPage = () => {
+  const navigate = useNavigate();
   const [incomeOptions, setIncomeOptions] = useState("fixed");
   const [incomeSources, setIncomeSources] = useState([
     {
@@ -80,6 +85,66 @@ const DashboardPage = () => {
       )
     );
   };
+
+  const rows = yearlyMonthlyReports.map((yearReport) => {
+    if (yearReport.year.toString() === year) {
+      return yearReport.months.map(({ month, income, logs }) => {
+        return (
+          <Table.Tr
+            key={month + "$" + year}
+            onClick={() => navigate(`/reports/${year}/${month.toLowerCase()}`)}
+          >
+            <Table.Td>{year}</Table.Td>
+            <Table.Td>{month}</Table.Td>
+            <Table.Td>${income}</Table.Td>
+            <Table.Td>${income}</Table.Td>
+            <Table.Th>
+              <IoTrendingUpOutline />
+            </Table.Th>
+            <Table.Th>
+              <Badge variant="light" color="red">
+                Closed
+              </Badge>
+            </Table.Th>
+            <Table.Td>{logs}</Table.Td>
+            <Table.Td>
+              <Button size="xs" variant="subtle" fullWidth>
+                View report
+              </Button>
+            </Table.Td>
+          </Table.Tr>
+        );
+      });
+    }
+  });
+
+  const yearRows = yearlyMonthlyReports.map(({ year }) => {
+    return (
+      <Table.Tr
+        key={year + "$" + year}
+        onClick={() => navigate(`/reports/${year}`)}
+      >
+        <Table.Td>{year}</Table.Td>
+        <Table.Td>{year}</Table.Td>
+        <Table.Td>${year}</Table.Td>
+        <Table.Td>${year}</Table.Td>
+        <Table.Th>
+          <IoTrendingUpOutline />
+        </Table.Th>
+        <Table.Th>
+          <Badge variant="light" color="red">
+            Closed
+          </Badge>
+        </Table.Th>
+        <Table.Td>{year}</Table.Td>
+        <Table.Td>
+          <Button size="xs" variant="subtle" fullWidth>
+            View report
+          </Button>
+        </Table.Td>
+      </Table.Tr>
+    );
+  });
 
   return (
     <Container size="xl" pt={NAVBAR_HEIGHT + 32}>
@@ -161,7 +226,7 @@ const DashboardPage = () => {
           <ContributionChart />
         </Grid.Col>
         <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
-          <Card h="100%" withBorder>
+          <Card h="100%" shadow="xl" withBorder>
             <Flex>
               <Text fw={700}>Most Recent transactions</Text>
             </Flex>
@@ -214,23 +279,9 @@ const DashboardPage = () => {
                 />
               </Flex>
             </Flex>
-            {yearlyMonthlyReports.map((yearReport) => {
-              console.log(yearReport);
-              if (yearReport.year.toString() === year) {
-                return yearReport.months.map(({ month, income, logs }) => {
-                  return (
-                    <MonthCard
-                      key={yearReport.year.toString() + "-" + month}
-                      month={month}
-                      year={yearReport.year.toString()}
-                      amount={income}
-                      logs={logs}
-                      //isCurrent={isCurrent}
-                    />
-                  );
-                });
-              }
-            })}
+            <Grid>
+              <YearAndMonthly rows={rows} />
+            </Grid>
             <Flex justify="center">
               <Pagination mt="md" total={10} />
             </Flex>
@@ -254,18 +305,7 @@ const DashboardPage = () => {
                 />
               </Flex>
             </Flex>
-            {yearlyMonthlyReports.map(({ year }) => {
-              return (
-                <YearCard
-                  key={year}
-                  month={year}
-                  year={year}
-                  amount={0}
-                  logs={"40"}
-                  //isCurrent={isCurrent}
-                />
-              );
-            })}
+            <YearAndMonthly rows={yearRows} />
             <Flex justify="center">
               <Pagination mt="md" total={3} />
             </Flex>
