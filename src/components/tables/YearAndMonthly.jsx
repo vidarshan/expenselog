@@ -1,13 +1,13 @@
 import { Table } from "@mantine/core";
 import React from "react";
 
-const YearAndMonthly = ({ rows }) => {
+const YearAndMonthly = ({ rows, mode = "month" }) => {
   return (
     <Table striped highlightOnHover>
       <Table.Thead>
         <Table.Tr>
           <Table.Th>Year</Table.Th>
-          <Table.Th>Month</Table.Th>
+          {mode === "month" && <Table.Th>Month</Table.Th>}
           <Table.Th>Income</Table.Th>
           <Table.Th>Expenses</Table.Th>
           <Table.Th>Outcome</Table.Th>

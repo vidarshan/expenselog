@@ -1,9 +1,7 @@
 import { Heatmap } from "@mantine/charts";
-import React from "react";
-import { heatdata } from "../../data/mockdata";
-import { Card, Divider, Flex, Text } from "@mantine/core";
+import { Card, Flex, Text } from "@mantine/core";
 
-const ActivityChart = () => {
+const ActivityChart = ({ data }) => {
   return (
     <Card className="hover" h="100%" shadow="xl" withBorder>
       <Text fw={700}>Active days in the year</Text>
@@ -15,13 +13,13 @@ const ActivityChart = () => {
           endDate="2024-12-31"
           withMonthLabels
           rectRadius={20}
-          gap={9}
+          gap={4}
           withWeekdayLabels
           withTooltip
           getTooltipLabel={({ date, value }) =>
             `${date} – ${value ?? 0} contributions`
           }
-          data={heatdata}
+          data={data}
         />
       </Flex>
     </Card>

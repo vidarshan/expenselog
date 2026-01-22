@@ -19,8 +19,8 @@ const Login = ({ opened, close }) => {
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
-      email: "",
-      password: "",
+      email: "vidarshan@gmail.com",
+      password: "123456",
     },
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),

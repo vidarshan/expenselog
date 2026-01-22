@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   NAVBAR_HEIGHT,
-  transactions,
+  recentTransactions,
   yearlyMonthlyReports,
 } from "../data/mockdata";
 import {
@@ -28,19 +28,17 @@ import {
   IoCalendarClearOutline,
   IoFilterOutline,
   IoTrashOutline,
+  IoTrendingDownOutline,
   IoTrendingUpOutline,
 } from "react-icons/io5";
-import { PieChart } from "@mantine/charts";
-import MonthCard from "../components/MonthCard";
 import { nanoid } from "nanoid";
 import ContributionChart from "../components/charts/ContributionChart";
 import OverviewCard from "../components/OverviewCard";
-import QuickActions from "../components/QuickActions";
 import ComparisonChart from "../components/charts/ComparisonChart";
 import moment from "moment";
-import YearCard from "../components/YearCard";
 import YearAndMonthly from "../components/tables/YearAndMonthly";
 import { useNavigate } from "react-router-dom";
+import { appData } from "../data/appData";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -81,8 +79,8 @@ const DashboardPage = () => {
   const editIncomeSource = (id, newName, newSalary) => {
     setIncomeSources((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, name: newName, salary: newSalary } : item
-      )
+        item.id === id ? { ...item, name: newName, salary: newSalary } : item,
+      ),
     );
   };
 
@@ -118,25 +116,37 @@ const DashboardPage = () => {
     }
   });
 
-  const yearRows = yearlyMonthlyReports.map(({ year }) => {
+  const yearRows = appData.map(({ year, summary }) => {
+    console.log("summary", summary);
     return (
       <Table.Tr
         key={year + "$" + year}
         onClick={() => navigate(`/reports/${year}`)}
       >
         <Table.Td>{year}</Table.Td>
-        <Table.Td>{year}</Table.Td>
-        <Table.Td>${year}</Table.Td>
-        <Table.Td>${year}</Table.Td>
+        <Table.Td>${summary.income}</Table.Td>
+        <Table.Td>${summary.expenses}</Table.Td>
+        <Table.Td>
+          {" "}
+          {summary.expenses > summary.income ? (
+            <IoTrendingDownOutline />
+          ) : (
+            <IoTrendingUpOutline />
+          )}
+        </Table.Td>
         <Table.Th>
-          <IoTrendingUpOutline />
+          {summary.isClosed ? (
+            <Badge variant="light" color="red">
+              Closed
+            </Badge>
+          ) : (
+            <Badge variant="light" color="green">
+              Open
+            </Badge>
+          )}
         </Table.Th>
-        <Table.Th>
-          <Badge variant="light" color="red">
-            Closed
-          </Badge>
-        </Table.Th>
-        <Table.Td>{year}</Table.Td>
+        <Table.Th>{summary.transactionCount}</Table.Th>
+        <Table.Td></Table.Td>
         <Table.Td>
           <Button size="xs" variant="subtle" fullWidth>
             View report
@@ -204,7 +214,6 @@ const DashboardPage = () => {
                 </Flex>
               );
             })}
-
             <Button mt="xs" variant="light" onClick={addIncomeSource} fullWidth>
               Add Source
             </Button>
@@ -230,7 +239,7 @@ const DashboardPage = () => {
             <Flex>
               <Text fw={700}>Most Recent transactions</Text>
             </Flex>
-            {transactions
+            {recentTransactions
               .slice(0, 5)
               .map(({ title, amount, category, date }, index) => (
                 <Card
@@ -290,7 +299,7 @@ const DashboardPage = () => {
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
           <Card h="100%" withBorder>
             <Flex mb="xl" justify="space-between" align="center">
-              <Text fw={700}>Past years</Text>
+              <Text fw={700}>Yearly</Text>
               <Flex gap="xs">
                 <Select
                   value={year}
@@ -305,7 +314,7 @@ const DashboardPage = () => {
                 />
               </Flex>
             </Flex>
-            <YearAndMonthly rows={yearRows} />
+            <YearAndMonthly mode="year" rows={yearRows} />
             <Flex justify="center">
               <Pagination mt="md" total={3} />
             </Flex>

@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { expenseData } from "../../data/mockdata";
 import { Box, Card, Group, SegmentedControl, Text } from "@mantine/core";
 import { PieChart } from "@mantine/charts";
 
 const ContributionChart = () => {
+  const [mode, setMode] = useState("percent");
+
   return (
     <Card h="100%" shadow="xl" withBorder>
       <Group justify="space-between" mb="lg">
@@ -11,7 +13,14 @@ const ContributionChart = () => {
         <SegmentedControl
           size="xs"
           orientation="horizontal"
-          data={["Percentage", "Values"]}
+          data={[
+            { label: "Values", value: "value" },
+            { label: "Percentages", value: "percent" },
+          ]}
+          onChange={(value) => {
+            console.log(value);
+            setMode(value);
+          }}
         />
       </Group>
       <Group justify="center">
@@ -20,7 +29,7 @@ const ContributionChart = () => {
           withTooltip
           tooltipDataSource="segment"
           labelsPosition="outside"
-          labelsType="percent"
+          labelsType={mode}
           withLabels
           data={expenseData}
         />

@@ -15,16 +15,33 @@ import ComparisonChart from "../components/charts/ComparisonChart";
 import TransactionTable from "../components/tables/TransactionTable";
 import { IoColorWandOutline } from "react-icons/io5";
 import ActivityChart from "../components/charts/ActivityChart";
+import { useParams } from "react-router-dom";
+import { appData } from "../data/appData";
 
 const YearlyPage = () => {
+  const { year } = useParams();
+  const yearlyData = appData.find((i) => i.year == Number(year));
+  const previousYearlyData = appData.find((i) => i.year == Number(year) - 1);
+  console.log("yearlyData", yearlyData);
+  console.log("prev", previousYearlyData);
+
   return (
     <Container size="xl" pt={NAVBAR_HEIGHT + 32}>
       <Grid>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          <QuickActions withActions={true} title="2026" />
+          <QuickActions withActions={true} title={year} />
         </Grid.Col>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          <OverviewCard />
+          <OverviewCard
+            prevIncome={previousYearlyData?.summary?.income}
+            currentIncome={yearlyData?.summary?.income}
+            prevExpense={previousYearlyData?.summary?.expenses}
+            currentExpenses={yearlyData?.summary?.expenses}
+            prevTransactions={previousYearlyData?.summary?.transactionCount}
+            currentTransactions={yearlyData?.summary?.transactionCount}
+            gainOrLoss={yearlyData?.summary?.net}
+            unit="year"
+          />
         </Grid.Col>
         <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
           <ContributionChart />
@@ -33,7 +50,7 @@ const YearlyPage = () => {
           <ComparisonChart />
         </Grid.Col>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          <ActivityChart />
+          <ActivityChart data={yearlyData.heatmap} />
         </Grid.Col>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
           <TransactionTable />

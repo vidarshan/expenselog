@@ -91,3 +91,7 @@ button:focus-visible {
 :root[data-mantine-color-scheme='dark'] .hover:hover {
   background-color: var(--mantine-color-dark-6) !important;
 }
+
+tr{
+  cursor: pointer !important;
+}

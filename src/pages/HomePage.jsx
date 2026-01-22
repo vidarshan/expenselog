@@ -2,43 +2,46 @@ import {
   Box,
   Button,
   Card,
-  Center,
   Container,
   Divider,
   Flex,
-  Group,
-  Modal,
+  Grid,
   SimpleGrid,
   Stack,
   Text,
-  ThemeIcon,
   Title,
 } from "@mantine/core";
-import React from "react";
-import { FcMoneyTransfer } from "react-icons/fc";
-import { FiCalendar, FiLock, FiPieChart } from "react-icons/fi";
-import Logo from "../components/Logo";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useScrollIntoView } from "@mantine/hooks";
 import Login from "../components/Login";
-import { RiNumber1 } from "react-icons/ri";
 import Feature from "../components/Feature";
-import { useNavigate } from "react-router-dom";
 import { NAVBAR_HEIGHT } from "../data/mockdata";
+import {
+  IoAppsOutline,
+  IoArrowDownOutline,
+  IoBarChartOutline,
+  IoCalendarOutline,
+  IoCashOutline,
+  IoSparklesOutline,
+  IoTrendingUpOutline,
+} from "react-icons/io5";
+import { Helmet } from "react-helmet";
 
 const HomePage = () => {
-  const navigate = useNavigate();
-  const [opened, { open, close }] = useDisclosure(false);
+  const [opened, { _, close }] = useDisclosure(false);
+  const { scrollIntoView, targetRef } = useScrollIntoView({ offset: 0 });
 
   return (
     <Container size="xl" pt={NAVBAR_HEIGHT + 32}>
+      <Helmet>
+        <title>Home | ExpenseLog</title>
+      </Helmet>
       <Login opened={opened} close={close} />
-      <Box h={`calc(80vh - ${NAVBAR_HEIGHT}px)`}>
+      <Flex direction="column" mih={`calc(80vh - ${NAVBAR_HEIGHT}px)`}>
         <Flex
           direction="column"
           align="center"
           justify="center"
-          h="100%"
-          gap="md"
+          style={{ flex: 1 }}
         >
           <Title order={1} ta="center" size="3.5rem" fw={600}>
             Understand your money,
@@ -65,16 +68,17 @@ const HomePage = () => {
           <Button
             mt="xl"
             size="lg"
-            //onClick={open}
-            onClick={() => {
-              navigate("/dashboard");
-              open();
-            }}
+            leftSection={<IoArrowDownOutline />}
+            onClick={() =>
+              scrollIntoView({
+                alignment: "center",
+              })
+            }
           >
             View features
           </Button>
         </Flex>
-      </Box>
+      </Flex>
 
       <Divider my="xl" />
 
@@ -91,6 +95,78 @@ const HomePage = () => {
       </Stack>
 
       <Divider my="xl" />
+      <Stack ref={targetRef} align="center" my={64} gap="md">
+        <Title ta="center" order={2}>
+          Start tracking today
+        </Title>
+
+        <Text ta="center" c="dimmed" maw={600}>
+          Build better awareness of your finances with a clean, focused
+          experience designed to stay out of your way.
+        </Text>
+      </Stack>
+      <Grid gutter={20}>
+        <Grid.Col span={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 4 }}>
+          <Feature
+            icon={<IoCalendarOutline />}
+            color="green"
+            title="Income & Expense Tracking"
+            desc="Log all your income sources and expenses in one place. See your financial flow clearly"
+          />
+        </Grid.Col>
+        <Grid.Col span={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 4 }}>
+          <Feature
+            icon={<IoAppsOutline size={20} />}
+            color="orange"
+            title="Category-Based Organization"
+            desc="Automatically categorize transactions (Food, Shopping, Transport, Bills, etc.) for easy analysis."
+          />
+        </Grid.Col>
+        <Grid.Col span={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 4 }}>
+          <Feature
+            icon={<IoTrendingUpOutline size={20} />}
+            color="pink"
+            title="Monthly & Yearly Reports"
+            desc="View summaries of your spending and income by month or year, with gains/loss trends."
+          />
+        </Grid.Col>
+        <Grid.Col span={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 4 }}>
+          <Feature
+            icon={<IoBarChartOutline size={20} />}
+            color="gray"
+            title="Interactive Visualizations"
+            desc="Charts and graphs compare categories and months, helping you spot patterns and plan ahead."
+          />
+        </Grid.Col>
+        <Grid.Col span={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 4 }}>
+          <Feature
+            icon={<IoCashOutline size={20} />}
+            color="red"
+            title="Income Type & Stability Insights"
+            desc="Track whether your income is stable (salary) or flexible (freelance/business) and adjust budgets accordingly."
+          />
+        </Grid.Col>
+        <Grid.Col span={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 4 }}>
+          <Feature
+            icon={<IoSparklesOutline size={20} />}
+            color="blue"
+            title="AI-Powered Financial Insights"
+            desc="Suggest budget adjustments, potential savings opportunities, or warn of overspending trends."
+          />
+        </Grid.Col>
+      </Grid>
+
+      <Divider my="xl" />
+      <Stack align="center" my={64} gap="md">
+        <Title ta="center" order={2}>
+          Get started in a few simple steps
+        </Title>
+
+        <Text ta="center" c="dimmed" maw={600}>
+          Set up your income, log your expenses, and gain clear insights into
+          your finances — all in minutes, with no clutter or complexity.
+        </Text>
+      </Stack>
 
       <SimpleGrid cols={{ base: 1, md: 3 }} spacing="xl" my="xl">
         {[
@@ -126,38 +202,6 @@ const HomePage = () => {
             </Stack>
           </Card>
         ))}
-      </SimpleGrid>
-
-      <Divider my="xl" />
-      <Stack align="center" my={64} gap="md">
-        <Title ta="center" order={2}>
-          Start tracking today
-        </Title>
-
-        <Text ta="center" c="dimmed" maw={600}>
-          Build better awareness of your finances with a clean, focused
-          experience designed to stay out of your way.
-        </Text>
-      </Stack>
-      <SimpleGrid cols={{ base: 1, md: 1 }} spacing="xl" mb={100}>
-        <Feature
-          icon={<FiCalendar size={20} />}
-          color="green"
-          title="Monthly insights"
-          desc="See balances, summaries, and spending breakdowns at a glance."
-        />
-        <Feature
-          icon={<FiPieChart size={20} />}
-          color="purple"
-          title="Clear visuals"
-          desc="Understand where your money goes with simple charts."
-        />
-        <Feature
-          icon={<FiLock size={20} />}
-          color="orange"
-          title="Simple & private"
-          desc="No bank connections. Your data stays intentional and local."
-        />
       </SimpleGrid>
     </Container>
   );

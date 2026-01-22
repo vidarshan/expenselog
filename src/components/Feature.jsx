@@ -3,18 +3,18 @@ import React from "react";
 
 const Feature = ({ icon, title, desc, color }) => {
   return (
-    <Card withBorder radius="lg" p="lg">
+    <Card h="100%" withBorder radius="lg" p="lg">
       <Group gap="sm">
-        <ThemeIcon variant="light" color={color} radius="md" size={40}>
+        <ThemeIcon variant="light" color={color} radius="xl" size={40}>
           {icon}
         </ThemeIcon>
 
-        <Title order={3} fw={500}>
+        <Title c={color} tt="uppercase" order={5} fw={700}>
           {title}
         </Title>
       </Group>
 
-      <Text c="dimmed" mt='sm' lh={1.6}>
+      <Text c="dimmed" mt="sm" lh={1.6}>
         {desc}
       </Text>
     </Card>

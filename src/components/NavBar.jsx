@@ -2,6 +2,7 @@ import Logo from "./Logo";
 import {
   Avatar,
   Button,
+  Divider,
   Flex,
   Popover,
   Switch,
@@ -12,6 +13,7 @@ import {
 import Login from "./Login";
 import { useDisclosure } from "@mantine/hooks";
 import {
+  IoBarChartOutline,
   IoLogInOutline,
   IoMoonOutline,
   IoPersonOutline,
@@ -48,18 +50,20 @@ const NavBar = () => {
       {user?.email ? (
         <Popover width={200} position="bottom" withArrow shadow="md">
           <Popover.Target>
-            <Avatar style={{ cursor: "pointer" }} color="cyan" radius="xl">
+            <Avatar style={{ cursor: "pointer" }} color="lime" radius="xl">
               {pickinitials(user.name)}
             </Avatar>
           </Popover.Target>
           <Popover.Dropdown>
             <Flex direction="column" align="center" gap="sm">
-              <Avatar color="cyan" radius="xl">
+              <Avatar color="cyan" size="xl" radius="xl">
                 {pickinitials(user.name)}
               </Avatar>
+
               <Title ta="center" order={5}>
                 Vidarshan
               </Title>
+
               <Flex align="center" w="100%" justify="space-between">
                 <Text fw={700} size="sm">
                   Theme
@@ -78,11 +82,19 @@ const NavBar = () => {
                 />
               </Flex>
               <Button
+                leftSection={<IoBarChartOutline />}
+                onClick={() => navigate("/dashboard")}
+                fullWidth
+              >
+                Dashboard
+              </Button>
+              <Button
                 leftSection={<IoPersonOutline />}
+                variant="light"
                 onClick={() => navigate("/profile")}
                 fullWidth
               >
-                Edit Profile
+                Account
               </Button>
               <Button
                 leftSection={<IoLogInOutline />}
@@ -97,7 +109,7 @@ const NavBar = () => {
           </Popover.Dropdown>
         </Popover>
       ) : (
-        <Button size="xs" onClick={open}>
+        <Button leftSection={<IoLogInOutline />} size="xs" onClick={open}>
           Login
         </Button>
       )}

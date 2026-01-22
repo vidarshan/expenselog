@@ -7,26 +7,44 @@ export const yearlyMonthlyReports = [
   {
     year: 2024,
     isCurrent: false,
+
+    summary: {
+      totalIncome: 56600,
+      totalExpenses: 52000,
+      totalTransactions: 295,
+      net: 4600,
+      status: "gain",
+    },
+
     months: [
-      { month: "January", income: 4200, expenses: 3800, logs: 18 },
-      { month: "February", income: 4000, expenses: 4100, logs: 20 }, // loss
-      { month: "March", income: 4500, expenses: 3900, logs: 22 },
-      { month: "April", income: 4300, expenses: 4300, logs: 19 }, // even
-      { month: "May", income: 4700, expenses: 4100, logs: 25 },
-      { month: "June", income: 4600, expenses: 4400, logs: 23 },
-      { month: "July", income: 4800, expenses: 4500, logs: 26 },
-      { month: "August", income: 4700, expenses: 4600, logs: 24 },
-      { month: "September", income: 4900, expenses: 4300, logs: 27 },
-      { month: "October", income: 5000, expenses: 4700, logs: 29 },
-      { month: "November", income: 5200, expenses: 4800, logs: 30 },
-      { month: "December", income: 5500, expenses: 5100, logs: 32 },
+      { month: "January", income: 4200, expenses: 3800, logs: 18, net: 400 },
+      { month: "February", income: 4000, expenses: 4100, logs: 20, net: -100 },
+      { month: "March", income: 4500, expenses: 3900, logs: 22, net: 600 },
+      { month: "April", income: 4300, expenses: 4300, logs: 19, net: 0 },
+      { month: "May", income: 4700, expenses: 4100, logs: 25, net: 600 },
+      { month: "June", income: 4600, expenses: 4400, logs: 23, net: 200 },
+      { month: "July", income: 4800, expenses: 4500, logs: 26, net: 300 },
+      { month: "August", income: 4700, expenses: 4600, logs: 24, net: 100 },
+      { month: "September", income: 4900, expenses: 4300, logs: 27, net: 600 },
+      { month: "October", income: 5000, expenses: 4700, logs: 29, net: 300 },
+      { month: "November", income: 5200, expenses: 4800, logs: 30, net: 400 },
+      { month: "December", income: 5500, expenses: 5100, logs: 32, net: 400 },
     ],
   },
   {
     year: 2025,
     isCurrent: true,
+
+    summary: {
+      totalIncome: 6100,
+      totalExpenses: 5900,
+      totalTransactions: 31,
+      net: 200,
+      status: "gain",
+    },
+
     months: [
-      { month: "January", income: 6100, expenses: 5900, logs: 31 }, // near even
+      { month: "January", income: 6100, expenses: 5900, logs: 31, net: 200 },
     ],
   },
 ];
@@ -127,7 +145,7 @@ export const categoryMonthlyComparison = [
   },
 ];
 
-export const transactions = [
+export const recentTransactions = [
   {
     title: "Lunch at Cafe",
     amount: 45.5,
@@ -135,6 +153,7 @@ export const transactions = [
     date: "2025-01-03",
     paymentMethod: "Card",
     notes: "Had sandwich and coffee",
+    type: "expense",
   },
   {
     title: "Clothes Purchase",
@@ -143,6 +162,7 @@ export const transactions = [
     date: "2025-01-05",
     paymentMethod: "Online",
     notes: "Bought a jacket and t-shirt",
+    type: "expense",
   },
   {
     title: "Taxi Fare",
@@ -151,6 +171,7 @@ export const transactions = [
     date: "2025-01-07",
     paymentMethod: "Cash",
     notes: "Ride to office",
+    type: "expense",
   },
   {
     title: "Electricity Bill",
@@ -159,6 +180,7 @@ export const transactions = [
     date: "2025-01-10",
     paymentMethod: "Card",
     notes: "Monthly electricity payment",
+    type: "expense",
   },
   {
     title: "Movie Ticket",
@@ -167,6 +189,7 @@ export const transactions = [
     date: "2025-01-12",
     paymentMethod: "Online",
     notes: "Watched a new release",
+    type: "expense",
   },
   {
     title: "Groceries",
@@ -175,6 +198,7 @@ export const transactions = [
     date: "2025-01-15",
     paymentMethod: "Cash",
     notes: "Weekly grocery shopping",
+    type: "expense",
   },
   {
     title: "Gym Membership",
@@ -183,6 +207,7 @@ export const transactions = [
     date: "2025-01-18",
     paymentMethod: "Card",
     notes: "Monthly membership fee",
+    type: "expense",
   },
   {
     title: "Online Accessories",
@@ -191,6 +216,7 @@ export const transactions = [
     date: "2025-01-20",
     paymentMethod: "Card",
     notes: "Bought phone case and charger",
+    type: "expense",
   },
   {
     title: "Bus Pass",
@@ -199,6 +225,7 @@ export const transactions = [
     date: "2025-01-22",
     paymentMethod: "Cash",
     notes: "Monthly bus pass",
+    type: "expense",
   },
   {
     title: "Water Bill",
@@ -207,6 +234,7 @@ export const transactions = [
     date: "2025-01-25",
     paymentMethod: "Card",
     notes: "Monthly water bill",
+    type: "expense",
   },
 ];
 
