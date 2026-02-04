@@ -20,7 +20,7 @@ import {
   IoSunnyOutline,
 } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "./hooks/useAuth";
+import { useAuth } from "../hooks/useAuth";
 import { pickinitials } from "../utils/pickinitials";
 const NavBar = () => {
   const navigate = useNavigate();
