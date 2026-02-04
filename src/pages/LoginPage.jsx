@@ -8,10 +8,12 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
+import { useSelection } from "@mantine/hooks";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { loading } = useSelection((state) => state.auth);
 
   return (
     <Container bg="blue" size="xl">
@@ -26,6 +28,7 @@ const LoginPage = () => {
         />
         <Flex mt="md">
           <Button
+            loading={loading}
             variant="light"
             mr="xs"
             fullWidth
