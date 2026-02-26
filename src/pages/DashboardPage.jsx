@@ -240,7 +240,7 @@ const DashboardPage = () => {
               <Text fw={700}>Most Recent transactions</Text>
             </Flex>
             {recentTransactions
-              .slice(0, 5)
+              ?.slice(0, 5)
               .map(({ title, amount, category, date }, index) => (
                 <Card
                   key={index + "@" + title}

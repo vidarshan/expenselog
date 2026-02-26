@@ -10,26 +10,43 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { getUser, loginUser } from "../store/slices/authSlice";
 import { useAuth } from "../hooks/useAuth";
 
 const Login = ({ opened, close }) => {
   const { login } = useAuth();
+  const dispatch = useDispatch();
   const [mode, setMode] = useState("login");
 
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
-      email: "vidarshan@gmail.com",
-      password: "123456",
+      email: "test@expenselog.com",
+      password: "password123",
+      name: "vidarshan",
     },
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
+      name: (value) =>
+        mode === "login"
+          ? null
+          : value.trim().length > 0
+            ? null
+            : "Name is required",
     },
   });
 
-  const handleSubmit = (e) => {
-    console.log(e);
-    login(e.email);
+  const handleLogin = () => {
+    dispatch(loginUser());
+  };
+
+  const handleSubmit = async (values) => {
+    if (mode === "login") {
+      await dispatch(loginUser(values));
+      await dispatch(getUser());
+    } else {
+    }
     close();
   };
 
@@ -47,13 +64,13 @@ const Login = ({ opened, close }) => {
           ]}
         />
       </Flex>
+      <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+        {mode === "login" ? (
+          <>
+            <Title c="lime" mt="xs" order={4}>
+              Welcome Back
+            </Title>
 
-      {mode === "login" ? (
-        <>
-          <Title c="lime" mt="xs" order={4}>
-            Welcome Back
-          </Title>
-          <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
             <TextInput
               mt="md"
               label="Email"
@@ -72,21 +89,39 @@ const Login = ({ opened, close }) => {
             <Button type="submit" mt="xl" fullWidth>
               Login
             </Button>
-          </form>
-        </>
-      ) : (
-        <>
-          <Title c="lime" mt="xs" order={4}>
-            Create a new account
-          </Title>
-          <TextInput mt="md" label="Email" placeholder="Your email" />
-          <TextInput mt="md" label="Name" placeholder="Your Name" />
-          <PasswordInput mt="md" label="Password" placeholder="Your password" />
-          <Button mt="xl" fullWidth>
-            Sign Up
-          </Button>
-        </>
-      )}
+          </>
+        ) : (
+          <>
+            <Title c="lime" mt="xs" order={4}>
+              Create a new account
+            </Title>
+            <TextInput
+              mt="md"
+              label="Email"
+              placeholder="Your email"
+              key={form.key("email")}
+              {...form.getInputProps("email")}
+            />
+            <TextInput
+              mt="md"
+              label="Name"
+              placeholder="Your Name"
+              key={form.key("name")}
+              {...form.getInputProps("name")}
+            />
+            <PasswordInput
+              mt="md"
+              label="Password"
+              placeholder="Your password"
+              key={form.key("password")}
+              {...form.getInputProps("password")}
+            />
+            <Button type="submit" mt="xl" fullWidth>
+              Sign Up
+            </Button>
+          </>
+        )}
+      </form>
     </Modal>
   );
 };

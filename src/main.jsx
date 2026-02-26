@@ -8,15 +8,19 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { HelmetProvider } from "react-helmet-async";
+import { store } from "./store/index.js";
+import { Provider } from "react-redux";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <HelmetProvider>
-          <App />
-        </HelmetProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <AuthProvider>
+          <HelmetProvider>
+            <App />
+          </HelmetProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </Provider>
   </StrictMode>,
 );

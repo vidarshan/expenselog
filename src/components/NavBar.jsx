@@ -23,12 +23,21 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { pickinitials } from "../utils/pickinitials";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser, logout } from "../store/slices/authSlice";
 const NavBar = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, loading } = useSelector((state) => state.auth);
+  console.log(user);
 
   const [opened, { open, close }] = useDisclosure(false);
   const { colorScheme, setColorScheme } = useMantineColorScheme();
+
+  useEffect(() => {
+    dispatch(getUser());
+  }, [dispatch]);
 
   return (
     <Flex
@@ -52,21 +61,26 @@ const NavBar = () => {
       <Button onClick={() => open()}>Open</Button>
       {/* <Login opened={opened} close={close} /> */}
       <Logo logoSize={30} titleSize={3} onClick={() => navigate("/")} />
-      {user?.email ? (
+      {!loading && user?.token != null ? (
         <Popover width={200} position="bottom" withArrow shadow="md">
           <Popover.Target>
-            <Avatar style={{ cursor: "pointer" }} color="lime" radius="xl">
-              {pickinitials(user.name)}
+            <Avatar
+              style={{ cursor: "pointer" }}
+              color="lime"
+              variant="filled"
+              radius="xl"
+            >
+              {pickinitials(user?.username)}
             </Avatar>
           </Popover.Target>
           <Popover.Dropdown>
             <Flex direction="column" align="center" gap="sm">
               <Avatar color="cyan" size="xl" radius="xl">
-                {pickinitials(user.name)}
+                {pickinitials(user?.username)}
               </Avatar>
 
               <Title ta="center" order={5}>
-                Vidarshan
+                {user?.username}
               </Title>
 
               <Flex align="center" w="100%" justify="space-between">
@@ -103,7 +117,7 @@ const NavBar = () => {
               </Button>
               <Button
                 leftSection={<IoLogInOutline />}
-                onClick={logout}
+                onClick={() => dispatch(logout())}
                 variant="light"
                 color="red"
                 fullWidth
