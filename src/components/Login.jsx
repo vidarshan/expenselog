@@ -10,9 +10,9 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import React, { useState } from "react";
-import { useAuth } from "./hooks/useAuth";
 import { useDispatch } from "react-redux";
 import { getUser, loginUser } from "../store/slices/authSlice";
+import { useAuth } from "../hooks/useAuth";
 
 const Login = ({ opened, close }) => {
   const { login } = useAuth();

@@ -2,7 +2,7 @@ import { Card, Flex, Text, Title } from "@mantine/core";
 import React from "react";
 import { FcMoneyTransfer } from "react-icons/fc";
 
-const Logo = ({ logoSize = 20, titleSize = 1, onClick }) => {
+const Logo = ({ logoSize = 20, titleSize = 1, onClick, noMargin = true }) => {
   return (
     <Card
       style={{ cursor: "pointer" }}
@@ -14,7 +14,7 @@ const Logo = ({ logoSize = 20, titleSize = 1, onClick }) => {
     >
       <Flex direction="row" align="center">
         <FcMoneyTransfer size={logoSize} />
-        <Title order={titleSize} fw={500} c="lime" ml="xs">
+        <Title order={titleSize} fw={500} c="lime" ml={noMargin ? 0 : "xs"}>
           ExpenseLog
         </Title>
       </Flex>

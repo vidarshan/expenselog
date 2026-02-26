@@ -2,6 +2,8 @@ import Logo from "./Logo";
 import {
   Avatar,
   Button,
+  Divider,
+  Drawer,
   Flex,
   Popover,
   Switch,
@@ -19,6 +21,7 @@ import {
   IoSunnyOutline,
 } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 import { pickinitials } from "../utils/pickinitials";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -52,7 +55,11 @@ const NavBar = () => {
         WebkitBackdropFilter: "blur(12px)",
       }}
     >
-      <Login opened={opened} close={close} />
+      <Drawer opened={opened} onClose={close} title="Authentication">
+        {/* Drawer content */}
+      </Drawer>
+      <Button onClick={() => open()}>Open</Button>
+      {/* <Login opened={opened} close={close} /> */}
       <Logo logoSize={30} titleSize={3} onClick={() => navigate("/")} />
       {!loading && user?.token != null ? (
         <Popover width={200} position="bottom" withArrow shadow="md">
