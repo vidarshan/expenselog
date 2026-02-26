@@ -16,7 +16,7 @@ import {
   Text,
   UnstyledButton,
 } from "@mantine/core";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
@@ -33,6 +33,7 @@ import Logo from "./components/Logo";
 import {
   IoBarChartOutline,
   IoBrush,
+  IoBuildOutline,
   IoCardOutline,
   IoCashOutline,
   IoCheckboxOutline,
@@ -41,13 +42,15 @@ import {
   IoHomeOutline,
   IoListOutline,
   IoMenu,
+  IoPodiumOutline,
   IoTrendingUpOutline,
 } from "react-icons/io5";
 
 function App() {
-  const location = useLocation();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure();
-
+  console.log("location", location);
   return (
     <MantineProvider
       defaultColorScheme="dark"
@@ -66,48 +69,59 @@ function App() {
       >
         <AppShell.Navbar>
           <Flex justify="center">
-            <Logo titleSize={5} />
+            <Logo titleSize={5} onClick={() => navigate("/")} />
           </Flex>
           <Stack h="100%" justify="space-between" p="sm">
             <Stack>
               {" "}
               <NavLink
                 className="rounded-link"
-                href="#required-for-focus"
                 label="Dashboard"
                 leftSection={<IoHomeOutline />}
+                onClick={() => navigate("/dashboard")}
+                c={pathname === "/dashboard" ? "lime" : "gray"}
               />
               <NavLink
                 className="rounded-link"
                 href="#required-for-focus"
                 label="Logs"
                 leftSection={<IoListOutline />}
+                onClick={() => navigate("/logs")}
+                c={pathname === "/logs" ? "lime" : "gray"}
               />
               <NavLink
                 className="rounded-link"
                 href="#required-for-focus"
                 label="AI Insights"
                 leftSection={<IoBarChartOutline />}
+                onClick={() => navigate("/insights")}
+                c={pathname === "/insights" ? "lime" : "gray"}
               />
               <NavLink
                 className="rounded-link"
                 href="#required-for-focus"
                 label="Reports"
                 leftSection={<IoDocumentOutline />}
+                onClick={() => navigate("/reports")}
+                c={pathname === "/reports" ? "lime" : "gray"}
               />
               <NavLink
                 className="rounded-link"
                 href="#required-for-focus"
                 label="Budgets"
                 leftSection={<IoCheckboxOutline />}
+                onClick={() => navigate("/budget")}
+                c={pathname === "/budget" ? "lime" : "gray"}
               />
               <Divider />
               <Stack px="sm">
                 <Text size="sm">Balances</Text>
-                <UnstyledButton c="green">
-                  <Flex justify="space-between">
+                <UnstyledButton>
+                  <Flex align="center" justify="space-between">
                     <Group gap={6}>
-                      <IoCashOutline />
+                      <ActionIcon color="lime" variant="light" radius="sm">
+                        <IoCashOutline />
+                      </ActionIcon>
                       <Text size="sm" fw={600}>
                         Cash
                       </Text>
@@ -117,10 +131,12 @@ function App() {
                     </Text>
                   </Flex>
                 </UnstyledButton>
-                <UnstyledButton c="orange">
-                  <Flex justify="space-between">
+                <UnstyledButton>
+                  <Flex align="center" justify="space-between">
                     <Group gap={6}>
-                      <IoCardOutline />
+                      <ActionIcon color="orange" variant="light" radius="sm">
+                        <IoCardOutline />
+                      </ActionIcon>
                       <Text size="sm" fw={600}>
                         Credit
                       </Text>
@@ -130,10 +146,12 @@ function App() {
                     </Text>
                   </Flex>
                 </UnstyledButton>
-                <UnstyledButton c="violet">
-                  <Flex justify="space-between">
+                <UnstyledButton align="center" justify="space-between">
+                  <Flex align="center" justify="space-between">
                     <Group gap={6}>
-                      <IoCashOutline />
+                      <ActionIcon color="violet" variant="light" radius="sm">
+                        <IoPodiumOutline />
+                      </ActionIcon>
                       <Text size="sm" fw={600}>
                         Bank
                       </Text>
