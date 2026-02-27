@@ -127,7 +127,6 @@ const LoginPage = () => {
                 display={{ base: "none", md: "block" }}
               />
 
-              {/* RIGHT (stretches to match left height) */}
               <Box
                 w={{ base: "100%", md: "50%" }}
                 style={{ alignSelf: "stretch" }}

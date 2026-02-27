@@ -9,6 +9,9 @@ import {
   Group,
   ActionIcon,
   Stack,
+  useMantineColorScheme,
+  Switch,
+  ThemeIcon,
 } from "@mantine/core";
 import {
   IoBarChartOutline,
@@ -16,14 +19,17 @@ import {
   IoCashOutline,
   IoCheckboxOutline,
   IoDocumentOutline,
+  IoHappy,
   IoHomeOutline,
   IoListOutline,
   IoLogOutOutline,
+  IoMoonOutline,
   IoPersonAddOutline,
   IoPersonOutline,
   IoPodiumOutline,
+  IoSunnyOutline,
 } from "react-icons/io5";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser, logout } from "../store/slices/authSlice";
@@ -32,6 +38,8 @@ const NavBar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { user } = useSelector((state) => state.auth);
+  console.log("user---", user);
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
 
   useEffect(() => {
     dispatch(getUser());
@@ -139,23 +147,53 @@ const NavBar = () => {
                 </Flex>
               </Paper>
             </Stack>
+            <Divider />
+            <Stack px="sm">
+              <Group justify="space-between">
+                <Text size="sm">Theme</Text>
+                <Switch
+                  size="sm"
+                  checked={colorScheme === "dark"}
+                  onLabel={<IoMoonOutline />}
+                  offLabel={<IoSunnyOutline />}
+                  onChange={(event) =>
+                    setColorScheme(
+                      event.currentTarget.checked ? "dark" : "light",
+                    )
+                  }
+                />
+              </Group>
+            </Stack>
           </Stack>
-          <Flex align="center">
-            <NavLink
-              className="rounded-link"
-              href="#required-for-focus"
-              label="Vidarshan"
-              leftSection={<Avatar size="sm" variant="light" />}
-            />
-            <ActionIcon
-              radius="sm"
-              color="red"
-              variant="light"
-              onClick={handleLogout}
-            >
-              <IoLogOutOutline />
-            </ActionIcon>
-          </Flex>
+          <Paper
+            className="hover-class"
+            onClick={() => navigate("/profile")}
+            py="md"
+          >
+            <Flex align="center" justify="space-between">
+              <Group gap="xs" justify="flex-start">
+                <ThemeIcon>
+                  <IoHappy />
+                </ThemeIcon>
+                {user !== null && (
+                  <Paper>
+                    <Text size="sm" fw={700}>
+                      {user.username}
+                    </Text>
+                  </Paper>
+                )}
+              </Group>
+
+              <ActionIcon
+                radius="sm"
+                color="red"
+                variant="light"
+                onClick={handleLogout}
+              >
+                <IoLogOutOutline />
+              </ActionIcon>
+            </Flex>
+          </Paper>
         </Stack>
       ) : (
         <Stack h="100%" justify="space-between" p="sm">

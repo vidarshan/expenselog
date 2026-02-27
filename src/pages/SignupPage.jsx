@@ -17,6 +17,7 @@ import {
   rem,
   ThemeIcon,
   Select,
+  Alert,
 } from "@mantine/core";
 import {
   IoSparklesOutline,
@@ -28,9 +29,45 @@ import {
 } from "react-icons/io5";
 import { AuthFeature } from "../components/AuthFeature";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "@mantine/form";
+import { useDispatch, useSelector } from "react-redux";
+import { signUpUser } from "../store/slices/authSlice";
 
 export default function RegistrationPage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.auth);
+
+  const form = useForm({
+    mode: "uncontrolled",
+    initialValues: {
+      name: "test",
+      email: "test11@expenselog.com",
+      password: "password123",
+      type: "fixed",
+    },
+    validate: {
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
+    },
+  });
+
+  const handleSubmit = async (values) => {
+    const newUser = {
+      email: values.email,
+      name: values.name,
+      password: values.password,
+      salary: {
+        type: values.type,
+        fixed: {
+          amount: 0,
+        },
+        variable: [],
+      },
+    };
+
+    await dispatch(signUpUser(newUser));
+    // await dispatch(getUser());
+  };
 
   return (
     <Container size="lg" h="calc(100vh - 28px)">
@@ -99,75 +136,105 @@ export default function RegistrationPage() {
                 orientation="vertical"
                 display={{ base: "none", md: "block" }}
               />
+              <Divider
+                orientation="vertical"
+                display={{ base: "none", md: "block" }}
+              />
 
-              <Box style={{ flex: 1, display: "flex" }}>
-                <Paper radius="xl" w="100%" h="100%" p="md" withBorder>
-                  <Group gap="sm" wrap="nowrap">
-                    <ThemeIcon radius="md" variant="filled" size="xl">
-                      <IoPersonAddOutline size={18} />
-                    </ThemeIcon>
+              <Box w={{ base: "100%", md: "50%" }} h="100%">
+                <Box
+                  component="form"
+                  onSubmit={form.onSubmit(handleSubmit)}
+                  h="100%"
+                >
+                  <Paper radius="xl" w="100%" h="100%" p="md" withBorder>
+                    <Group gap="sm" wrap="nowrap">
+                      <ThemeIcon radius="md" variant="filled" size="xl">
+                        <IoPersonAddOutline size={18} />
+                      </ThemeIcon>
+                      <Box>
+                        <Title order={2}>Create account</Title>
+                        <Text mt={2}>Start tracking your money today.</Text>
+                      </Box>
+                    </Group>
 
-                    <Box>
-                      <Title order={2}>Create account</Title>
-                      <Text mt={2}>Start tracking your money today.</Text>
-                    </Box>
-                  </Group>
+                    {error && (
+                      <Alert
+                        my="lg"
+                        variant="light"
+                        color="red"
+                        title="An error occurred"
+                      />
+                    )}
 
-                  <TextInput
-                    mt="lg"
-                    label="Name"
-                    placeholder="Your name"
-                    radius="md"
-                  />
+                    <TextInput
+                      label="Name"
+                      placeholder="Your name"
+                      radius="md"
+                      {...form.getInputProps("name")}
+                    />
 
-                  <TextInput
-                    mt="md"
-                    label="Email"
-                    placeholder="you@example.com"
-                    radius="md"
-                  />
+                    <TextInput
+                      mt="md"
+                      label="Email"
+                      placeholder="you@example.com"
+                      radius="md"
+                      {...form.getInputProps("email")}
+                    />
 
-                  <PasswordInput
-                    mt="md"
-                    label="Password"
-                    placeholder="Create a strong password"
-                    radius="md"
-                  />
+                    <PasswordInput
+                      mt="md"
+                      label="Password"
+                      placeholder="Create a strong password"
+                      radius="md"
+                      {...form.getInputProps("password")}
+                    />
 
-                  <Select
-                    mt="md"
-                    label="Salary type"
-                    placeholder="Choose salary type"
-                    radius="md"
-                    data={[
-                      { value: "fixed", label: "Fixed" },
-                      { value: "variable", label: "Variable" },
-                    ]}
-                  />
+                    <Select
+                      mt="md"
+                      label="Salary type"
+                      placeholder="Choose salary type"
+                      radius="md"
+                      data={[
+                        { value: "fixed", label: "Fixed" },
+                        { value: "variable", label: "Variable" },
+                      ]}
+                      {...form.getInputProps("type")}
+                    />
 
-                  <Text size="xs" mt={6}>
-                    You can change this later in Settings.
-                  </Text>
-
-                  <Button fullWidth mt="lg" radius="md" size="md">
-                    Create account
-                  </Button>
-                  <Group my="md" align="center" justify="space-between">
-                    <Text size="sm">Already have an account? </Text>
-                    <Text
-                      onClick={() => navigate("/login")}
-                      c="lime"
-                      size="sm"
-                      style={{ cursor: "pointer" }}
-                    >
-                      Login
+                    <Text size="xs" mt={6}>
+                      You can change this later in Settings.
                     </Text>
-                  </Group>
-                  <Text size="xs" mt="md">
-                    By creating an account, you agree to keep your credentials
-                    safe.
-                  </Text>
-                </Paper>
+
+                    <Button
+                      type="submit"
+                      fullWidth
+                      mt="lg"
+                      radius="md"
+                      size="md"
+                      loading={loading}
+                    >
+                      Create account
+                    </Button>
+
+                    <Group my="md" align="center" justify="space-between">
+                      <Text size="sm">Already have an account?</Text>
+                      <Text
+                        onClick={() => navigate("/login")}
+                        c="lime"
+                        size="sm"
+                        style={{ cursor: "pointer" }}
+                      >
+                        Login
+                      </Text>
+                    </Group>
+
+                    <Text size="xs" mt="md">
+                      By creating an account, you agree to keep your credentials
+                      safe.
+                    </Text>
+                  </Paper>
+                </Box>
               </Box>
             </Flex>
           </Paper>

@@ -7,107 +7,146 @@ const initialState = {
     token: localStorage.getItem("expenselog-token"),
     username: "",
     salary: {
-      fixed: {
-        amount: 0,
-      },
+      fixed: { amount: 0 },
       type: "fixed",
       variable: [],
     },
   },
   loading: false,
+  error: "",
 };
 
 export const loginUser = createAsyncThunk(
   "auth/login",
-  async ({ email, password }) => {
-    const response = await axios.post(`/api/auth/login`, {
-      email,
-      password,
-    });
+  async ({ email, password }, thunkAPI) => {
+    try {
+      const loginRes = await axios.post("/api/auth/login", { email, password });
+      const token = loginRes.data?.token;
 
-    // "salary": {
-    //     "fixed": {
-    //         "amount": 60000
-    //     },
-    //     "type": "fixed",
-    //     "variable": []
-    // },
-    // "_id": "697309ca23af00f4b2ce63ca",
-    // "email": "test@expenselog.com",
-    // "username": "test user",
-    // "role": "user",
+      if (!token) {
+        return thunkAPI.rejectWithValue("Missing token from login response");
+      }
 
-    console.log(response);
-    return response.data;
+      localStorage.setItem("expenselog-token", token);
+
+      const meRes = await api.get("/auth/me");
+
+      return { token, user: meRes.data };
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message || err?.message || "Login failed";
+      return thunkAPI.rejectWithValue(msg);
+    }
   },
 );
 
 export const signUpUser = createAsyncThunk(
   "auth/signup",
-  async ({ email, password }) => {
-    const response = await axios.post(`/api/auth/login`, {
-      email,
-      password,
-    });
-    console.log(response);
-    return response.data;
+  async ({ email, password, name, salary }, thunkAPI) => {
+    try {
+      await axios.post("/api/auth/register", { email, password, name, salary });
+
+      const loginRes = await axios.post("/api/auth/login", { email, password });
+      const token = loginRes.data?.token;
+
+      if (!token) {
+        return thunkAPI.rejectWithValue("Missing token from login response");
+      }
+
+      localStorage.setItem("expenselog-token", token);
+
+      const meRes = await api.get("/auth/me");
+
+      return { token, user: meRes.data };
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message || err?.message || "Registration failed";
+      return thunkAPI.rejectWithValue(msg);
+    }
   },
 );
 
-export const getUser = createAsyncThunk("auth/me", async () => {
-  const response = await api.get("/auth/me");
-  console.log(response);
-  return response.data;
+export const getUser = createAsyncThunk("auth/me", async (_, thunkAPI) => {
+  try {
+    const res = await api.get("/auth/me");
+    return res.data;
+  } catch (err) {
+    const msg =
+      err?.response?.data?.message || err?.message || "Failed to fetch user";
+    return thunkAPI.rejectWithValue(msg);
+  }
 });
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    logout(state) {
+    logout() {
       localStorage.removeItem("expenselog-token");
-      state.user = {
-        token: null,
-        username: "",
-        salary: {
-          fixed: { amount: 0 },
-          type: "fixed",
-          variable: [],
+      return {
+        ...initialState,
+        user: {
+          ...initialState.user,
+          token: null,
         },
+        loading: false,
+        error: "",
       };
-      state.loading = false;
     },
   },
   extraReducers: (builder) => {
     builder
+
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
+        state.error = "";
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log("action", action.payload);
+        state.loading = false;
+        state.error = "";
         state.user.token = action.payload.token;
-        state.loading = false;
-        localStorage.setItem("expenselog-token", action.payload.token);
+        state.user.username = action.payload.user?.username || "";
+        state.user.salary =
+          action.payload.user?.salary || initialState.user.salary;
       })
-      .addCase(loginUser.rejected, (state) => {
+      .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = "Login failed";
+        state.error = action.payload || "Login failed";
       })
+
+      .addCase(signUpUser.pending, (state) => {
+        state.loading = true;
+        state.error = "";
+      })
+      .addCase(signUpUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = "";
+        state.user.token = action.payload.token;
+        state.user.username = action.payload.user?.username || "";
+        state.user.salary =
+          action.payload.user?.salary || initialState.user.salary;
+      })
+      .addCase(signUpUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Registration failed";
+      })
+
       .addCase(getUser.pending, (state) => {
         state.loading = true;
+        state.error = "";
       })
       .addCase(getUser.fulfilled, (state, action) => {
-        console.log(action);
-        state.user.salary = action.payload.salary;
-        state.user.username = action.payload.username;
         state.loading = false;
+        state.error = "";
+        state.user.username = action.payload?.username || "";
+        state.user.salary = action.payload?.salary || initialState.user.salary;
       })
-      .addCase(getUser.rejected, (state) => {
+      .addCase(getUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = "Login failed";
+        state.error = action.payload || "Failed to fetch user";
       });
   },
 });
 
-export const { loginStart, loginSuccess, logout } = authSlice.actions;
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;

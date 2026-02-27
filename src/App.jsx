@@ -41,7 +41,8 @@ function App() {
             pos="fixed"
             size="xl"
             radius="xl"
-            variant="light"
+            style={{ zIndex: 9999 }}
+            variant="filled"
             onClick={toggle}
           >
             {opened ? <IoClose /> : <IoMenu />}
