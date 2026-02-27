@@ -15,7 +15,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a, body, h1, h2, h3, h4, h5, h6, p, div, button {
+a, body, h1, h2, h3, h4, h5, h6, p, div, button, input {
    font-family: "Manrope", sans-serif !important;
   font-optical-sizing: auto;
   font-weight: 500;

@@ -11,8 +11,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { useDisclosure, useScrollIntoView } from "@mantine/hooks";
-import Login from "../components/Login";
+import { useScrollIntoView } from "@mantine/hooks";
 import Feature from "../components/Feature";
 import { NAVBAR_HEIGHT } from "../data/mockdata";
 import {
@@ -25,9 +24,9 @@ import {
   IoTrendingUpOutline,
 } from "react-icons/io5";
 import { Helmet } from "react-helmet";
+import Logo from "../components/Logo";
 
 const HomePage = () => {
-  const [opened, { _, close }] = useDisclosure(false);
   const { scrollIntoView, targetRef } = useScrollIntoView({ offset: 0 });
 
   return (
@@ -35,7 +34,7 @@ const HomePage = () => {
       <Helmet>
         <title>Home | ExpenseLog</title>
       </Helmet>
-      <Login opened={opened} close={close} />
+
       <Flex direction="column" mih={`calc(80vh - ${NAVBAR_HEIGHT}px)`}>
         <Flex
           direction="column"
@@ -43,6 +42,7 @@ const HomePage = () => {
           justify="center"
           style={{ flex: 1 }}
         >
+          <Logo logoSize={40} />
           <Title order={1} ta="center" size="3.5rem" fw={600}>
             Understand your money,
           </Title>

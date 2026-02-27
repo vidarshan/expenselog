@@ -65,10 +65,17 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     logout(state) {
-      state.user = null;
-      state.token = null;
-      state.isAuthenticated = false;
       localStorage.removeItem("expenselog-token");
+      state.user = {
+        token: null,
+        username: "",
+        salary: {
+          fixed: { amount: 0 },
+          type: "fixed",
+          variable: [],
+        },
+      };
+      state.loading = false;
     },
   },
   extraReducers: (builder) => {
