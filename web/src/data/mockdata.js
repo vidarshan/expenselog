@@ -49,7 +49,7 @@ export const yearlyMonthlyReports = [
   },
 ];
 
-export const NAVBAR_HEIGHT = 64;
+export const NAVBAR_HEIGHT = 20;
 
 export const expenseData = [
   { name: "Food & Drink", value: 450, color: "red.6" },

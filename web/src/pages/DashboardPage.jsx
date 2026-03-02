@@ -157,7 +157,7 @@ const DashboardPage = () => {
   });
 
   return (
-    <Container size="xl" pt={NAVBAR_HEIGHT + 32}>
+    <Container size="xl">
       <Modal
         opened={recordOpened}
         onClose={() => setRecordOpened(false)}
@@ -227,7 +227,7 @@ const DashboardPage = () => {
         </Flex>
       </Modal>
 
-      <Grid mt="md">
+      <Grid>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
           <OverviewCard />
         </Grid.Col>
