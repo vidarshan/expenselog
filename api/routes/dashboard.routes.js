@@ -1,12 +1,14 @@
-const express = require("express");
+import express from "express";
+import {
+  getDashboard,
+  getCategoryComparison,
+} from "../controllers/dashboard.controller.js";
+import auth from "../middleware/auth.middleware.js";
+
 const router = express.Router();
 
-const dashboardController = require("../controllers/dashboard.controller");
-const authMiddleware = require("../middleware/auth.middleware");
+router.route("/").get(auth, getDashboard);
 
-router.route("/").get(authMiddleware, dashboardController.getDashboard);
-router
-  .route("/compare")
-  .get(authMiddleware, dashboardController.getCategoryComparison);
+router.route("/compare").get(auth, getCategoryComparison);
 
-module.exports = router;
+export default router;

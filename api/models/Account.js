@@ -10,7 +10,7 @@ const accountSchema = new mongoose.Schema(
     name: { type: String, required: true },
     type: { type: String, enum: ["cash", "bank", "credit"], required: true },
     initialBalance: { type: Number, default: 0 },
-    currentBalance: { type: Number, default: 0 }, // <-- NEW
+    currentBalance: { type: Number, default: 0 },
     creditLimit: { type: Number, default: 0 },
     isDeleted: { type: Boolean, default: false },
   },
@@ -22,4 +22,4 @@ accountSchema.index(
   { unique: true, partialFilterExpression: { isDeleted: false } },
 );
 
-module.exports = mongoose.model("Account", accountSchema);
+export default mongoose.model("Account", accountSchema);

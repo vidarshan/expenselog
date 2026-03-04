@@ -1,5 +1,5 @@
-const OpenAI = require("openai");
-const { default: Insight } = require("../models/Insight");
+import OpenAI from "openai";
+import Insight from "../models/Insight.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -10,7 +10,7 @@ const aiProfile = {
   focusCategories: ["Food", "Entertainment"],
 };
 
-exports.getInsights = async (req, res) => {
+export const getInsights = async (req, res) => {
   try {
     const { month } = req.query;
     const userId = req.user?.id || req.user?._id || req.userId;

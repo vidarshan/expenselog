@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const budgetSchema = new mongoose.Schema(
   {
@@ -25,4 +25,4 @@ budgetSchema.index(
   { unique: true },
 );
 
-module.exports = mongoose.model("Budget", budgetSchema);
+export default mongoose.model("Budget", budgetSchema);

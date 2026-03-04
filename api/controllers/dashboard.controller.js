@@ -1,5 +1,7 @@
-const MonthlyLog = require("../models/MonthlyLog");
-const Transaction = require("../models/Transaction");
+import mongoose from "mongoose";
+import MonthlyLog from "../models/MonthlyLog.js";
+import Transaction from "../models/Transaction.js";
+
 function parseYearMonth(req) {
   const year = Number(req.query.year);
   const month = Number(req.query.month);
@@ -18,7 +20,6 @@ function prevYearMonth(year, month) {
   return { year, month: month - 1 };
 }
 
-//create or get the monthly log
 async function ensureMonthlyLog(userId, year, month) {
   let log = await MonthlyLog.findOne({ userId, year, month });
   if (!log) {
@@ -55,30 +56,8 @@ async function aggregateSummary(logId) {
   return { income, expenses, net, savingsRate, txCount };
 }
 
-async function buildBudgetProgress(/* userId, year, month, logId */) {
+async function buildBudgetProgress() {
   return [];
-}
-
-async function aggregateCategoryBreakdown(logId) {
-  return Transaction.aggregate([
-    { $match: { logId, type: "expense" } },
-    {
-      $group: {
-        _id: "$categoryName",
-        total: { $sum: "$amount" },
-        count: { $sum: 1 },
-      },
-    },
-    { $sort: { total: -1 } },
-    {
-      $project: {
-        _id: 0,
-        name: "$_id",
-        total: 1,
-        count: 1,
-      },
-    },
-  ]);
 }
 
 async function aggregateRecentTransactions(logId) {
@@ -88,8 +67,6 @@ async function aggregateRecentTransactions(logId) {
     .select("name amount type date categoryName")
     .lean();
 }
-
-const mongoose = require("mongoose");
 
 async function aggregateCategoryBreakdown(userId, year, month) {
   const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
@@ -140,12 +117,6 @@ async function aggregateMonthCategoryTotals(userId, start, end) {
   ]);
 }
 
-function monthName(year, month) {
-  return new Date(year, month - 1, 1).toLocaleString("en-US", {
-    month: "long",
-  });
-}
-
 const MONTHS = [
   "January",
   "February",
@@ -161,56 +132,44 @@ const MONTHS = [
   "December",
 ];
 
-function monthName(year, month) {
-  return new Date(year, month - 1, 1).toLocaleString("en-US", {
-    month: "long",
-  });
-}
-
-async function buildCategoryMonthlyComparison(userId, year, month) {
-  const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
-  const end = new Date(year, month, 0, 23, 59, 59, 999);
-
-  const prevStart = new Date(year, month - 2, 1, 0, 0, 0, 0);
-  const prevEnd = new Date(year, month - 1, 0, 23, 59, 59, 999);
-
-  const [curr, prev] = await Promise.all([
-    aggregateMonthCategoryTotals(userId, start, end), // [{ _id: "Food", total: 500 }, ...]
-    aggregateMonthCategoryTotals(userId, prevStart, prevEnd),
-  ]);
-
-  // make lookup objects
-  const currTotals = {};
-  for (const r of curr) currTotals[r._id] = r.total;
-
-  const prevTotals = {};
-  for (const r of prev) prevTotals[r._id] = r.total;
-
-  // month labels (MUST match series.name)
-  const currLabel = monthName(year, month);
-  const prevLabel = monthName(year, month - 1);
-
-  // all categories
-  const categories = Array.from(
-    new Set([...Object.keys(currTotals), ...Object.keys(prevTotals)]),
-  );
-
-  // final chart data
-  return categories.map((cat) => ({
-    category: cat,
-    [prevLabel]: prevTotals[cat] ?? 0,
-    [currLabel]: currTotals[cat] ?? 0,
-  }));
-}
-
 function monthLabel(year, month) {
-  return `${MONTHS[month - 1]} ${year}`; // keeps labels unique across years
+  return `${MONTHS[month - 1]} ${year}`;
 }
 
 function monthRange(year, month) {
   const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
   const end = new Date(year, month, 0, 23, 59, 59, 999);
   return { start, end };
+}
+
+async function buildCategoryMonthlyComparison(userId, year, month) {
+  const { start, end } = monthRange(year, month);
+  const prev = prevYearMonth(year, month);
+  const { start: prevStart, end: prevEnd } = monthRange(prev.year, prev.month);
+
+  const [curr, prevRows] = await Promise.all([
+    aggregateMonthCategoryTotals(userId, start, end),
+    aggregateMonthCategoryTotals(userId, prevStart, prevEnd),
+  ]);
+
+  const currTotals = {};
+  for (const r of curr) currTotals[r._id] = r.total;
+
+  const prevTotals = {};
+  for (const r of prevRows) prevTotals[r._id] = r.total;
+
+  const labelA = monthLabel(prev.year, prev.month);
+  const labelB = monthLabel(year, month);
+
+  const categories = Array.from(
+    new Set([...Object.keys(currTotals), ...Object.keys(prevTotals)]),
+  );
+
+  return categories.map((cat) => ({
+    category: cat,
+    [labelA]: prevTotals[cat] ?? 0,
+    [labelB]: currTotals[cat] ?? 0,
+  }));
 }
 
 async function buildCategoryCompareAnyTwoMonths(
@@ -220,20 +179,17 @@ async function buildCategoryCompareAnyTwoMonths(
   yearB,
   monthB,
 ) {
-  const uid = new mongoose.Types.ObjectId(userId);
-
   const { start: startA, end: endA } = monthRange(yearA, monthA);
   const { start: startB, end: endB } = monthRange(yearB, monthB);
 
   const [aRows, bRows] = await Promise.all([
-    aggregateMonthCategoryTotals(uid, startA, endA), // [{ _id: categoryName, total }]
-    aggregateMonthCategoryTotals(uid, startB, endB),
+    aggregateMonthCategoryTotals(userId, startA, endA),
+    aggregateMonthCategoryTotals(userId, startB, endB),
   ]);
 
   const labelA = monthLabel(yearA, monthA);
   const labelB = monthLabel(yearB, monthB);
 
-  // lookup objects
   const aTotals = {};
   for (const r of aRows) aTotals[r._id] = r.total;
 
@@ -245,7 +201,7 @@ async function buildCategoryCompareAnyTwoMonths(
   );
 
   return {
-    labels: { a: labelA, b: labelB }, // helps frontend build series
+    labels: { a: labelA, b: labelB },
     data: categories.map((cat) => ({
       category: cat,
       [labelA]: aTotals[cat] ?? 0,
@@ -254,7 +210,7 @@ async function buildCategoryCompareAnyTwoMonths(
   };
 }
 
-exports.getCategoryComparison = async (req, res) => {
+export const getCategoryComparison = async (req, res) => {
   try {
     const userId = req.userId;
 
@@ -264,9 +220,9 @@ exports.getCategoryComparison = async (req, res) => {
     const monthB = Number(req.query.monthB);
 
     if (!yearA || !monthA || !yearB || !monthB) {
-      return res
-        .status(400)
-        .json({ message: "yearA/monthA/yearB/monthB are required" });
+      return res.status(400).json({
+        message: "yearA/monthA/yearB/monthB are required",
+      });
     }
 
     const result = await buildCategoryCompareAnyTwoMonths(
@@ -279,12 +235,12 @@ exports.getCategoryComparison = async (req, res) => {
 
     return res.json(result);
   } catch (err) {
-    console.error("GET /api/dashboard/compare error:", err);
+    console.error(err);
     return res.status(500).json({ message: "Failed to compare months" });
   }
 };
 
-exports.getDashboard = async (req, res) => {
+export const getDashboard = async (req, res) => {
   try {
     const { year, month, error } = parseYearMonth(req);
     if (error) return res.status(400).json({ message: error });
@@ -315,9 +271,7 @@ exports.getDashboard = async (req, res) => {
       savingsRate: 0,
       txCount: 0,
     };
-    if (prevLog) {
-      prevSummary = await aggregateSummary(prevLog._id);
-    }
+    if (prevLog) prevSummary = await aggregateSummary(prevLog._id);
 
     const comparison = {
       lastMonth: { year: prev.year, month: prev.month },
@@ -338,7 +292,7 @@ exports.getDashboard = async (req, res) => {
       budgets,
     });
   } catch (err) {
-    console.error("GET /api/dashboard error:", err);
+    console.error(err);
     return res.status(500).json({ message: "Failed to load dashboard" });
   }
 };

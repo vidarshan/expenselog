@@ -1,9 +1,9 @@
-const express = require("express");
+import express from "express";
+import { getInsights } from "../controllers/insights.controller.js";
+import auth from "../middleware/auth.middleware.js";
+
 const router = express.Router();
 
-const insightsController = require("../controllers/insights.controller");
-const authMiddleware = require("../middleware/auth.middleware");
+router.route("/").get(auth, getInsights);
 
-router.route("/").get(authMiddleware, insightsController.getInsights);
-
-module.exports = router;
+export default router;

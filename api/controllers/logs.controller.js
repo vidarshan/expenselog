@@ -1,8 +1,8 @@
-const MonthlyLog = require("../models/MonthlyLog");
-const Transaction = require("../models/Transaction");
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+import MonthlyLog from "../models/MonthlyLog.js";
+import Transaction from "../models/Transaction.js";
 
-exports.getActivePeriods = async (req, res) => {
+export const getActivePeriods = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.userId);
 
@@ -29,10 +29,10 @@ exports.getActivePeriods = async (req, res) => {
   }
 };
 
-exports.createMonthlyLog = async (req, res) => {
+export const createMonthlyLog = async (req, res) => {
   try {
     const date = new Date();
-    const userId = req.userId;
+    const userId = new mongoose.Types.ObjectId(req.userId);
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
 
@@ -46,10 +46,10 @@ exports.createMonthlyLog = async (req, res) => {
       });
     }
 
-    res.status(201).json(log);
+    return res.status(201).json(log);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Operation failed" });
+    return res.status(500).json({ message: "Operation failed" });
   }
 };
 
@@ -86,22 +86,23 @@ async function summarizeLog(logId) {
   };
 }
 
-exports.getMonthlyLogs = async (req, res) => {
+export const getMonthlyLogs = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 12;
+    const userId = new mongoose.Types.ObjectId(req.userId);
+
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 12;
     const skip = (page - 1) * limit;
 
     const [logs, total] = await Promise.all([
-      MonthlyLog.find({ userId: req.userId })
+      MonthlyLog.find({ userId })
         .sort({ year: -1, month: -1 })
         .skip(skip)
         .limit(limit)
         .lean(),
-      MonthlyLog.countDocuments({ userId: req.userId }),
+      MonthlyLog.countDocuments({ userId }),
     ]);
 
-    // add computed fields per log
     const enriched = await Promise.all(
       logs.map(async (log) => {
         const s = await summarizeLog(log._id);
@@ -116,7 +117,7 @@ exports.getMonthlyLogs = async (req, res) => {
       }),
     );
 
-    res.json({
+    return res.json({
       data: enriched,
       pagination: {
         page,
@@ -127,14 +128,16 @@ exports.getMonthlyLogs = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Failed to fetch logs" });
+    return res.status(500).json({ message: "Failed to fetch logs" });
   }
 };
 
-exports.getYearlyLogs = async (req, res) => {
+export const getYearlyLogs = async (req, res) => {
   try {
+    const userId = new mongoose.Types.ObjectId(req.userId);
+
     const yearlyLogs = await MonthlyLog.aggregate([
-      { $match: { userId: new mongoose.Types.ObjectId(req.userId) } },
+      { $match: { userId } },
       {
         $group: {
           _id: "$year",
@@ -151,9 +154,9 @@ exports.getYearlyLogs = async (req, res) => {
       { $sort: { _id: -1 } },
     ]);
 
-    res.json(yearlyLogs);
+    return res.json(yearlyLogs);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };

@@ -1,9 +1,17 @@
-require("dotenv").config();
-const express = require("express");
-const colors = require("colors");
-const morgan = require("morgan");
-require("./jobs/monthlyLog.job");
-const { default: mongoose } = require("mongoose");
+import dotenv from "dotenv/config";
+import mongoose from "mongoose";
+import express from "express";
+import colors from "colors";
+import morgan from "morgan";
+
+import authRoutes from "./routes/auth.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
+import logRoutes from "./routes/log.routes.js";
+import transactionRoutes from "./routes/transaction.routes.js";
+import dashboardRoutes from "./routes/dashboard.routes.js";
+import insightsRoutes from "./routes/insights.routes.js";
+import budgetRoutes from "./routes/budget.routes.js";
+
 const app = express();
 const PORT = process.env.PORT;
 
@@ -24,13 +32,13 @@ app.get("/", (req, res) => {
   res.send("Server is running 🚀");
 });
 
-app.use("/api/auth", require("./routes/auth.routes"));
-app.use("/api/categories", require("./routes/category.routes"));
-app.use("/api/logs", require("./routes/log.routes"));
-app.use("/api/transactions", require("./routes/transaction.routes"));
-app.use("/api/dashboard", require("./routes/dashboard.routes"));
-app.use("/api/insights", require("./routes/insights.routes"));
-app.use("/api/budget", require("./routes/budget.routes"));
+app.use("/api/auth", authRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/logs", logRoutes);
+app.use("/api/transactions", transactionRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/insights", insightsRoutes);
+app.use("/api/budget", budgetRoutes);
 
 app.listen(PORT, () => {
   console.log(

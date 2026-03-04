@@ -1,12 +1,22 @@
-const express = require("express");
-const router = express.Router();
+import express from "express";
+import {
+  getTransactionsByMonth,
+  createTransaction,
+  updateTransaction,
+  deleteTransaction,
+} from "../controllers/transaction.controller.js";
+import auth from "../middleware/auth.middleware.js";
 
-const transactionController = require("../controllers/transaction.controller");
-const authMiddleware = require("../middleware/auth.middleware");
+const router = express.Router();
 
 router
   .route("/")
-  .get(authMiddleware, transactionController.getTransactionsByMonth)
-  .post(authMiddleware, transactionController.createTransaction);
+  .get(auth, getTransactionsByMonth)
+  .post(auth, createTransaction);
 
-module.exports = router;
+router
+  .route("/:id")
+  .patch(auth, updateTransaction)
+  .delete(auth, deleteTransaction);
+
+export default router;

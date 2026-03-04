@@ -1,14 +1,18 @@
-const express = require("express");
+import express from "express";
+import {
+  getMonthlyLogs,
+  createMonthlyLog,
+  getYearlyLogs,
+  getActivePeriods,
+} from "../controllers/logs.controller.js";
+import auth from "../middleware/auth.middleware.js";
+
 const router = express.Router();
 
-const logController = require("../controllers/logs.controller");
-const authMiddleware = require("../middleware/auth.middleware");
+router.route("/monthly").get(auth, getMonthlyLogs).post(auth, createMonthlyLog);
 
-router
-  .route("/monthly")
-  .get(authMiddleware, logController.getMonthlyLogs)
-  .post(authMiddleware, logController.createMonthlyLog);
-router.route("/yearly").get(authMiddleware, logController.getYearlyLogs);
-router.route("/active").get(authMiddleware, logController.getActivePeriods);
+router.route("/yearly").get(auth, getYearlyLogs);
 
-module.exports = router;
+router.route("/active").get(auth, getActivePeriods);
+
+export default router;

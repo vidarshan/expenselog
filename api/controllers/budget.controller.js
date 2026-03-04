@@ -1,11 +1,10 @@
-const mongoose = require("mongoose");
-const Budget = require("../models/Budget");
-const Transaction = require("../models/Transaction");
+import mongoose from "mongoose";
+import Budget from "../models/Budget.js";
+import Transaction from "../models/Transaction.js";
 
-exports.getBudgetOverview = async (req, res) => {
+export const getBudgetOverview = async (req, res) => {
   try {
     const userId = req.userId;
-    console.log(userId);
     const year = Number(req.query.year);
     const month = Number(req.query.month);
 
@@ -76,7 +75,7 @@ exports.getBudgetOverview = async (req, res) => {
     const totalSpentBudgeted = items.reduce((s, i) => s + i.spent, 0);
     const totalSpentAll = spentByCategory.reduce((s, x) => s + x.spent, 0);
 
-    res.json({
+    return res.json({
       period: { year, month },
       items,
       unbudgeted,
@@ -88,11 +87,11 @@ exports.getBudgetOverview = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
-exports.createOrEditBudget = async (req, res) => {
+export const createOrEditBudget = async (req, res) => {
   try {
     const userId = req.userId;
     const { year, month, categoryId, limit } = req.body;
@@ -115,13 +114,13 @@ exports.createOrEditBudget = async (req, res) => {
       },
     );
 
-    res.status(201).json(budget);
+    return res.status(201).json(budget);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
-exports.deleteBudget = async (req, res) => {
+export const deleteBudget = async (req, res) => {
   try {
     const userId = req.userId;
 
@@ -138,8 +137,8 @@ exports.deleteBudget = async (req, res) => {
       return res.status(404).json({ message: "Budget not found" });
     }
 
-    res.json({ success: true });
+    return res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
