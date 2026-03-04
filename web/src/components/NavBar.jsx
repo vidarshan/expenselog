@@ -76,8 +76,8 @@ const NavBar = () => {
               className="rounded-link"
               label="Budgets"
               leftSection={<IoCheckboxOutline />}
-              onClick={() => navigate("/budget")}
-              c={pathname === "/budget" ? "lime" : "gray"}
+              onClick={() => navigate("/budgets")}
+              c={pathname === "/budgets" ? "lime" : "gray"}
             />
             <Divider />
             <Stack px="sm">

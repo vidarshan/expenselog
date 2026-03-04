@@ -6,6 +6,7 @@ import {
 } from "../data/mockdata";
 import {
   ActionIcon,
+  Avatar,
   Badge,
   Box,
   Button,
@@ -19,6 +20,7 @@ import {
   Modal,
   NumberInput,
   Pagination,
+  PasswordInput,
   Radio,
   Select,
   Table,
@@ -27,9 +29,14 @@ import {
   Title,
 } from "@mantine/core";
 import {
+  IoBriefcaseOutline,
   IoCalendarClearOutline,
   IoCalendarOutline,
+  IoCashOutline,
   IoFilterOutline,
+  IoLockClosedOutline,
+  IoMailOpenOutline,
+  IoTextOutline,
   IoTrashOutline,
   IoTrendingDownOutline,
   IoTrendingUpOutline,
@@ -205,6 +212,122 @@ const DashboardPage = () => {
 
   return (
     <Container size="xl">
+      <Modal
+        opened={false}
+        onClose={() => setRecordOpened(false)}
+        title=""
+        closeOnClickOutside={false}
+        centered
+      >
+        <Group justify="space-between">
+          <Flex gap="xs">
+            <Avatar size="xl" color="cyan" radius="xl">
+              V
+            </Avatar>
+            <Group align="center" justify="space-between">
+              <Box>
+                <Title>Vidarshan</Title>
+                <Text>vidarshan@gmail.com</Text>
+              </Box>
+            </Group>
+          </Flex>
+          <Button color="red" variant="light">
+            Logout
+          </Button>
+        </Group>
+        <Divider label="Profile Information" my="sm" />
+        <TextInput
+          leftSection={<IoMailOpenOutline />}
+          label="Email"
+          placeholder="Type in your email"
+        />
+        <TextInput
+          leftSection={<IoTextOutline />}
+          mt="md"
+          label="Name"
+          placeholder="Type in your name"
+        />
+        <PasswordInput
+          leftSection={<IoLockClosedOutline />}
+          mt="md"
+          label="Password"
+          placeholder="Type in your password"
+        />
+        <Divider label="Financial Information" my="md" />
+        <Radio.Group
+          name="incomeTypes"
+          defaultValue={incomeOptions}
+          onChange={setIncomeOptions}
+          withAsterisk
+        >
+          <Group mt="xs">
+            <Radio
+              value="fixed"
+              label="Fixed salary (same amount every month)"
+            />
+            <Radio
+              value="variable"
+              label="Variable income (freelance / hourly / tips)"
+            />
+          </Group>
+        </Radio.Group>
+        {incomeOptions === "fixed" ? (
+          <NumberInput
+            mt="sm"
+            leftSection={<IoCashOutline />}
+            placeholder="Enter your salary"
+          />
+        ) : (
+          <Card withBorder>
+            {incomeSources.map(({ id, name, salary }) => {
+              return (
+                <Flex mb="sm" align="center">
+                  <TextInput
+                    w="100%"
+                    leftSection={<IoBriefcaseOutline />}
+                    value={name}
+                    placeholder="Source name"
+                    mr="xs"
+                    onChange={(e) =>
+                      editIncomeSource(id, e.target.value, salary)
+                    }
+                  />
+                  <NumberInput
+                    w="100%"
+                    leftSection={<IoCashOutline />}
+                    value={salary.toString()}
+                    placeholder="Salary"
+                    onChange={(e) => editIncomeSource(id, name, e.target.value)}
+                    mr="xs"
+                  />
+                  <ActionIcon
+                    color="red"
+                    onClick={() => removeIncomeSource(id)}
+                    variant="light"
+                  >
+                    <IoTrashOutline />
+                  </ActionIcon>
+                </Flex>
+              );
+            })}
+
+            <Button
+              mt="xs"
+              leftSection={<IoAddSharp />}
+              variant="light"
+              onClick={addIncomeSource}
+              fullWidth
+            >
+              Add Source
+            </Button>
+          </Card>
+        )}
+        <Divider label="Account Actions" my="md" />
+        <Group justify="space-between" mt="md">
+          <Button color="red">Delete Account</Button>
+          <Button>Update Information</Button>
+        </Group>
+      </Modal>
       <Modal
         opened={recordOpened}
         onClose={() => setRecordOpened(false)}

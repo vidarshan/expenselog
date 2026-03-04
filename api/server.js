@@ -30,6 +30,7 @@ app.use("/api/logs", require("./routes/log.routes"));
 app.use("/api/transactions", require("./routes/transaction.routes"));
 app.use("/api/dashboard", require("./routes/dashboard.routes"));
 app.use("/api/insights", require("./routes/insights.routes"));
+app.use("/api/budget", require("./routes/budget.routes"));
 
 app.listen(PORT, () => {
   console.log(

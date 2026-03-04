@@ -2,54 +2,182 @@ const MonthlyLog = require("../models/MonthlyLog");
 const Transaction = require("../models/Transaction");
 const { createMonthlyLog } = require("./logs.controller");
 
-exports.createTransaction = async (req, res) => {
+function computeDelta(accountType, txType, amount) {
+  if (amount <= 0) throw new Error("Amount must be > 0");
+
+  // cash/bank behave normally
+  if (accountType === "cash" || accountType === "bank") {
+    return txType === "income" ? +amount : -amount;
+  }
+
+  // credit: balance = amount you owe (simple model)
+  if (accountType === "credit") {
+    return txType === "expense" ? +amount : -amount; // income=payment
+  }
+
+  throw new Error("Invalid account type");
+}
+
+exports.deleteTransaction = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const userId = req.userId;
+    const userId = req.user.id;
+    const txId = req.params.id;
 
-    let log = await MonthlyLog.findOne({ userId: req.userId, year, month });
-    console.log("monthlyLog", log);
+    const tx = await Transaction.findOne({
+      _id: txId,
+      userId,
+      isDeleted: false,
+    }).session(session);
+    if (!tx) return res.status(404).json({ message: "Transaction not found" });
 
-    if (log.isClosed) {
-      throw new Error("This month is closed. Cannot add transactions.");
-    } else {
-      const transaction = await Transaction.create({
-        userId,
-        logId: log._id,
-        name: req.body.name,
-        amount: req.body.amount,
-        type: req.body.type,
-        categoryId: req.body.categoryId,
-        categoryName: req.body.category,
-        source: {
-          type: "fixed",
-          refId: userId,
+    const account = await Account.findOne({
+      _id: tx.accountId,
+      userId,
+      isDeleted: false,
+    }).session(session);
+    if (!account) return res.status(404).json({ message: "Account not found" });
+
+    const delta = computeDelta(account.type, tx.type, tx.amount);
+
+    tx.isDeleted = true;
+    await tx.save({ session });
+
+    await Account.updateOne(
+      { _id: account._id },
+      { $inc: { currentBalance: -delta } },
+      { session },
+    );
+
+    await session.commitTransaction();
+    res.json({ ok: true });
+  } catch (e) {
+    await session.abortTransaction();
+    res.status(400).json({ message: e.message });
+  } finally {
+    session.endSession();
+  }
+};
+
+exports.createTransaction = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const userId = req.user.id;
+    const { accountId, type, amount, categoryId, date, source } = req.body;
+
+    const account = await Account.findOne({
+      _id: accountId,
+      userId,
+      isDeleted: false,
+    }).session(session);
+    if (!account) return res.status(404).json({ message: "Account not found" });
+
+    const delta = computeDelta(account.type, type, amount);
+
+    const [tx] = await Transaction.create(
+      [
+        {
+          userId,
+          accountId,
+          type, // "income" | "expense"
+          amount, // positive
+          categoryId: type === "expense" ? categoryId : undefined,
+          date: date ? new Date(date) : new Date(),
+          source: source || "manual",
+          isDeleted: false,
         },
-        date,
-      });
-      res.status(201).json(transaction);
-    }
+      ],
+      { session },
+    );
 
-    // if (monthlyLog.isClosed) {
-    //   throw new Error("This month is closed. Cannot add transactions.");
-    // }
-    // const transaction = await Transaction.create({
-    //   userId,
-    //   logId: monthlyLog._id,
-    //   name,
-    //   amount,
-    //   type,
-    //   categoryId,
-    //   categoryName,
-    //   source,
-    //   date: txDate,
-    // });
-    // res.status(201).json(transaction);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Operation failed" });
+    await Account.updateOne(
+      { _id: accountId },
+      { $inc: { currentBalance: delta } },
+      { session },
+    );
+
+    await session.commitTransaction();
+    res.status(201).json(tx);
+  } catch (e) {
+    await session.abortTransaction();
+    res.status(400).json({ message: e.message });
+  } finally {
+    session.endSession();
+  }
+};
+
+exports.updateTransaction = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const userId = req.user.id;
+    const txId = req.params.id;
+    const patch = req.body;
+
+    const tx = await Transaction.findOne({
+      _id: txId,
+      userId,
+      isDeleted: false,
+    }).session(session);
+    if (!tx) return res.status(404).json({ message: "Transaction not found" });
+
+    const oldAccount = await Account.findOne({
+      _id: tx.accountId,
+      userId,
+      isDeleted: false,
+    }).session(session);
+    if (!oldAccount)
+      return res.status(404).json({ message: "Account not found" });
+
+    const oldDelta = computeDelta(oldAccount.type, tx.type, tx.amount);
+
+    const newAccountId = patch.accountId ?? tx.accountId;
+    const newType = patch.type ?? tx.type;
+    const newAmount = patch.amount ?? tx.amount;
+
+    const newAccount = await Account.findOne({
+      _id: newAccountId,
+      userId,
+      isDeleted: false,
+    }).session(session);
+    if (!newAccount)
+      return res.status(404).json({ message: "New account not found" });
+
+    const newDelta = computeDelta(newAccount.type, newType, newAmount);
+
+    // update tx
+    tx.accountId = newAccountId;
+    tx.type = newType;
+    tx.amount = newAmount;
+    if (patch.date) tx.date = new Date(patch.date);
+    if (patch.categoryId !== undefined) tx.categoryId = patch.categoryId;
+    await tx.save({ session });
+
+    // revert old
+    await Account.updateOne(
+      { _id: oldAccount._id },
+      { $inc: { currentBalance: -oldDelta } },
+      { session },
+    );
+    // apply new
+    await Account.updateOne(
+      { _id: newAccount._id },
+      { $inc: { currentBalance: newDelta } },
+      { session },
+    );
+
+    await session.commitTransaction();
+    res.json(tx);
+  } catch (e) {
+    await session.abortTransaction();
+    res.status(400).json({ message: e.message });
+  } finally {
+    session.endSession();
   }
 };
 

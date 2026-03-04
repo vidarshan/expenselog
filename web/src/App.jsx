@@ -15,6 +15,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { IoClose, IoMenu } from "react-icons/io5";
 import LogsPage from "./pages/LogsPage";
 import InsightsPage from "./pages/InsightsPage";
+import BudgetsPage from "./pages/BudgetsPage";
 
 function App() {
   const [opened, { toggle }] = useDisclosure(true);
@@ -82,6 +83,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/budgets"
+              element={
+                <ProtectedRoute>
+                  <BudgetsPage />
                 </ProtectedRoute>
               }
             />

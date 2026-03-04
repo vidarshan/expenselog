@@ -30,7 +30,7 @@ const transactionSchema = new mongoose.Schema(
       ref: "Category",
       required: false,
     },
-    AccountId: {
+    accountId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Account",
       required: false,
