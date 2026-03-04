@@ -3,6 +3,8 @@ import authReducer from "./slices/authSlice";
 import dashboardReducer from "./slices/dashboardSlice";
 import logReducer from "./slices/logSlice";
 import transactionsReducer from "./slices/transactionsSlice";
+import categoryReducer from "./slices/categorySlice";
+import accountsReducer from "./slices/accountsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +12,8 @@ export const store = configureStore({
     dashboard: dashboardReducer,
     logs: logReducer,
     transactions: transactionsReducer,
+    categories: categoryReducer,
+    accounts: accountsReducer,
   },
   devTools: import.meta.env.MODE !== "production",
 });

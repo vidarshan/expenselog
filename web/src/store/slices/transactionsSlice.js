@@ -33,7 +33,7 @@ export const getTransactions = createAsyncThunk(
   },
 );
 
-const dashboardSlice = createSlice({
+const transactionSlice = createSlice({
   name: "transactions",
   initialState,
   reducers: {},
@@ -55,4 +55,4 @@ const dashboardSlice = createSlice({
   },
 });
 
-export default dashboardSlice.reducer;
+export default transactionSlice.reducer;

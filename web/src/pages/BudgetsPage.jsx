@@ -1,9 +1,4 @@
-// BudgetsPage.tsx
-// Complete Budgets page with MOCK DATA (no API needed yet)
-// Stack: React + Mantine
-// Drop this into your routes/pages and render <BudgetsPage />
-
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   ActionIcon,
   Badge,
@@ -29,33 +24,6 @@ import {
 } from "@mantine/core";
 import { IoPencilOutline, IoSearchOutline } from "react-icons/io5";
 
-/** -----------------------------
- * Types
- ------------------------------*/
-type Period = { year: number; month: number };
-
-type BudgetItem = {
-  categoryId: string;
-  categoryName: string;
-  limit: number; // budget limit for this category
-  spent: number; // total expenses in the period
-};
-
-type UnbudgetedItem = {
-  categoryId: string;
-  categoryName: string;
-  spent: number;
-};
-
-type BudgetOverview = {
-  period: Period;
-  items: BudgetItem[];
-  unbudgeted: UnbudgetedItem[];
-};
-
-/** -----------------------------
- * Mock data helpers
- ------------------------------*/
 const MONTHS = [
   { value: "1", label: "Jan" },
   { value: "2", label: "Feb" },
@@ -71,16 +39,16 @@ const MONTHS = [
   { value: "12", label: "Dec" },
 ];
 
-function clamp(n: number, min: number, max: number) {
+function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
 }
 
-function pctUsed(spent: number, limit: number) {
+function pctUsed(spent, limit) {
   if (limit <= 0) return spent > 0 ? 1 : 0;
   return spent / limit;
 }
 
-function statusFor(spent: number, limit: number): "ok" | "warning" | "over" {
+function statusFor(spent, limit) {
   if (limit <= 0) return spent > 0 ? "over" : "ok";
   const p = spent / limit;
   if (spent > limit) return "over";
@@ -88,25 +56,24 @@ function statusFor(spent: number, limit: number): "ok" | "warning" | "over" {
   return "ok";
 }
 
-function statusBadge(status: "ok" | "warning" | "over") {
+function statusBadge(status) {
   if (status === "over") return <Badge color="red">Over</Badge>;
   if (status === "warning") return <Badge color="yellow">Warning</Badge>;
   return <Badge color="green">OK</Badge>;
 }
 
-// Creates predictable mock numbers that vary by month/year
-function seededAmount(seed: number, min: number, max: number) {
-  // simple deterministic-ish pseudo-random
+// deterministic-ish pseudo random number between min/max
+function seededAmount(seed, min, max) {
   const x = Math.sin(seed) * 10000;
   const frac = x - Math.floor(x);
   return Math.round((min + frac * (max - min)) * 100) / 100;
 }
 
-function buildMockOverview(period: Period): BudgetOverview {
+function buildMockOverview(period) {
   const { year, month } = period;
   const baseSeed = year * 100 + month;
 
-  const budgeted: BudgetItem[] = [
+  const budgeted = [
     {
       categoryId: "cat_food",
       categoryName: "Food",
@@ -145,7 +112,7 @@ function buildMockOverview(period: Period): BudgetOverview {
     },
   ];
 
-  const unbudgeted: UnbudgetedItem[] = [
+  const unbudgeted = [
     {
       categoryId: "cat_gifts",
       categoryName: "Gifts",
@@ -161,16 +128,7 @@ function buildMockOverview(period: Period): BudgetOverview {
   return { period, items: budgeted, unbudgeted };
 }
 
-/** -----------------------------
- * Components
- ------------------------------*/
-function PeriodPicker({
-  value,
-  onChange,
-}: {
-  value: Period;
-  onChange: (p: Period) => void;
-}) {
+function PeriodPicker({ value, onChange }) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 7 }).map((_, i) => {
     const y = currentYear - 3 + i;
@@ -195,7 +153,7 @@ function PeriodPicker({
   );
 }
 
-function SummaryCards({ overview }: { overview: BudgetOverview }) {
+function SummaryCards({ overview }) {
   const summary = useMemo(() => {
     const totalLimit = overview.items.reduce((s, i) => s + (i.limit || 0), 0);
     const totalSpentBudgeted = overview.items.reduce(
@@ -281,22 +239,11 @@ function BudgetEditModal({
   initialLimit,
   onSave,
   saving,
-}: {
-  opened: boolean;
-  onClose: () => void;
-  categoryName: string;
-  initialLimit: number;
-  onSave: (limit: number) => void;
-  saving?: boolean;
 }) {
-  const [limit, setLimit] = useState<number>(initialLimit);
+  const [limit, setLimit] = useState(initialLimit || 0);
 
-  // keep in sync when opening different rows
-  // (simple approach: reset when modal opens)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useMemo(() => {
-    if (opened) setLimit(initialLimit);
-    return null;
+  useEffect(() => {
+    if (opened) setLimit(initialLimit || 0);
   }, [opened, initialLimit]);
 
   return (
@@ -316,17 +263,13 @@ function BudgetEditModal({
           min={0}
           decimalScale={2}
           fixedDecimalScale
-          hideControls={false}
         />
 
         <Group justify="flex-end" mt="sm">
           <Button variant="default" onClick={onClose}>
             Cancel
           </Button>
-          <Button
-            loading={saving}
-            onClick={() => onSave(Number.isFinite(limit) ? limit : 0)}
-          >
+          <Button loading={saving} onClick={() => onSave(Number(limit) || 0)}>
             Save
           </Button>
         </Group>
@@ -335,17 +278,7 @@ function BudgetEditModal({
   );
 }
 
-function BudgetedTable({
-  items,
-  query,
-  only,
-  onEdit,
-}: {
-  items: BudgetItem[];
-  query: string;
-  only: "all" | "warning" | "over";
-  onEdit: (categoryId: string) => void;
-}) {
+function BudgetedTable({ items, query, only, onEdit }) {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return items
@@ -356,7 +289,6 @@ function BudgetedTable({
         return s === only;
       })
       .sort((a, b) => {
-        // show worst offenders first
         const ap = pctUsed(a.spent, a.limit);
         const bp = pctUsed(b.spent, b.limit);
         return bp - ap;
@@ -450,15 +382,7 @@ function BudgetedTable({
   );
 }
 
-function UnbudgetedTable({
-  items,
-  query,
-  onCreateBudget,
-}: {
-  items: UnbudgetedItem[];
-  query: string;
-  onCreateBudget: (categoryId: string) => void;
-}) {
+function UnbudgetedTable({ items, query, onCreateBudget }) {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return items
@@ -523,32 +447,28 @@ function UnbudgetedTable({
   );
 }
 
-/** -----------------------------
- * Page
- ------------------------------*/
 export default function BudgetsPage() {
   const now = new Date();
-  const [period, setPeriod] = useState<Period>({
+
+  const [period, setPeriod] = useState({
     year: now.getFullYear(),
     month: now.getMonth() + 1,
   });
 
-  // Mock overview: rebuild when period changes
-  const [overview, setOverview] = useState<BudgetOverview>(() =>
-    buildMockOverview(period),
-  );
-  useMemo(() => {
+  // Mock overview (rebuild when period changes)
+  const [overview, setOverview] = useState(() => buildMockOverview(period));
+
+  useEffect(() => {
     setOverview(buildMockOverview(period));
-    return null;
   }, [period.year, period.month]);
 
   // Filters
   const [search, setSearch] = useState("");
-  const [only, setOnly] = useState<"all" | "warning" | "over">("all");
+  const [only, setOnly] = useState("all"); // "all" | "warning" | "over"
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
-  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
+  const [activeCategoryId, setActiveCategoryId] = useState(null);
 
   const active = useMemo(() => {
     if (!activeCategoryId) return null;
@@ -556,47 +476,42 @@ export default function BudgetsPage() {
     const inBudgeted = overview.items.find(
       (x) => x.categoryId === activeCategoryId,
     );
-    if (inBudgeted) return { kind: "budgeted" as const, ...inBudgeted };
+    if (inBudgeted) return { kind: "budgeted", ...inBudgeted };
 
     const inUnbudgeted = overview.unbudgeted.find(
       (x) => x.categoryId === activeCategoryId,
     );
-    if (inUnbudgeted) {
-      return { kind: "unbudgeted" as const, ...inUnbudgeted, limit: 0 };
-    }
+    if (inUnbudgeted) return { kind: "unbudgeted", ...inUnbudgeted, limit: 0 };
 
     return null;
   }, [activeCategoryId, overview.items, overview.unbudgeted]);
 
-  const onEditBudgeted = (categoryId: string) => {
+  const onEditBudgeted = (categoryId) => {
     setActiveCategoryId(categoryId);
     setModalOpen(true);
   };
 
-  const onCreateBudgetFromUnbudgeted = (categoryId: string) => {
+  const onCreateBudgetFromUnbudgeted = (categoryId) => {
     setActiveCategoryId(categoryId);
     setModalOpen(true);
   };
 
-  const saveBudget = (limit: number) => {
+  const saveBudget = (limit) => {
     if (!activeCategoryId) return;
 
-    // MOCK "upsert budget":
-    // - if already in items: update limit
-    // - else: move from unbudgeted to budgeted with that limit
     setOverview((prev) => {
       const existingIdx = prev.items.findIndex(
         (x) => x.categoryId === activeCategoryId,
       );
 
-      // If already budgeted, update limit
+      // already budgeted → update limit
       if (existingIdx >= 0) {
         const nextItems = [...prev.items];
         nextItems[existingIdx] = { ...nextItems[existingIdx], limit };
         return { ...prev, items: nextItems };
       }
 
-      // If unbudgeted, move it into budgeted
+      // move from unbudgeted → budgeted
       const ub = prev.unbudgeted.find((x) => x.categoryId === activeCategoryId);
       if (ub) {
         const nextUnbudgeted = prev.unbudgeted.filter(
@@ -655,7 +570,7 @@ export default function BudgetsPage() {
 
             <Select
               value={only}
-              onChange={(v) => setOnly((v as any) ?? "all")}
+              onChange={(v) => setOnly(v ?? "all")}
               data={[
                 { value: "all", label: "All" },
                 { value: "warning", label: "Warning only" },
@@ -685,6 +600,7 @@ export default function BudgetsPage() {
           categoryName={active?.categoryName ?? ""}
           initialLimit={active?.limit ?? 0}
           onSave={saveBudget}
+          saving={false}
         />
       </Stack>
     </Container>

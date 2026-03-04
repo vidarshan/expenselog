@@ -16,6 +16,7 @@ import { IoClose, IoMenu } from "react-icons/io5";
 import LogsPage from "./pages/LogsPage";
 import InsightsPage from "./pages/InsightsPage";
 import BudgetsPage from "./pages/BudgetsPage";
+import AccountsPage from "./pages/AccountsPage";
 
 function App() {
   const [opened, { toggle }] = useDisclosure(true);
@@ -44,8 +45,8 @@ function App() {
             pos="fixed"
             size="xl"
             radius="xl"
-            style={{ zIndex: 9999 }}
-            variant="filled"
+            style={{ zIndex: 99 }}
+            variant="white"
             onClick={toggle}
           >
             {opened ? <IoClose /> : <IoMenu />}
@@ -91,6 +92,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <BudgetsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/accounts"
+              element={
+                <ProtectedRoute>
+                  <AccountsPage />
                 </ProtectedRoute>
               }
             />

@@ -211,7 +211,7 @@ const DashboardPage = () => {
   });
 
   return (
-    <Container size="xl">
+    <Container size="lg" py="md">
       <Modal
         opened={false}
         onClose={() => setRecordOpened(false)}
@@ -402,39 +402,14 @@ const DashboardPage = () => {
         <Grid>
           <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
             <Group my="sm" align="center" justify="space-between">
-              <Title>Dashboard</Title>
-              <Flex gap="xs">
-                <Select
-                  value={selectedMonth}
-                  leftSection={<IoCalendarOutline />}
-                  onChange={(value) => handleFilterChange(value, selectedYear)}
-                  placeholder="Month"
-                  data={[
-                    { value: "1", label: "January" },
-                    { value: "2", label: "February" },
-                    { value: "3", label: "March" },
-                    { value: "4", label: "April" },
-                    { value: "5", label: "May" },
-                    { value: "6", label: "June" },
-                    { value: "7", label: "July" },
-                    { value: "8", label: "August" },
-                    { value: "9", label: "September" },
-                    { value: "10", label: "October" },
-                    { value: "11", label: "November" },
-                    { value: "12", label: "December" },
-                  ]}
-                />
-                {/* <Select
-                  value={selectedYear}
-                  leftSection={<IoCalendarOutline />}
-                  placeholder="Year"
-                  onChange={(value) => handleFilterChange(selectedMonth, value)}
-                  data={logs.map((log) => ({
-                    value: log.year.toString(),
-                    label: log.year.toString(),
-                  }))}
-                /> */}
-              </Flex>
+              <Group justify="space-between" align="flex-end">
+                <Box>
+                  <Title order={2}>Dashboard</Title>
+                  <Text c="dimmed" size="sm">
+                    Overview for current month
+                  </Text>
+                </Box>
+              </Group>
             </Group>
           </Grid.Col>
           <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>

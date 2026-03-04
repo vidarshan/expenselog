@@ -11,6 +11,7 @@ import transactionRoutes from "./routes/transaction.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import insightsRoutes from "./routes/insights.routes.js";
 import budgetRoutes from "./routes/budget.routes.js";
+import accountRoutes from "./routes/accounts.routes.js";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -39,6 +40,7 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/insights", insightsRoutes);
 app.use("/api/budget", budgetRoutes);
+app.use("/api/accounts", accountRoutes);
 
 app.listen(PORT, () => {
   console.log(

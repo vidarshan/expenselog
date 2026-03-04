@@ -12,9 +12,12 @@ import {
   useMantineColorScheme,
   Switch,
   ThemeIcon,
+  Button,
 } from "@mantine/core";
 import {
+  IoAddOutline,
   IoBarChartOutline,
+  IoBuildOutline,
   IoCardOutline,
   IoCashOutline,
   IoCheckboxOutline,
@@ -30,15 +33,19 @@ import {
   IoSunnyOutline,
 } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser, logout } from "../store/slices/authSlice";
+import AddRecord from "./popups/AddRecord";
+import SidebarBalanceCard from "./cards/SidebarBalanceCard";
 const NavBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { user } = useSelector((state) => state.auth);
+  const { accounts, loading } = useSelector((state) => state.accounts);
   const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const [opened, setOpened] = useState(false);
 
   useEffect(() => {
     dispatch(getUser());
@@ -51,6 +58,7 @@ const NavBar = () => {
 
   return (
     <>
+      <AddRecord expenseOpened={opened} setExpenseOpened={setOpened} />
       <Flex justify="center">
         <Logo titleSize={5} onClick={() => navigate("/")} />
       </Flex>
@@ -58,6 +66,14 @@ const NavBar = () => {
         <Stack h="100%" justify="space-between" p="sm">
           <Stack>
             {" "}
+            <Button
+              leftSection={<IoAddOutline />}
+              variant="light"
+              onClick={() => setOpened(!opened)}
+            >
+              Create Log
+            </Button>
+            <Divider />
             <NavLink
               className="rounded-link"
               label="Dashboard"
@@ -79,54 +95,31 @@ const NavBar = () => {
               onClick={() => navigate("/budgets")}
               c={pathname === "/budgets" ? "lime" : "gray"}
             />
+            <NavLink
+              className="rounded-link"
+              label="Accounts"
+              leftSection={<IoCardOutline />}
+              onClick={() => navigate("/accounts")}
+              c={pathname === "/accounts" ? "lime" : "gray"}
+            />
             <Divider />
             <Stack px="sm">
               <Text size="sm">Balances</Text>
-              <Paper>
-                <Flex align="center" justify="space-between">
-                  <Group gap={6}>
-                    <ActionIcon color="lime" variant="light" radius="sm">
-                      <IoCashOutline />
-                    </ActionIcon>
-                    <Text size="sm" fw={600}>
-                      Cash
-                    </Text>
-                  </Group>
-                  <Text size="sm" fw={600}>
-                    $1,340
-                  </Text>
-                </Flex>
-              </Paper>
-              <Paper>
-                <Flex align="center" justify="space-between">
-                  <Group gap={6}>
-                    <ActionIcon color="orange" variant="light" radius="sm">
-                      <IoCardOutline />
-                    </ActionIcon>
-                    <Text size="sm" fw={600}>
-                      Credit
-                    </Text>
-                  </Group>
-                  <Text size="sm" fw={600}>
-                    $1,340
-                  </Text>
-                </Flex>
-              </Paper>
-              <Paper align="center" justify="space-between">
-                <Flex align="center" justify="space-between">
-                  <Group gap={6}>
-                    <ActionIcon color="violet" variant="light" radius="sm">
-                      <IoPodiumOutline />
-                    </ActionIcon>
-                    <Text size="sm" fw={600}>
-                      Bank
-                    </Text>
-                  </Group>
-                  <Text size="sm" fw={600}>
-                    $1,340
-                  </Text>
-                </Flex>
-              </Paper>
+              {accounts.length ? (
+                <>
+                  {accounts.map((a) => {
+                    return (
+                      <SidebarBalanceCard
+                        title={a.name}
+                        type={a.type}
+                        balance={a.currentBalance}
+                      />
+                    );
+                  })}
+                </>
+              ) : (
+                <Text size="xs">No accounts found.</Text>
+              )}
             </Stack>
             <Divider />
             <Stack px="sm">
