@@ -74,13 +74,6 @@ const NavBar = () => {
             />
             <NavLink
               className="rounded-link"
-              label="AI Insights"
-              leftSection={<IoBarChartOutline />}
-              onClick={() => navigate("/insights")}
-              c={pathname === "/insights" ? "lime" : "gray"}
-            />
-            <NavLink
-              className="rounded-link"
               label="Budgets"
               leftSection={<IoCheckboxOutline />}
               onClick={() => navigate("/budget")}

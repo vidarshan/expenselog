@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 import React from "react";
 import { IoCalendarOutline } from "react-icons/io5";
+import { AIInsightsCard } from "../components/cards/AICard";
 
 const InsightsPage = () => {
   return (

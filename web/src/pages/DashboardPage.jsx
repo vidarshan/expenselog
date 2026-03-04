@@ -47,6 +47,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getComparisons, getDashboard } from "../store/slices/dashboardSlice";
 import Loading from "../components/Loading";
 import { getActivePeriods } from "../store/slices/logSlice";
+import { AIInsightsCard } from "../components/cards/AICard";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -300,7 +301,7 @@ const DashboardPage = () => {
                     { value: "12", label: "December" },
                   ]}
                 />
-                <Select
+                {/* <Select
                   value={selectedYear}
                   leftSection={<IoCalendarOutline />}
                   placeholder="Year"
@@ -309,12 +310,28 @@ const DashboardPage = () => {
                     value: log.year.toString(),
                     label: log.year.toString(),
                   }))}
-                />
+                /> */}
               </Flex>
             </Group>
           </Grid.Col>
           <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
             <OverviewCard summary={dashboard?.summary} unit="month" />
+          </Grid.Col>
+          <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+            <AIInsightsCard
+              insights={[
+                "Your expense jump likely came from 1–2 categories—check Food vs last month.",
+                "Your spend is concentrated, so savings growth will come from optimizing the remaining flexible 30%.",
+              ]}
+              actions={[
+                "Try a 7-day discretionary cap and track it daily.",
+                "Pick 3 repeat merchants and set a weekly limit.",
+              ]}
+              risks={[
+                { label: "High essentials ratio", severity: "medium" },
+                { label: "Income flat", severity: "low" },
+              ]}
+            />
           </Grid.Col>
           <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
             <ContributionChart
