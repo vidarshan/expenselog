@@ -76,7 +76,6 @@ const TransactionTable = ({ disableAddLog }) => {
   // }, []);
 
   const addOrEditTransaction = (type, values) => {
-    console.log(type);
     const newTransaction = {
       title: values?.name,
       amount: values?.amount,
@@ -87,11 +86,9 @@ const TransactionTable = ({ disableAddLog }) => {
       type: values?.type,
     };
     if (selectedIndex === null) {
-      console.log(values);
       transactions.push(newTransaction);
       form.reset();
     } else {
-      console.log(selectedIndex);
       const updatedTransactions = transactions.map((item, i) =>
         i === selectedIndex ? { ...item, ...newTransaction } : item,
       );

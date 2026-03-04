@@ -28,11 +28,11 @@ app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/categories", require("./routes/category.routes"));
 app.use("/api/logs", require("./routes/log.routes"));
 app.use("/api/transactions", require("./routes/transaction.routes"));
+app.use("/api/dashboard", require("./routes/dashboard.routes"));
+app.use("/api/insights", require("./routes/insights.routes"));
 
 app.listen(PORT, () => {
   console.log(
     colors.bgGreen(`Server running on http://localhost:${PORT} on ${MODE}`),
   );
 });
-
-

@@ -38,7 +38,6 @@ const NavBar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { user } = useSelector((state) => state.auth);
-  console.log("user---", user);
   const { colorScheme, setColorScheme } = useMantineColorScheme();
 
   useEffect(() => {
@@ -68,7 +67,6 @@ const NavBar = () => {
             />
             <NavLink
               className="rounded-link"
-              href="#required-for-focus"
               label="Logs"
               leftSection={<IoListOutline />}
               onClick={() => navigate("/logs")}
@@ -76,7 +74,6 @@ const NavBar = () => {
             />
             <NavLink
               className="rounded-link"
-              href="#required-for-focus"
               label="AI Insights"
               leftSection={<IoBarChartOutline />}
               onClick={() => navigate("/insights")}
@@ -84,15 +81,6 @@ const NavBar = () => {
             />
             <NavLink
               className="rounded-link"
-              href="#required-for-focus"
-              label="Reports"
-              leftSection={<IoDocumentOutline />}
-              onClick={() => navigate("/reports")}
-              c={pathname === "/reports" ? "lime" : "gray"}
-            />
-            <NavLink
-              className="rounded-link"
-              href="#required-for-focus"
               label="Budgets"
               leftSection={<IoCheckboxOutline />}
               onClick={() => navigate("/budget")}

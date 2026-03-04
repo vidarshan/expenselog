@@ -7,6 +7,7 @@ import {
 import {
   ActionIcon,
   Badge,
+  Box,
   Button,
   Card,
   Container,
@@ -14,6 +15,7 @@ import {
   Flex,
   Grid,
   Group,
+  Loader,
   Modal,
   NumberInput,
   Pagination,
@@ -26,6 +28,7 @@ import {
 } from "@mantine/core";
 import {
   IoCalendarClearOutline,
+  IoCalendarOutline,
   IoFilterOutline,
   IoTrashOutline,
   IoTrendingDownOutline,
@@ -39,9 +42,32 @@ import moment from "moment";
 import YearAndMonthly from "../components/tables/YearAndMonthly";
 import { useNavigate } from "react-router-dom";
 import { appData } from "../data/appData";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getComparisons, getDashboard } from "../store/slices/dashboardSlice";
+import Loading from "../components/Loading";
+import { getActivePeriods } from "../store/slices/logSlice";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const now = new Date();
+  const { dashboard, monthlyComparison, loading, error } = useSelector(
+    (state) => state.dashboard,
+  );
+  const {
+    logs,
+    loading: activeLoading,
+    error: errorLoading,
+  } = useSelector((state) => state.logs);
+  console.log(logs);
+  const [selectedYear, setSelectedYear] = useState(
+    now.getFullYear().toString(),
+  );
+  const [selectedMonth, setSelectedMonth] = useState(
+    (now.getMonth() + 1).toString(),
+  );
+
   const [incomeOptions, setIncomeOptions] = useState("fixed");
   const [incomeSources, setIncomeSources] = useState([
     {
@@ -84,6 +110,27 @@ const DashboardPage = () => {
     );
   };
 
+  const handleFilterChange = (nextMonth, nextYear) => {
+    if (!nextMonth || !nextYear) return;
+
+    setSelectedMonth(nextMonth);
+    setSelectedYear(nextYear);
+
+    dispatch(
+      getDashboard({
+        year: Number(nextYear),
+        month: Number(nextMonth),
+      }),
+    );
+  };
+  useEffect(() => {
+    dispatch(getDashboard({ year: 2026, month: 1 }));
+    dispatch(
+      getComparisons({ yearA: 2026, monthA: 1, yearB: 2026, monthB: 2 }),
+    );
+    dispatch(getActivePeriods());
+  }, [dispatch]);
+
   const rows = yearlyMonthlyReports.map((yearReport) => {
     if (yearReport.year.toString() === year) {
       return yearReport.months.map(({ month, income, logs }) => {
@@ -115,9 +162,8 @@ const DashboardPage = () => {
       });
     }
   });
-
+  console.log(dashboard);
   const yearRows = appData.map(({ year, summary }) => {
-    console.log("summary", summary);
     return (
       <Table.Tr
         key={year + "$" + year}
@@ -226,101 +272,153 @@ const DashboardPage = () => {
           <Button>Create</Button>
         </Flex>
       </Modal>
-
-      <Grid>
-        <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          <OverviewCard />
-        </Grid.Col>
-        <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
-          <ContributionChart />
-        </Grid.Col>
-        <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
-          <Card h="100%" shadow="xl" withBorder>
-            <Flex>
-              <Text fw={700}>Most Recent transactions</Text>
-            </Flex>
-            {recentTransactions
-              ?.slice(0, 5)
-              .map(({ title, amount, category, date }, index) => (
-                <Card
-                  key={index + "@" + title}
-                  mt="xs"
-                  radius="lg"
-                  style={{ cursor: "pointer" }}
-                  withBorder
-                >
-                  <Flex align="center" justify="space-between">
-                    <Flex align="center">
+      {loading ? (
+        <Loading title="Loading Dashboard" />
+      ) : (
+        <Grid>
+          <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+            <Group my="sm" align="center" justify="space-between">
+              <Title>Dashboard</Title>
+              <Flex gap="xs">
+                <Select
+                  value={selectedMonth}
+                  leftSection={<IoCalendarOutline />}
+                  onChange={(value) => handleFilterChange(value, selectedYear)}
+                  placeholder="Month"
+                  data={[
+                    { value: "1", label: "January" },
+                    { value: "2", label: "February" },
+                    { value: "3", label: "March" },
+                    { value: "4", label: "April" },
+                    { value: "5", label: "May" },
+                    { value: "6", label: "June" },
+                    { value: "7", label: "July" },
+                    { value: "8", label: "August" },
+                    { value: "9", label: "September" },
+                    { value: "10", label: "October" },
+                    { value: "11", label: "November" },
+                    { value: "12", label: "December" },
+                  ]}
+                />
+                <Select
+                  value={selectedYear}
+                  leftSection={<IoCalendarOutline />}
+                  placeholder="Year"
+                  onChange={(value) => handleFilterChange(selectedMonth, value)}
+                  data={logs.map((log) => ({
+                    value: log.year.toString(),
+                    label: log.year.toString(),
+                  }))}
+                />
+              </Flex>
+            </Group>
+          </Grid.Col>
+          <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+            <OverviewCard summary={dashboard?.summary} unit="month" />
+          </Grid.Col>
+          <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
+            <ContributionChart
+              categoryBreakdown={dashboard?.categoryBreakdown}
+            />
+          </Grid.Col>
+          <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
+            <Card h="100%" shadow="xl" withBorder>
+              <Flex>
+                <Text fw={700}>Most Recent transactions</Text>
+              </Flex>
+              {dashboard?.recentTransactions?.map((tx) => {
+                return (
+                  <Card
+                    key={tx._id}
+                    mt="xs"
+                    radius="lg"
+                    style={{ cursor: "pointer" }}
+                    withBorder
+                  >
+                    <Flex align="center" justify="space-between">
+                      <Flex align="center">
+                        <Text fw={600} size="sm">
+                          {tx.name}
+                        </Text>
+                        <Badge ml="xs" variant="light">
+                          {tx.categoryName}
+                        </Badge>
+                      </Flex>
+                      <Text></Text>
                       <Text fw={600} size="sm">
-                        {title}
+                        ${tx.amount} | {moment(tx.date).fromNow()}
                       </Text>
-                      <Badge ml="xs" variant="light">
-                        {category}
-                      </Badge>
                     </Flex>
-                    <Text></Text>
-                    <Text fw={600} size="sm">
-                      ${amount} | {moment(date).fromNow()}
-                    </Text>
-                  </Flex>
-                </Card>
-              ))}
-          </Card>
-        </Grid.Col>
-        <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          <ComparisonChart />
-        </Grid.Col>
-        <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          <Card h="100%" withBorder>
-            <Flex mb="xl" justify="space-between" align="center">
-              <Text fw={700}>Past months</Text>
-              <Flex gap="xs">
-                <Select
-                  value={year}
-                  onChange={setYear}
-                  leftSection={<IoCalendarClearOutline />}
-                  data={["2025", "2024", "2023", "2022"]}
-                />
-                <Select
-                  leftSection={<IoFilterOutline />}
-                  placeholder="Apply Filters"
-                  data={["Most Recent", "Most Gain", "Most Loss", "Break Even"]}
-                />
+                  </Card>
+                );
+              })}
+            </Card>
+          </Grid.Col>
+          <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+            <ComparisonChart monthlyComparison={monthlyComparison} />
+          </Grid.Col>
+          {/* <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+            <Card h="100%" withBorder>
+              <Flex mb="xl" justify="space-between" align="center">
+                <Text fw={700}>Past months</Text>
+                <Flex gap="xs">
+                  <Select
+                    value={year}
+                    onChange={setYear}
+                    leftSection={<IoCalendarClearOutline />}
+                    data={["2025", "2024", "2023", "2022"]}
+                  />
+                  <Select
+                    leftSection={<IoFilterOutline />}
+                    placeholder="Apply Filters"
+                    data={[
+                      "Most Recent",
+                      "Most Gain",
+                      "Most Loss",
+                      "Break Even",
+                    ]}
+                  />
+                </Flex>
               </Flex>
-            </Flex>
-            <Grid>
-              <YearAndMonthly rows={rows} />
-            </Grid>
-            <Flex justify="center">
-              <Pagination mt="md" total={10} />
-            </Flex>
-          </Card>
-        </Grid.Col>
-        <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          <Card h="100%" withBorder>
-            <Flex mb="xl" justify="space-between" align="center">
-              <Text fw={700}>Yearly</Text>
-              <Flex gap="xs">
-                <Select
-                  value={year}
-                  onChange={setYear}
-                  leftSection={<IoCalendarClearOutline />}
-                  data={["2025", "2024", "2023", "2022"]}
-                />
-                <Select
-                  leftSection={<IoFilterOutline />}
-                  placeholder="Apply Filters"
-                  data={["Most Recent", "Most Gain", "Most Loss", "Break Even"]}
-                />
+              <Grid>
+                <YearAndMonthly rows={rows} />
+              </Grid>
+              <Flex justify="center">
+                <Pagination mt="md" total={10} />
               </Flex>
-            </Flex>
-            <YearAndMonthly mode="year" rows={yearRows} />
-            <Flex justify="center">
-              <Pagination mt="md" total={3} />
-            </Flex>
-          </Card>
-        </Grid.Col>
-      </Grid>
+            </Card>
+          </Grid.Col> */}
+          {/* <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+            <Card h="100%" withBorder>
+              <Flex mb="xl" justify="space-between" align="center">
+                <Text fw={700}>Yearly</Text>
+                <Flex gap="xs">
+                  <Select
+                    value={year}
+                    onChange={setYear}
+                    leftSection={<IoCalendarClearOutline />}
+                    data={["2025", "2024", "2023", "2022"]}
+                  />
+                  <Select
+                    leftSection={<IoFilterOutline />}
+                    placeholder="Apply Filters"
+                    data={[
+                      "Most Recent",
+                      "Most Gain",
+                      "Most Loss",
+                      "Break Even",
+                    ]}
+                  />
+                </Flex>
+              </Flex>
+              <YearAndMonthly mode="year" rows={yearRows} />
+              <Flex justify="center">
+                <Pagination mt="md" total={3} />
+              </Flex>
+            </Card>
+          </Grid.Col> */}
+        </Grid>
+      )}
     </Container>
   );
 };

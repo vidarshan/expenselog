@@ -13,9 +13,11 @@ import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useDisclosure } from "@mantine/hooks";
 import { IoClose, IoMenu } from "react-icons/io5";
+import LogsPage from "./pages/LogsPage";
+import InsightsPage from "./pages/InsightsPage";
 
 function App() {
-  const [opened, { toggle }] = useDisclosure();
+  const [opened, { toggle }] = useDisclosure(true);
 
   return (
     <MantineProvider
@@ -56,6 +58,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/logs"
+              element={
+                <ProtectedRoute>
+                  <LogsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/insights"
+              element={
+                <ProtectedRoute>
+                  <InsightsPage />
                 </ProtectedRoute>
               }
             />

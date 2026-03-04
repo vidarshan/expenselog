@@ -9,5 +9,6 @@ router
   .get(authMiddleware, logController.getMonthlyLogs)
   .post(authMiddleware, logController.createMonthlyLog);
 router.route("/yearly").get(authMiddleware, logController.getYearlyLogs);
+router.route("/active").get(authMiddleware, logController.getActivePeriods);
 
 module.exports = router;

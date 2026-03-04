@@ -4,7 +4,8 @@ import React from "react";
 import { IoCalendarOutline } from "react-icons/io5";
 import { categoryMonthlyComparison } from "../../data/mockdata";
 
-const ComparisonChart = () => {
+const ComparisonChart = ({ monthlyComparison }) => {
+  console.log("monthlyComparisonsss", monthlyComparison.labels.a);
   return (
     <Card h="100%" shadow="xl" withBorder>
       <Group justify="space-between" mb="lg">
@@ -25,16 +26,18 @@ const ComparisonChart = () => {
           />
         </Group>
       </Group>
-      <BarChart
-        h={300}
-        data={categoryMonthlyComparison}
-        dataKey="category"
-        series={[
-          { name: "January", color: "violet.6" },
-          { name: "February", color: "blue.6" },
-        ]}
-        tickLine="y"
-      />
+      {monthlyComparison != undefined && (
+        <BarChart
+          h={300}
+          data={monthlyComparison?.data}
+          dataKey="category"
+          series={[
+            { name: monthlyComparison.labels.a, color: "violet.6" },
+            { name: monthlyComparison.labels.b, color: "green.6" },
+          ]}
+          tickLine="y"
+        />
+      )}
     </Card>
   );
 };

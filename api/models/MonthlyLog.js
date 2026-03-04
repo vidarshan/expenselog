@@ -19,6 +19,13 @@ const monthlyLogSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    aiInsights: {
+      insights: [String],
+      suggestions: [String],
+      risk_flags: [String],
+      positive_note: String,
+      updatedAt: Date,
+    },
   },
   { timestamps: true },
 );

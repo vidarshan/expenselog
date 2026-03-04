@@ -1,16 +1,8 @@
 import { Card, Flex, Grid, Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import { IoTrendingDown, IoTrendingUp } from "react-icons/io5";
 
-const OverviewCard = ({
-  prevIncome = 0.0,
-  currentIncome = 0.0,
-  prevExpense = 0.0,
-  currentExpenses = 0.0,
-  prevTransactions = 0,
-  currentTransactions = 0,
-  gainOrLoss,
-  unit = "month",
-}) => {
+const OverviewCard = ({ summary, unit = "month" }) => {
+  const { expenses, income, net, savingsRate } = summary;
   return (
     <Grid>
       <Grid.Col span={{ xs: 3, sm: 3, md: 3, lg: 3, xl: 3 }}>
@@ -25,25 +17,21 @@ const OverviewCard = ({
           <Stack spacing="xs">
             <Flex gap={10} align="center">
               <ThemeIcon
-                color={currentIncome > prevIncome ? "green" : "red"}
+                color={income ? "green" : "red"}
                 variant="filled"
                 size="xl"
               >
-                {currentIncome > prevIncome ? (
-                  <IoTrendingUp />
-                ) : (
-                  <IoTrendingDown />
-                )}
+                {income > 0 ? <IoTrendingUp /> : <IoTrendingDown />}
               </ThemeIcon>
               <Flex direction="column">
                 <Text size="sm" c="dimmed">
                   Income
                 </Text>
-                <Title order={3}>${currentIncome}</Title>
+                <Title order={3}>${income}</Title>
               </Flex>
             </Flex>
             <Text size="sm" c="green.6">
-              ${currentIncome - prevIncome} compared to last {unit}
+              ${income} compared to last {unit}
             </Text>
           </Stack>
         </Card>
@@ -59,25 +47,21 @@ const OverviewCard = ({
           <Stack spacing="xs">
             <Flex gap={10} align="center">
               <ThemeIcon
-                color={currentExpenses > prevExpense ? "green" : "red"}
+                color={expenses ? "green" : "red"}
                 variant="filled"
                 size="xl"
               >
-                {currentExpenses > prevExpense ? (
-                  <IoTrendingUp />
-                ) : (
-                  <IoTrendingDown />
-                )}
+                {expenses > 0 ? <IoTrendingUp /> : <IoTrendingDown />}
               </ThemeIcon>
               <Flex direction="column">
                 <Text size="sm" c="dimmed">
                   Expenses
                 </Text>
-                <Title order={3}>${currentExpenses}</Title>
+                <Title order={3}>${expenses}</Title>
               </Flex>
             </Flex>
             <Text size="sm" c="green.6">
-              ${currentExpenses - prevExpense} compared to last {unit}
+              ${expenses} compared to last {unit}
             </Text>
           </Stack>
         </Card>
@@ -93,25 +77,21 @@ const OverviewCard = ({
           <Stack spacing="xs">
             <Flex gap={10} align="center">
               <ThemeIcon
-                color={currentTransactions > prevTransactions ? "green" : "red"}
+                color={savingsRate > 0 ? "green" : "red"}
                 variant="filled"
                 size="xl"
               >
-                {currentTransactions > prevTransactions ? (
-                  <IoTrendingUp />
-                ) : (
-                  <IoTrendingDown />
-                )}
+                {savingsRate > 0 ? <IoTrendingUp /> : <IoTrendingDown />}
               </ThemeIcon>
               <Flex direction="column">
                 <Text size="sm" c="dimmed">
-                  Transactions
+                  Savings Rate
                 </Text>
-                <Title order={3}>{currentTransactions}</Title>
+                <Title order={3}>{savingsRate}%</Title>
               </Flex>
             </Flex>
             <Text size="sm" c="green.6">
-              {currentTransactions - prevTransactions} compared to last {unit}
+              {savingsRate} compared to last {unit}
             </Text>
           </Stack>
         </Card>
@@ -127,27 +107,23 @@ const OverviewCard = ({
           <Stack spacing="xs">
             <Flex align="center" gap={10}>
               <ThemeIcon
-                color={currentTransactions > prevTransactions ? "green" : "red"}
+                color={net > 0 ? "green" : "red"}
                 variant="filled"
                 size="xl"
               >
-                {currentTransactions > prevTransactions ? (
-                  <IoTrendingUp />
-                ) : (
-                  <IoTrendingDown />
-                )}
+                {net > 0 ? <IoTrendingUp /> : <IoTrendingDown />}
               </ThemeIcon>
               <Flex direction="column">
                 <Text size="sm" c="dimmed">
                   Net Gain
                 </Text>
-                <Title order={3}>${gainOrLoss}</Title>
+                <Title order={3}>${net}</Title>
               </Flex>
             </Flex>
 
             <Flex align="center" gap="xs">
               <Text size="sm" c="green.6">
-                + ${gainOrLoss} compared to last {unit}
+                + ${net} compared to last {unit}
               </Text>
             </Flex>
           </Stack>

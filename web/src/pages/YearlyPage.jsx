@@ -22,8 +22,6 @@ const YearlyPage = () => {
   const { year } = useParams();
   const yearlyData = appData.find((i) => i.year == Number(year));
   const previousYearlyData = appData.find((i) => i.year == Number(year) - 1);
-  console.log("yearlyData", yearlyData);
-  console.log("prev", previousYearlyData);
 
   return (
     <Container size="xl" pt={NAVBAR_HEIGHT + 32}>

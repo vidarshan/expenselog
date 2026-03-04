@@ -3,8 +3,19 @@ import { expenseData } from "../../data/mockdata";
 import { Box, Card, Group, SegmentedControl, Text } from "@mantine/core";
 import { PieChart } from "@mantine/charts";
 
-const ContributionChart = () => {
+const ContributionChart = ({ categoryBreakdown }) => {
   const [mode, setMode] = useState("percent");
+  const totalSum = categoryBreakdown.reduce((sum, x) => sum + x.total, 0);
+
+  const pieData = categoryBreakdown.map((x) => ({
+    id: x.categoryId, // optional
+    name: x.categoryName, // label
+    value: x.total, // numeric value used for slices
+    percentage:
+      totalSum === 0 ? 0 : Number(((x.total / totalSum) * 100).toFixed(1)),
+  }));
+
+  console.log(mode);
 
   return (
     <Card h="100%" shadow="xl" withBorder>
@@ -18,7 +29,6 @@ const ContributionChart = () => {
             { label: "Percentages", value: "percent" },
           ]}
           onChange={(value) => {
-            console.log(value);
             setMode(value);
           }}
         />
@@ -31,14 +41,16 @@ const ContributionChart = () => {
           labelsPosition="outside"
           labelsType={mode}
           withLabels
-          data={expenseData}
+          data={pieData}
         />
         <Box>
-          {expenseData.map(({ name, value }) => {
+          {pieData.map(({ name, value, percentage }) => {
             return (
               <Group key={name + "-" + value} mb="xs" justify="space-between">
                 <Text size="xs">{name}</Text>
-                <Text size="xs">{value}</Text>
+                <Text size="xs">
+                  {mode === "percent" ? percentage + "%" : value}
+                </Text>
               </Group>
             );
           })}
