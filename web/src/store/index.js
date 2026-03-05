@@ -5,6 +5,7 @@ import logReducer from "./slices/logSlice";
 import transactionsReducer from "./slices/transactionsSlice";
 import categoryReducer from "./slices/categorySlice";
 import accountsReducer from "./slices/accountsSlice";
+import appReducer from "./slices/appSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     transactions: transactionsReducer,
     categories: categoryReducer,
     accounts: accountsReducer,
+    app: appReducer,
   },
   devTools: import.meta.env.MODE !== "production",
 });

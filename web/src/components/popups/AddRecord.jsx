@@ -25,13 +25,35 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { getCategories } from "../../store/slices/categorySlice";
 import { editAccount, getAccounts } from "../../store/slices/accountsSlice";
-import { createTransaction } from "../../store/slices/transactionsSlice";
+import {
+  createTransaction,
+  getTransactions,
+  updateTransaction,
+} from "../../store/slices/transactionsSlice";
 
-const AddRecord = ({ expenseOpened, setExpenseOpened }) => {
+const AddRecord = ({
+  expenseOpened,
+  setExpenseOpened,
+  mode = "create",
+  transaction,
+}) => {
   const dispatch = useDispatch();
-  const { loading, error, categories } = useSelector(
-    (state) => state.categories,
-  );
+  const { categories } = useSelector((state) => state.categories);
+  const { currentYear, currentMonth } = useSelector((state) => state.app);
+
+  function ymdToLocalDate(ymd) {
+    if (!ymd) return null;
+    const [y, m, d] = ymd.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  function dateToYMD(date) {
+    if (!date) return "";
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
 
   const { accounts } = useSelector((state) => state.accounts);
   const form = useForm({
@@ -59,6 +81,7 @@ const AddRecord = ({ expenseOpened, setExpenseOpened }) => {
   });
 
   const addOrEditTransaction = async (_type, values) => {
+    console.log(values);
     const payload = {
       name: values.name,
       amount: Number(values.amount) || 0,
@@ -66,16 +89,60 @@ const AddRecord = ({ expenseOpened, setExpenseOpened }) => {
       accountId: values.accountId,
       categoryId: values.type === "expense" ? values.category : undefined,
       date: values.date,
-      source: values.type === "income" ? values.source : undefined,
+      notes: values.notes,
+      time: values.time,
     };
 
-    await dispatch(createTransaction(payload)).unwrap();
+    if (mode === "create") {
+      await dispatch(createTransaction(payload)).unwrap();
+    } else {
+      await dispatch(
+        updateTransaction({ id: transaction._id, patch: payload }),
+      ).unwrap();
+    }
 
-    await dispatch(getAccounts()); // balances updated by backend
+    await dispatch(
+      getTransactions({
+        year: currentYear,
+        month: currentMonth,
+        page: 1,
+        limit: 20,
+      }),
+    );
+    await dispatch(getAccounts());
 
     form.reset();
     setExpenseOpened(false);
   };
+
+  useEffect(() => {
+    if (!expenseOpened) return;
+
+    if (mode === "edit" && transaction) {
+      form.setValues({
+        type: transaction.type ?? "expense",
+        amount: transaction.amount ?? 0,
+        name: transaction.name ?? "",
+        category: transaction.categoryId ?? "",
+        date: ymdToLocalDate(transaction.date),
+        time: transaction.time ?? "",
+        notes: transaction.notes ?? "",
+        accountId: transaction.accountId ?? "",
+      });
+    } else {
+      form.setValues({
+        type: "expense",
+        amount: 0,
+        name: "",
+        category: "",
+        date: null,
+        time: "",
+        notes: "",
+        accountId: "",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expenseOpened, mode, transaction]);
 
   useEffect(() => {
     dispatch(getCategories());
@@ -85,7 +152,7 @@ const AddRecord = ({ expenseOpened, setExpenseOpened }) => {
     <Modal
       opened={expenseOpened}
       onClose={() => setExpenseOpened(false)}
-      title="Add Record"
+      title={mode === "edit" ? "Edit Record" : "Add Record"}
       centered
       closeOnClickOutside={false}
     >
@@ -237,7 +304,7 @@ const AddRecord = ({ expenseOpened, setExpenseOpened }) => {
           >
             Cancel
           </Button>
-          <Button type="submit">Create</Button>
+          <Button type="submit">{mode === "edit" ? "Save" : "Create"}</Button>
         </Flex>
       </form>
     </Modal>

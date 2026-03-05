@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 import MonthlyLog from "../models/MonthlyLog.js";
 import Transaction from "../models/Transaction.js";
 import Account from "../models/Account.js";
+import Category from "../models/Category.js";
+
+function ymdToUTCNoon(ymd) {
+  const [y, m, d] = String(ymd).split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+}
 
 function computeDelta(accountType, txType, amount) {
   const amt = Number(amount);
@@ -21,66 +27,64 @@ function computeDelta(accountType, txType, amount) {
   throw new Error("Invalid account type");
 }
 
+
+
+
+
+
 async function getOrCreateMonthlyLog({ userId, date }) {
   const d = date ? new Date(date) : new Date();
   const year = d.getFullYear();
   const month = d.getMonth() + 1;
 
-  const log = await MonthlyLog.findOneAndUpdate(
-    { userId, year, month },
-    { $setOnInsert: { userId, year, month } },
-    { new: true, upsert: true },
-  );
-
+  let log = await MonthlyLog.findOne({ userId, year, month });
+  if (!log) {
+    log = await MonthlyLog.create({ userId, year, month });
+  }
   return log;
 }
 
 export const deleteTransaction = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const userId = new mongoose.Types.ObjectId(req.userId);
     const txId = new mongoose.Types.ObjectId(req.params.id);
 
+    // 1) Find tx (treat missing isDeleted as not deleted)
     const tx = await Transaction.findOne({
       _id: txId,
       userId,
-      isDeleted: false,
-    }).session(session);
+      isDeleted: { $ne: true },
+    });
 
     if (!tx) return res.status(404).json({ message: "Transaction not found" });
 
+    // 2) Find account
     const account = await Account.findOne({
       _id: tx.accountId,
       userId,
       isDeleted: false,
-    }).session(session);
+    });
 
     if (!account) return res.status(404).json({ message: "Account not found" });
 
+    // 3) Compute its balance effect
     const delta = computeDelta(account.type, tx.type, tx.amount);
 
+    // 4) Soft-delete the tx
     tx.isDeleted = true;
-    await tx.save({ session });
+    await tx.save();
 
-    // revert its effect on balance
+    // 5) Revert its effect on account balance
     await Account.updateOne(
       { _id: account._id },
       { $inc: { currentBalance: -delta } },
-      { session },
     );
 
-    await session.commitTransaction();
     return res.json({ ok: true });
   } catch (e) {
-    await session.abortTransaction();
     return res.status(400).json({ message: e.message });
-  } finally {
-    session.endSession();
   }
 };
-
 export const createTransaction = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.userId);
@@ -99,7 +103,18 @@ export const createTransaction = async (req, res) => {
     const delta = computeDelta(account.type, type, amount);
 
     const log = await getOrCreateMonthlyLog({ userId, date, session: null }); // adjust helper to allow no session
+    let categoryName = "";
+    if (type === "expense") {
+      const cat = await Category.findOne({
+        _id: new mongoose.Types.ObjectId(categoryId),
+        userId,
+        isDeleted: false, // if you have this field
+      }).lean();
 
+      if (!cat) return res.status(404).json({ message: "Category not found" });
+
+      categoryName = cat.name;
+    }
     const tx = await Transaction.create({
       userId,
       logId: log._id,
@@ -108,8 +123,8 @@ export const createTransaction = async (req, res) => {
       amount: Number(amount),
       name: name ?? "Transaction",
       categoryId: type === "expense" ? categoryId : undefined,
-      categoryName: type === "expense" ? "Expense" : "",
-      date: date ? new Date(date) : new Date(),
+      categoryName,
+      date: date ? ymdToUTCNoon(date) : new Date(),
       source: source ?? undefined,
       isDeleted: false,
     });
@@ -134,9 +149,6 @@ export const createTransaction = async (req, res) => {
 };
 
 export const updateTransaction = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const userId = new mongoose.Types.ObjectId(req.userId);
     const txId = new mongoose.Types.ObjectId(req.params.id);
@@ -145,81 +157,97 @@ export const updateTransaction = async (req, res) => {
     const tx = await Transaction.findOne({
       _id: txId,
       userId,
-      isDeleted: false,
-    }).session(session);
+      isDeleted: { $ne: true },
+    });
 
     if (!tx) return res.status(404).json({ message: "Transaction not found" });
 
+    // OLD account + old delta
     const oldAccount = await Account.findOne({
       _id: tx.accountId,
       userId,
       isDeleted: false,
-    }).session(session);
+    });
 
     if (!oldAccount)
       return res.status(404).json({ message: "Account not found" });
 
     const oldDelta = computeDelta(oldAccount.type, tx.type, tx.amount);
 
-    const newAccountId = patch.accountId ?? tx.accountId;
+    // NEW values (fallback to existing tx values)
+    const newAccountIdRaw = patch.accountId ?? tx.accountId;
     const newType = patch.type ?? tx.type;
     const newAmount = patch.amount ?? tx.amount;
 
+    const newAccountId = new mongoose.Types.ObjectId(newAccountIdRaw);
+
     const newAccount = await Account.findOne({
-      _id: new mongoose.Types.ObjectId(newAccountId),
+      _id: newAccountId,
       userId,
       isDeleted: false,
-    }).session(session);
+    });
 
     if (!newAccount)
       return res.status(404).json({ message: "New account not found" });
 
     const newDelta = computeDelta(newAccount.type, newType, newAmount);
 
-    // if date changes, logId may need to change
-    let newLogId = tx.logId;
+    // Update log/date if date changed
     if (patch.date) {
       const log = await getOrCreateMonthlyLog({
         userId,
         date: patch.date,
-        session,
       });
-      newLogId = log._id;
-      tx.date = new Date(patch.date);
+      tx.logId = log._id;
+      tx.date = ymdToUTCNoon(patch.date);
     }
 
-    // update tx fields
-    tx.accountId = new mongoose.Types.ObjectId(newAccountId);
+    // Update tx fields
+    tx.accountId = newAccountId;
     tx.type = newType;
     tx.amount = Number(newAmount);
-    tx.logId = newLogId;
 
     if (patch.name !== undefined) tx.name = patch.name;
-    if (patch.categoryId !== undefined) tx.categoryId = patch.categoryId;
 
-    await tx.save({ session });
+    // categoryId rules
+    if (newType === "expense") {
+      // if expense, you can change categoryId
+      if (patch.categoryId !== undefined) tx.categoryId = patch.categoryId;
+    } else {
+      // if income, categoryId should not exist
+      tx.categoryId = undefined;
+    }
 
-    // revert old effect
-    await Account.updateOne(
-      { _id: oldAccount._id },
-      { $inc: { currentBalance: -oldDelta } },
-      { session },
-    );
+    await tx.save();
 
-    // apply new effect
-    await Account.updateOne(
-      { _id: newAccount._id },
-      { $inc: { currentBalance: newDelta } },
-      { session },
-    );
+    // Balance adjustment
+    const sameAccount = String(oldAccount._id) === String(newAccount._id);
 
-    await session.commitTransaction();
+    if (sameAccount) {
+      // only apply the difference
+      const diff = newDelta - oldDelta;
+      if (diff !== 0) {
+        await Account.updateOne(
+          { _id: oldAccount._id },
+          { $inc: { currentBalance: diff } },
+        );
+      }
+    } else {
+      // revert old + apply new
+      await Account.updateOne(
+        { _id: oldAccount._id },
+        { $inc: { currentBalance: -oldDelta } },
+      );
+
+      await Account.updateOne(
+        { _id: newAccount._id },
+        { $inc: { currentBalance: newDelta } },
+      );
+    }
+
     return res.json(tx);
   } catch (e) {
-    await session.abortTransaction();
     return res.status(400).json({ message: e.message });
-  } finally {
-    session.endSession();
   }
 };
 

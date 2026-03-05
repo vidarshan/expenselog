@@ -10,6 +10,9 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import { HelmetProvider } from "react-helmet-async";
 import { store } from "./store/index.js";
 import { Provider } from "react-redux";
+import { setupInterceptors } from "./api/axios.js";
+
+setupInterceptors(store.dispatch);
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

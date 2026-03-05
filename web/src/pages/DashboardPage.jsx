@@ -56,26 +56,19 @@ import Loading from "../components/Loading";
 import { getActivePeriods } from "../store/slices/logSlice";
 import { AIInsightsCard } from "../components/cards/AICard";
 import { getAccounts } from "../store/slices/accountsSlice";
+import { getMonthOptions, getYearOptions } from "../utils/getCurrentPeriod";
+import { setMonth, setYear } from "../store/slices/appSlice";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const now = new Date();
-  const { dashboard, monthlyComparison, loading, error } = useSelector(
+
+  const { dashboard, monthlyComparison, loading } = useSelector(
     (state) => state.dashboard,
   );
-  const {
-    logs,
-    loading: activeLoading,
-    error: errorLoading,
-  } = useSelector((state) => state.logs);
+  const { currentYear, currentMonth } = useSelector((state) => state.app);
+  const { logs } = useSelector((state) => state.logs);
   console.log(logs);
-  const [selectedYear, setSelectedYear] = useState(
-    now.getFullYear().toString(),
-  );
-  const [selectedMonth, setSelectedMonth] = useState(
-    (now.getMonth() + 1).toString(),
-  );
 
   const [incomeOptions, setIncomeOptions] = useState("fixed");
   const [incomeSources, setIncomeSources] = useState([
@@ -87,8 +80,6 @@ const DashboardPage = () => {
   ]);
 
   const [recordOpened, setRecordOpened] = useState(false);
-
-  const [year, setYear] = useState("2025");
 
   const removeIncomeSource = (id) => {
     if (incomeSources.length > 1) {
@@ -119,97 +110,18 @@ const DashboardPage = () => {
     );
   };
 
-  const handleFilterChange = (nextMonth, nextYear) => {
-    if (!nextMonth || !nextYear) return;
-
-    setSelectedMonth(nextMonth);
-    setSelectedYear(nextYear);
-
+  useEffect(() => {
+    dispatch(getDashboard({ year: currentYear, month: currentMonth }));
     dispatch(
-      getDashboard({
-        year: Number(nextYear),
-        month: Number(nextMonth),
+      getComparisons({
+        yearA: currentYear,
+        monthA: currentMonth - 1,
+        yearB: currentYear,
+        monthB: currentMonth,
       }),
     );
-  };
-  useEffect(() => {
-    dispatch(getDashboard({ year: 2026, month: 1 }));
-    dispatch(
-      getComparisons({ yearA: 2026, monthA: 1, yearB: 2026, monthB: 2 }),
-    );
     dispatch(getActivePeriods());
-  }, [dispatch]);
-
-  const rows = yearlyMonthlyReports.map((yearReport) => {
-    if (yearReport.year.toString() === year) {
-      return yearReport.months.map(({ month, income, logs }) => {
-        return (
-          <Table.Tr
-            key={month + "$" + year}
-            onClick={() => navigate(`/reports/${year}/${month.toLowerCase()}`)}
-          >
-            <Table.Td>{year}</Table.Td>
-            <Table.Td>{month}</Table.Td>
-            <Table.Td>${income}</Table.Td>
-            <Table.Td>${income}</Table.Td>
-            <Table.Th>
-              <IoTrendingUpOutline />
-            </Table.Th>
-            <Table.Th>
-              <Badge variant="light" color="red">
-                Closed
-              </Badge>
-            </Table.Th>
-            <Table.Td>{logs}</Table.Td>
-            <Table.Td>
-              <Button size="xs" variant="subtle" fullWidth>
-                View report
-              </Button>
-            </Table.Td>
-          </Table.Tr>
-        );
-      });
-    }
-  });
-  console.log(dashboard);
-  const yearRows = appData.map(({ year, summary }) => {
-    return (
-      <Table.Tr
-        key={year + "$" + year}
-        onClick={() => navigate(`/reports/${year}`)}
-      >
-        <Table.Td>{year}</Table.Td>
-        <Table.Td>${summary.income}</Table.Td>
-        <Table.Td>${summary.expenses}</Table.Td>
-        <Table.Td>
-          {" "}
-          {summary.expenses > summary.income ? (
-            <IoTrendingDownOutline />
-          ) : (
-            <IoTrendingUpOutline />
-          )}
-        </Table.Td>
-        <Table.Th>
-          {summary.isClosed ? (
-            <Badge variant="light" color="red">
-              Closed
-            </Badge>
-          ) : (
-            <Badge variant="light" color="green">
-              Open
-            </Badge>
-          )}
-        </Table.Th>
-        <Table.Th>{summary.transactionCount}</Table.Th>
-        <Table.Td></Table.Td>
-        <Table.Td>
-          <Button size="xs" variant="subtle" fullWidth>
-            View report
-          </Button>
-        </Table.Td>
-      </Table.Tr>
-    );
-  });
+  }, [currentMonth, currentYear, dispatch]);
 
   return (
     <Container size="lg" py="md">
@@ -411,6 +323,26 @@ const DashboardPage = () => {
                   </Text>
                 </Box>
               </Group>
+              <Flex gap="sm">
+                <Select
+                  radius="md"
+                  value={currentMonth}
+                  leftSection={<IoCalendarOutline />}
+                  placeholder="Select Month"
+                  onChange={(value) => dispatch(setMonth(value))}
+                  data={getMonthOptions()}
+                  allowDeselect={false}
+                />
+                <Select
+                  radius="md"
+                  value={currentYear}
+                  leftSection={<IoCalendarOutline />}
+                  placeholder="Select Year"
+                  onChange={(value) => dispatch(setYear(value))}
+                  data={getYearOptions()}
+                  allowDeselect={false}
+                />
+              </Flex>
             </Group>
           </Grid.Col>
           <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>

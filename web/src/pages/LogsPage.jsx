@@ -1,71 +1,90 @@
 import { useState } from "react";
 import {
-  NAVBAR_HEIGHT,
-  recentTransactions,
-  yearlyMonthlyReports,
-} from "../data/mockdata";
-import {
-  ActionIcon,
-  Badge,
   Box,
   Button,
-  Card,
   Container,
-  Divider,
   Flex,
   Grid,
   Group,
-  Loader,
-  Modal,
-  NumberInput,
   Pagination,
-  Radio,
   ScrollArea,
   SegmentedControl,
   Select,
   Table,
   Text,
-  TextInput,
   Title,
 } from "@mantine/core";
-import {
-  IoCalendarClearOutline,
-  IoCalendarOutline,
-  IoFilterOutline,
-  IoTrashOutline,
-  IoTrendingDownOutline,
-  IoTrendingUpOutline,
-} from "react-icons/io5";
-import { nanoid } from "nanoid";
-import moment from "moment";
-import ContributionChart from "../components/charts/ContributionChart";
-import OverviewCard from "../components/OverviewCard";
-import ComparisonChart from "../components/charts/ComparisonChart";
 
-import YearAndMonthly from "../components/tables/YearAndMonthly";
-import { useNavigate } from "react-router-dom";
-import { appData } from "../data/appData";
+import moment from "moment";
+
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getComparisons, getDashboard } from "../store/slices/dashboardSlice";
-import Loading from "../components/Loading";
-import { getActivePeriods, getMonthlyLogs } from "../store/slices/logSlice";
-import { getTransactions } from "../store/slices/transactionsSlice";
+
+import { getMonthlyLogs } from "../store/slices/logSlice";
+import {
+  deleteTransaction,
+  getTransactions,
+} from "../store/slices/transactionsSlice";
+import { IoCalendarOutline, IoGridOutline } from "react-icons/io5";
+import {
+  getMonthOptions,
+  getYearOptions,
+  months,
+} from "../utils/getCurrentPeriod";
+import { setMonth, setYear } from "../store/slices/appSlice";
+import { getAccounts } from "../store/slices/accountsSlice";
+import AddRecord from "../components/popups/AddRecord";
+import { useNavigate } from "react-router-dom";
 
 const LogsPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading, error, transactions } = useSelector(
-    (state) => state.transactions,
-  );
+  const [expenseOpened, setExpenseOpened] = useState(false);
+  const [txMode, setTxMode] = useState("create");
+  const [selectedTx, setSelectedTx] = useState(null);
+  const { transactions } = useSelector((state) => state.transactions);
   const { monthlyLogs } = useSelector((state) => state.logs);
+
+  const { currentYear, currentMonth } = useSelector((state) => state.app);
 
   const [mode, setMode] = useState("This Month");
   const [activePage, setActivePage] = useState(1);
 
+  const openCreateTx = () => {
+    setTxMode("create");
+    setSelectedTx(null);
+    setExpenseOpened(true);
+  };
+
+  const openEditTx = (tx) => {
+    setTxMode("edit");
+    setSelectedTx(tx);
+    setExpenseOpened(true);
+  };
+
+  const handleDeleteTx = async (tx) => {
+    await dispatch(deleteTransaction(tx._id)).unwrap();
+    await dispatch(getAccounts());
+    await dispatch(
+      getTransactions({
+        year: currentYear,
+        month: currentMonth,
+        page: activePage,
+        limit: 20,
+      }),
+    );
+  };
+
   const handlePageChange = (value) => {
     setActivePage(value);
-    dispatch(getTransactions({ year: 2026, month: 1, page: value, limit: 10 }));
+    dispatch(
+      getTransactions({
+        year: currentYear,
+        month: currentMonth,
+        page: value,
+        limit: 20,
+      }),
+    );
   };
 
   console.log("transactions", transactions);
@@ -88,10 +107,12 @@ const LogsPage = () => {
       <Table.Td>{element.categoryName}</Table.Td>
       <Table.Td>{moment(element.date).format("MM-DD-YYYY hh:mm A")}</Table.Td>
       <Table.Td>
-        <Button size="xs">Edit</Button>
+        <Button size="xs" onClick={() => openEditTx(element)}>
+          Edit
+        </Button>
       </Table.Td>
       <Table.Td>
-        <Button color="red" size="xs">
+        <Button color="red" size="xs" onClick={() => handleDeleteTx(element)}>
           Delete
         </Button>
       </Table.Td>
@@ -114,22 +135,60 @@ const LogsPage = () => {
   ));
 
   useEffect(() => {
-    dispatch(getTransactions({ year: 2026, month: 1, page: 1, limit: 10 }));
-  }, [dispatch]);
+    dispatch(
+      getTransactions({
+        year: currentYear,
+        month: currentMonth,
+        page: 1,
+        limit: 20,
+      }),
+    );
+  }, [dispatch, currentMonth, currentYear]);
 
   return (
     <Container size="xl">
+      <AddRecord
+        expenseOpened={expenseOpened}
+        setExpenseOpened={setExpenseOpened}
+        mode={txMode}
+        transaction={selectedTx}
+      />
       <Grid>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
           <Group my="sm" align="center" justify="space-between">
-            <Title>{mode}</Title>
+            <Box>
+              <Title order={2}>{mode}</Title>
+              <Text c="dimmed" size="sm">
+                Logs for {months()[currentMonth - 1]} {currentYear}
+              </Text>
+            </Box>
             <Flex gap="xs"></Flex>
-            <SegmentedControl
-              value={mode}
-              color="lime"
-              onChange={(value) => handleModeChange(value)}
-              data={["This Month", "Monthly"]}
-            />
+            <Flex gap="xs">
+              <Button
+                leftSection={<IoGridOutline />}
+                onClick={() => navigate(`/categories`)}
+              >
+                Categories
+              </Button>
+              <Select
+                radius="md"
+                value={currentMonth}
+                leftSection={<IoCalendarOutline />}
+                placeholder="Select Month"
+                onChange={(value) => dispatch(setMonth(value))}
+                data={getMonthOptions()}
+                allowDeselect={false}
+              />
+              <Select
+                radius="md"
+                value={currentYear}
+                leftSection={<IoCalendarOutline />}
+                placeholder="Select Year"
+                onChange={(value) => dispatch(setYear(value))}
+                data={getYearOptions()}
+                allowDeselect={false}
+              />
+            </Flex>
           </Group>
         </Grid.Col>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>

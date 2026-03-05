@@ -17,6 +17,7 @@ import LogsPage from "./pages/LogsPage";
 import InsightsPage from "./pages/InsightsPage";
 import BudgetsPage from "./pages/BudgetsPage";
 import AccountsPage from "./pages/AccountsPage";
+import CategoriesPage from "./pages/CategoriesPage";
 
 function App() {
   const [opened, { toggle }] = useDisclosure(true);
@@ -25,7 +26,7 @@ function App() {
     <MantineProvider
       defaultColorScheme="light"
       theme={{
-        defaultRadius: "lg",
+        defaultRadius: "md",
         primaryColor: "lime",
       }}
     >
@@ -100,6 +101,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AccountsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/categories"
+              element={
+                <ProtectedRoute>
+                  <CategoriesPage />
                 </ProtectedRoute>
               }
             />
