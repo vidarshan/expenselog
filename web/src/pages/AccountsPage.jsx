@@ -15,7 +15,6 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { isInRange, isNotEmpty, useForm } from "@mantine/form";
 import React, { useEffect, useState } from "react";
 import { IoAddOutline } from "react-icons/io5";
 import AddAccount from "../components/popups/AddAccount";
@@ -27,25 +26,42 @@ import Loading from "../components/Loading";
 
 const AccountsPage = () => {
   const dispatch = useDispatch();
-  const { loading, error, accounts } = useSelector((state) => state.accounts);
+  const { loading, accounts } = useSelector((state) => state.accounts);
   const [opened, setOpened] = useState(false);
+  const [mode, setMode] = useState("create");
+  const [account, setAccount] = useState();
 
   const handleDelete = async (id) => {
     await dispatch(deleteAccount(id));
   };
 
-  useEffect(() => {
-    dispatch(getAccounts());
-  }, [dispatch]);
+  const openCreate = () => {
+    setMode("create");
+    setAccount(undefined);
+    setOpened(true);
+  };
+
+  const openEdit = (a) => {
+    setMode("edit");
+    setAccount(a);
+    setOpened(true);
+  };
+
+  const handleClose = () => {
+    setOpened(false);
+    setMode("create");
+    setAccount(undefined);
+  };
 
   return (
     <Container size="lg" py="md">
       <AddAccount
+        account={account}
+        mode={mode}
+        setMode={setMode}
         opened={opened}
-        onClose={() => setOpened(false)}
-        onSave={() => {
-          dispatch(getAccounts());
-        }}
+        onClose={handleClose}
+        onSave={() => dispatch(getAccounts())}
       />
       <Stack gap="md">
         <Group justify="space-between" align="center">
@@ -55,32 +71,28 @@ const AccountsPage = () => {
               Bank, Credit and Cash
             </Text>
           </Box>
-          <Button
-            leftSection={<IoAddOutline />}
-            onClick={() => setOpened(true)}
-          >
+
+          <Button leftSection={<IoAddOutline />} onClick={openCreate}>
             Create Account
           </Button>
         </Group>
       </Stack>
       {loading ? (
         <Loading />
+      ) : accounts.length > 0 ? (
+        <SimpleGrid mt="sm" cols={1}>
+          {accounts.map((a) => (
+            <AccountCard
+              key={a._id}
+              account={a}
+              onDelete={() => handleDelete(a._id)}
+              onEdit={() => openEdit(a)}
+              onSelect={() => openEdit(a)}
+            />
+          ))}
+        </SimpleGrid>
       ) : (
-        <>
-          {accounts.length > 0 ? (
-            <SimpleGrid mt="sm" cols={1}>
-              {accounts.map((a) => (
-                <AccountCard
-                  key={a._id}
-                  account={a}
-                  onDelete={() => handleDelete(a._id)}
-                />
-              ))}
-            </SimpleGrid>
-          ) : (
-            <EmptyContainer message="You have no accounts" />
-          )}
-        </>
+        <EmptyContainer message="You have no accounts" />
       )}
     </Container>
   );

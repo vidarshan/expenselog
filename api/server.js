@@ -30,7 +30,7 @@ mongoose
   .catch((err) => console.error(err));
 
 app.get("/", (req, res) => {
-  res.send("Server is running 🚀");
+  res.send("Server is running...");
 });
 
 app.use("/api/auth", authRoutes);

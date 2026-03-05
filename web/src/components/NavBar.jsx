@@ -38,6 +38,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUser, logout } from "../store/slices/authSlice";
 import AddRecord from "./popups/AddRecord";
 import SidebarBalanceCard from "./cards/SidebarBalanceCard";
+import { getAccounts } from "../store/slices/accountsSlice";
 const NavBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ const NavBar = () => {
 
   useEffect(() => {
     dispatch(getUser());
+    dispatch(getAccounts());
   }, [dispatch]);
 
   const handleLogout = () => {
@@ -110,6 +112,7 @@ const NavBar = () => {
                   {accounts.map((a) => {
                     return (
                       <SidebarBalanceCard
+                        key={a._id}
                         title={a.name}
                         type={a.type}
                         balance={a.currentBalance}

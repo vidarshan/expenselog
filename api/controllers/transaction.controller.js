@@ -12,7 +12,7 @@ function computeDelta(accountType, txType, amount) {
     return txType === "income" ? +amt : -amt;
   }
 
-  // credit: currentBalance = amount you owe (simple model)
+  // credit: currentBalance = amount owed (simple model)
   // expense increases debt, income (payment) reduces debt
   if (accountType === "credit") {
     return txType === "expense" ? +amt : -amt;
@@ -21,19 +21,17 @@ function computeDelta(accountType, txType, amount) {
   throw new Error("Invalid account type");
 }
 
-// helper: get or create monthly log for a given date
-async function getOrCreateMonthlyLog({ userId, date, session }) {
+async function getOrCreateMonthlyLog({ userId, date }) {
   const d = date ? new Date(date) : new Date();
   const year = d.getFullYear();
   const month = d.getMonth() + 1;
 
-  let log = await MonthlyLog.findOne({ userId, year, month }).session(session);
-  if (!log) {
-    const [created] = await MonthlyLog.create([{ userId, year, month }], {
-      session,
-    });
-    log = created;
-  }
+  const log = await MonthlyLog.findOneAndUpdate(
+    { userId, year, month },
+    { $setOnInsert: { userId, year, month } },
+    { new: true, upsert: true },
+  );
+
   return log;
 }
 
@@ -84,64 +82,54 @@ export const deleteTransaction = async (req, res) => {
 };
 
 export const createTransaction = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
     const userId = new mongoose.Types.ObjectId(req.userId);
     const { accountId, type, amount, categoryId, date, source, name } =
       req.body;
 
     if (!accountId) throw new Error("accountId is required");
-    if (!type || !["income", "expense"].includes(type))
-      throw new Error("type must be 'income' or 'expense'");
-    if (type === "expense" && !categoryId)
-      throw new Error("categoryId is required for expense");
 
     const account = await Account.findOne({
-      _id: new mongoose.Types.ObjectId(accountId),
+      _id: accountId,
       userId,
       isDeleted: false,
-    }).session(session);
-
+    });
     if (!account) return res.status(404).json({ message: "Account not found" });
 
     const delta = computeDelta(account.type, type, amount);
 
-    const log = await getOrCreateMonthlyLog({ userId, date, session });
+    const log = await getOrCreateMonthlyLog({ userId, date, session: null }); // adjust helper to allow no session
 
-    const [tx] = await Transaction.create(
-      [
-        {
-          userId,
-          logId: log._id,
-          accountId: account._id,
-          type,
-          amount: Number(amount),
-          name: name ?? "Transaction",
-          categoryId: type === "expense" ? categoryId : undefined,
-          categoryName: type === "expense" ? "Expense" : "Income", // optional; adjust if you store real names
-          date: date ? new Date(date) : new Date(),
-          source: source ?? undefined, // your schema defines object; keep undefined unless you use it
-          isDeleted: false,
-        },
-      ],
-      { session },
-    );
+    const tx = await Transaction.create({
+      userId,
+      logId: log._id,
+      accountId,
+      type,
+      amount: Number(amount),
+      name: name ?? "Transaction",
+      categoryId: type === "expense" ? categoryId : undefined,
+      categoryName: type === "expense" ? "Expense" : "",
+      date: date ? new Date(date) : new Date(),
+      source: source ?? undefined,
+      isDeleted: false,
+    });
 
-    await Account.updateOne(
-      { _id: account._id },
+    const updated = await Account.updateOne(
+      { _id: accountId, userId, isDeleted: false },
       { $inc: { currentBalance: delta } },
-      { session },
     );
 
-    await session.commitTransaction();
+    if (updated.modifiedCount !== 1) {
+      await Transaction.updateOne(
+        { _id: tx._id },
+        { $set: { isDeleted: true } },
+      );
+      return res.status(400).json({ message: "Failed to update balance" });
+    }
+
     return res.status(201).json(tx);
   } catch (e) {
-    await session.abortTransaction();
     return res.status(400).json({ message: e.message });
-  } finally {
-    session.endSession();
   }
 };
 

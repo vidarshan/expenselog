@@ -1,9 +1,11 @@
-import { ActionIcon, Popover } from "@mantine/core";
+import { ActionIcon, Popover, Box } from "@mantine/core";
 import React, { useState } from "react";
 import { IoEllipsisVerticalSharp } from "react-icons/io5";
 
 const MoreOptions = ({ options }) => {
   const [opened, setOpened] = useState(false);
+
+  const close = () => setOpened(false);
 
   return (
     <Popover
@@ -16,13 +18,20 @@ const MoreOptions = ({ options }) => {
         <ActionIcon
           variant="light"
           color="gray"
-          onClick={() => setOpened((o) => !o)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpened((o) => !o);
+          }}
         >
           <IoEllipsisVerticalSharp />
         </ActionIcon>
       </Popover.Target>
 
-      <Popover.Dropdown>{options}</Popover.Dropdown>
+      <Popover.Dropdown>
+        <Box onClick={(e) => e.stopPropagation()}>
+          {typeof options === "function" ? options({ close }) : options}
+        </Box>
+      </Popover.Dropdown>
     </Popover>
   );
 };

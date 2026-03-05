@@ -24,12 +24,16 @@ import {
 } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { getCategories } from "../../store/slices/categorySlice";
+import { editAccount, getAccounts } from "../../store/slices/accountsSlice";
+import { createTransaction } from "../../store/slices/transactionsSlice";
 
 const AddRecord = ({ expenseOpened, setExpenseOpened }) => {
   const dispatch = useDispatch();
   const { loading, error, categories } = useSelector(
     (state) => state.categories,
   );
+
+  const { accounts } = useSelector((state) => state.accounts);
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
@@ -39,47 +43,37 @@ const AddRecord = ({ expenseOpened, setExpenseOpened }) => {
       category: "",
       date: null,
       time: "",
-      method: "",
       notes: "",
+      accountId: "",
     },
     validate: {
       name: isNotEmpty("Name cannot be empty"),
       amount: isInRange({ min: 1 }, "Enter a value more than 0"),
       date: isNotEmpty("Date cannot be empty"),
-      method: (value, values) =>
-        values.type === "income"
-          ? null
-          : isNotEmpty("Method cannot be empty")(value),
-      time: (value, values) =>
-        values.type === "income"
-          ? null
-          : isNotEmpty("Time cannot be empty")(value),
+      accountId: isNotEmpty("Account cannot be empty"),
       category: (value, values) =>
-        values.type === "income"
-          ? null
-          : isNotEmpty("Category cannot be empty")(value),
+        values.type === "expense"
+          ? isNotEmpty("Category cannot be empty")(value)
+          : null,
     },
   });
 
-  const addOrEditTransaction = (type, values) => {
-    const newTransaction = {
-      title: values?.name,
-      amount: values?.amount,
-      category: values?.category,
-      date: values?.date,
-      paymentMethod: values?.method,
-      notes: values?.notes,
-      type: values?.type,
+  const addOrEditTransaction = async (_type, values) => {
+    const payload = {
+      name: values.name,
+      amount: Number(values.amount) || 0,
+      type: values.type,
+      accountId: values.accountId,
+      categoryId: values.type === "expense" ? values.category : undefined,
+      date: values.date,
+      source: values.type === "income" ? values.source : undefined,
     };
-    // if (selectedIndex === null) {
-    //   transactions.push(newTransaction);
-    //   form.reset();
-    // } else {
-    //   const updatedTransactions = transactions.map((item, i) =>
-    //     i === selectedIndex ? { ...item, ...newTransaction } : item,
-    //   );
-    //   setTransactions(updatedTransactions);
-    // }
+
+    await dispatch(createTransaction(payload)).unwrap();
+
+    await dispatch(getAccounts()); // balances updated by backend
+
+    form.reset();
     setExpenseOpened(false);
   };
 
@@ -167,12 +161,15 @@ const AddRecord = ({ expenseOpened, setExpenseOpened }) => {
             />
             <Select
               mt="sm"
-              label="Payment Method"
+              label="Account"
               leftSection={<IoCardOutline />}
-              placeholder="Select Method"
-              data={["Cash", "Card", "Bank", "Other"]}
-              key={form.key("method")}
-              {...form.getInputProps("method")}
+              placeholder="Select account"
+              data={(accounts || []).map((a) => ({
+                value: a._id,
+                label: `${a.name} (${a.type})`,
+              }))}
+              key={form.key("accountId")}
+              {...form.getInputProps("accountId")}
             />
             <Textarea
               mt="sm"
@@ -201,6 +198,18 @@ const AddRecord = ({ expenseOpened, setExpenseOpened }) => {
               placeholder="Enter Amount"
               key={form.key("amount")}
               {...form.getInputProps("amount")}
+            />
+            <Select
+              mt="sm"
+              label="Account"
+              leftSection={<IoCardOutline />}
+              placeholder="Select account"
+              data={(accounts || []).map((a) => ({
+                value: a._id,
+                label: `${a.name} (${a.type})`,
+              }))}
+              key={form.key("accountId")}
+              {...form.getInputProps("accountId")}
             />
             <DatePickerInput
               mt="sm"

@@ -15,6 +15,31 @@ const initialState = {
   error: "",
 };
 
+export const createTransaction = createAsyncThunk(
+  "transactions/create",
+  async (
+    { name, amount, type, categoryId, accountId, date, source },
+    thunkAPI,
+  ) => {
+    try {
+      const res = await api.post("/transactions", {
+        name,
+        amount,
+        type,
+        categoryId,
+        accountId,
+        date,
+        source,
+      });
+      return res.data;
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message || err?.message || "Create failed";
+      return thunkAPI.rejectWithValue(msg);
+    }
+  },
+);
+
 export const getTransactions = createAsyncThunk(
   "transactions/get",
   async ({ year, month, page, limit }, thunkAPI) => {

@@ -43,7 +43,7 @@ function getTypeMeta(type) {
   };
 }
 
-export default function AccountCard({ account, onDelete }) {
+export default function AccountCard({ account, onDelete, onSelect, onEdit }) {
   const name = account?.name || "Unnamed";
   const type = account?.type || "bank";
 
@@ -57,7 +57,7 @@ export default function AccountCard({ account, onDelete }) {
   const meta = getTypeMeta(type);
 
   return (
-    <Card withBorder p="lg">
+    <Card withBorder p="lg" onClick={onSelect}>
       <Group justify="space-between" align="flex-start" wrap="nowrap">
         <Group gap="sm" align="flex-start" wrap="nowrap">
           <ThemeIcon
@@ -65,7 +65,7 @@ export default function AccountCard({ account, onDelete }) {
               type === "cash" ? "lime" : type === "credit" ? "grape" : "blue"
             }
             size={44}
-            radius="md"
+            radius="xl"
             variant="light"
           >
             {meta.icon}
@@ -97,16 +97,35 @@ export default function AccountCard({ account, onDelete }) {
             </Text>
           </Stack>
           <MoreOptions
-            options={
-              <Button
-                color="red"
-                variant="light"
-                leftSection={<IoTrashOutline />}
-                onClick={() => onDelete && onDelete(account)}
-              >
-                Delete Account
-              </Button>
-            }
+            options={({ close }) => (
+              <Stack>
+                <Button
+                  color="red"
+                  variant="light"
+                  leftSection={<IoPencilOutline />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    close();
+                    onEdit && onEdit();
+                  }}
+                >
+                  Edit Account
+                </Button>
+
+                <Button
+                  color="red"
+                  variant="light"
+                  leftSection={<IoTrashOutline />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    close();
+                    onDelete && onDelete(account);
+                  }}
+                >
+                  Delete Account
+                </Button>
+              </Stack>
+            )}
           />
         </Flex>
       </Group>

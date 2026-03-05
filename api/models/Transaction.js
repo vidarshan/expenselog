@@ -28,36 +28,27 @@ const transactionSchema = new mongoose.Schema(
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
-      required: false,
+      required: function () {
+        return this.type === "expense";
+      },
     },
     accountId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Account",
-      required: false,
+      required: true,
     },
     categoryName: {
       type: String,
-      required: true,
-    },
-    source: {
-      type: {
-        type: String,
-        enum: ["fixed", "variable"],
-        required: function () {
-          return this.type === "income";
-        },
+      required: function () {
+        return this.type === "expense";
       },
-      refId: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: function () {
-          return this.type === "income";
-        },
-      },
+      default: "",
     },
     date: {
       type: Date,
       required: true,
     },
+    isDeleted: { type: Boolean, default: false, index: true },
   },
   { timestamps: true },
 );

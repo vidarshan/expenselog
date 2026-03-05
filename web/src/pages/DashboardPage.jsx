@@ -55,6 +55,7 @@ import { getComparisons, getDashboard } from "../store/slices/dashboardSlice";
 import Loading from "../components/Loading";
 import { getActivePeriods } from "../store/slices/logSlice";
 import { AIInsightsCard } from "../components/cards/AICard";
+import { getAccounts } from "../store/slices/accountsSlice";
 
 const DashboardPage = () => {
   const navigate = useNavigate();

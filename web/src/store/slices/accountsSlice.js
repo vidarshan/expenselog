@@ -60,6 +60,25 @@ export const deleteAccount = createAsyncThunk(
   },
 );
 
+export const editAccount = createAsyncThunk(
+  "accounts/edit",
+  async ({ id, name, type, creditLimit, initialBalance }, thunkAPI) => {
+    try {
+      const res = await api.patch(`/accounts/${id}`, {
+        name,
+        type,
+        creditLimit,
+        initialBalance,
+      });
+      return res.data;
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message || err?.message || "Update failed";
+      return thunkAPI.rejectWithValue(msg);
+    }
+  },
+);
+
 const accountsSlice = createSlice({
   name: "accounts",
   initialState,
@@ -105,6 +124,23 @@ const accountsSlice = createSlice({
       .addCase(deleteAccount.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Delete failed";
+      })
+      .addCase(editAccount.pending, (state) => {
+        state.loading = true;
+        state.error = "";
+      })
+      .addCase(editAccount.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = "";
+        const id = action.meta.arg.id;
+        const updated = action.payload;
+        state.accounts = state.accounts.map((a) =>
+          a._id === id ? { ...a, ...updated } : a,
+        );
+      })
+      .addCase(editAccount.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Update failed";
       });
   },
 });

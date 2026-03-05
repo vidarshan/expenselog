@@ -49,14 +49,17 @@ export const updateAccount = async (req, res) => {
     const userId = new mongoose.Types.ObjectId(req.userId);
     const id = new mongoose.Types.ObjectId(req.params.id);
 
-    const { name, type, creditLimit } = req.body;
+    const { name, type, creditLimit, initialBalance, currentBalance } =
+      req.body;
 
     const updates = {};
-
     if (name !== undefined) updates.name = String(name).trim();
     if (type !== undefined) updates.type = type;
     if (creditLimit !== undefined)
       updates.creditLimit = Number(creditLimit) || 0;
+
+    if (initialBalance !== undefined)
+      updates.initialBalance = Number(initialBalance) || 0;
 
     const updated = await Account.findOneAndUpdate(
       { _id: id, userId, isDeleted: false },
@@ -64,9 +67,7 @@ export const updateAccount = async (req, res) => {
       { new: true, runValidators: true },
     );
 
-    if (!updated) {
-      return res.status(404).json({ message: "Account not found" });
-    }
+    if (!updated) return res.status(404).json({ message: "Account not found" });
 
     return res.json(updated);
   } catch (err) {
@@ -76,7 +77,6 @@ export const updateAccount = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
-
 export const deleteAccount = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.userId);

@@ -10,7 +10,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { isInRange, isNotEmpty, useForm } from "@mantine/form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   IoBusinessOutline,
@@ -18,10 +18,10 @@ import {
   IoCashOutline,
   IoWalletOutline,
 } from "react-icons/io5";
-import { createAccount } from "../../store/slices/accountsSlice";
+import { createAccount, editAccount } from "../../store/slices/accountsSlice";
 import { useDispatch } from "react-redux";
 
-const AddAccount = ({ opened, onClose, onSave }) => {
+const AddAccount = ({ opened, onClose, onSave, mode, setMode, account }) => {
   const dispatch = useDispatch();
   const form = useForm({
     initialValues: {
@@ -43,6 +43,32 @@ const AddAccount = ({ opened, onClose, onSave }) => {
 
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    console.log(account);
+    if (!opened) return;
+
+    if (mode === "edit" && account) {
+      form.setValues({
+        name: account?.name ?? "",
+        type: account?.type ?? "bank",
+        initialBalance: Number(account?.initialBalance ?? 0),
+        creditLimit: Number(account?.creditLimit ?? 0),
+      });
+      form.resetDirty(); // optional: so Save button/dirty checks behave
+    }
+
+    if (mode === "create") {
+      form.setValues({
+        name: "",
+        type: "bank",
+        initialBalance: 0,
+        creditLimit: 0,
+      });
+      form.resetDirty();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [opened, mode, account]);
+
   async function handleSubmit(values) {
     try {
       setSaving(true);
@@ -55,7 +81,12 @@ const AddAccount = ({ opened, onClose, onSave }) => {
           values.type === "credit" ? Number(values.creditLimit) || 0 : 0,
       };
 
-      await dispatch(createAccount(payload));
+      if (mode === "create") {
+        await dispatch(createAccount(payload)).unwrap();
+      } else {
+        await dispatch(editAccount({ id: account?._id, ...payload })).unwrap();
+      }
+
       if (onSave) await onSave();
       form.reset();
       onClose();
@@ -71,7 +102,7 @@ const AddAccount = ({ opened, onClose, onSave }) => {
       title={
         <Group gap="xs">
           <IoWalletOutline />
-          <Text fw={600}>Create Account</Text>
+          <Text fw={600}>{mode === "create" ? "Create" : "Edit"} Account</Text>
         </Group>
       }
       centered
@@ -80,7 +111,8 @@ const AddAccount = ({ opened, onClose, onSave }) => {
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="sm">
           <Text c="dimmed" size="sm">
-            Add an account to track balances (cash, bank, or credit).
+            {mode === "create" ? "Create" : "Edit"} an account to track balances
+            (cash, bank, or credit).
           </Text>
 
           <TextInput
