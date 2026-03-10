@@ -45,11 +45,11 @@ const DashboardPage = () => {
   const isAuthed = !!token;
   const accountsCount = accounts?.length || 0;
   const categoriesCount = categories?.length || 0;
-  const logsCount = monthlyLogs?.data?.length || 0;
+  const hasTransactions = (dashboard?.recentTransactions?.length || 0) > 0;
+  console.log(monthlyLogs);
 
   const showSetup =
-    accountsCount === 0 || categoriesCount === 0 || logsCount === 0;
-
+    accountsCount === 0 || categoriesCount === 0 || !hasTransactions;
   useEffect(() => {
     dispatch(getDashboard({ year: currentYear, month: currentMonth }));
     dispatch(
@@ -76,7 +76,7 @@ const DashboardPage = () => {
             <GettingStartedCard
               accountsCount={accountsCount}
               categoriesCount={categoriesCount}
-              logsCount={logsCount}
+              hasTransactions={hasTransactions}
               setOpened={setOpened}
             />
           ) : (

@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 const GettingStartedCard = ({
   accountsCount = 0,
   categoriesCount = 0,
-  logsCount = 0,
+  hasTransactions = false,
   setOpened,
 }) => {
   const navigate = useNavigate();
@@ -121,19 +121,19 @@ const GettingStartedCard = ({
         <Card withBorder radius="md" p="md">
           <Group align="flex-start" wrap="nowrap">
             <ThemeIcon
-              color={logsCount > 0 ? "lime" : "orange"}
+              color={hasTransactions ? "lime" : "orange"}
               radius="xl"
               size="lg"
               variant="filled"
             >
-              {logsCount > 0 ? <IoCheckmark /> : "3"}
+              {hasTransactions ? <IoCheckmark /> : "3"}
             </ThemeIcon>
 
             <Stack gap={6} flex={1}>
               <Text
                 fw={600}
-                td={logsCount > 0 ? "line-through" : undefined}
-                c={logsCount > 0 ? "dimmed" : undefined}
+                td={hasTransactions ? "line-through" : undefined}
+                c={hasTransactions ? "dimmed" : undefined}
               >
                 Add First Transaction
               </Text>
@@ -141,12 +141,12 @@ const GettingStartedCard = ({
               <Text
                 size="sm"
                 c="dimmed"
-                td={logsCount > 0 ? "line-through" : undefined}
+                td={hasTransactions ? "line-through" : undefined}
               >
                 Start tracking income or expenses.
               </Text>
 
-              {logsCount > 0 ? (
+              {hasTransactions ? (
                 <Text tt="uppercase" fw={700} c="green">
                   Done
                 </Text>

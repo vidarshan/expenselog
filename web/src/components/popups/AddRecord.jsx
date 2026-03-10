@@ -32,6 +32,7 @@ import {
   getTransactions,
   updateTransaction,
 } from "../../store/slices/transactionsSlice";
+import { getDashboard } from "../../store/slices/dashboardSlice";
 
 const AddRecord = ({
   expenseOpened,
@@ -115,6 +116,7 @@ const AddRecord = ({
         limit: 20,
       }),
     );
+    await dispatch(getDashboard({ year: currentYear, month: currentMonth }));
     await dispatch(getAccounts());
 
     form.reset();
