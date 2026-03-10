@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import api from "../../api/axios";
+import { notifications } from "@mantine/notifications";
+import classes from "../../Demo.module.css";
 
 const initialState = {
   user: {
@@ -15,6 +17,21 @@ const initialState = {
   loading: false,
   error: "",
 };
+
+export const updateUser = createAsyncThunk(
+  "auth/update",
+  async (payload, thunkAPI) => {
+    console.log(payload);
+    try {
+      const res = await api.patch("/auth/update", payload);
+      return res.data;
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message || err?.message || "Update failed";
+      return thunkAPI.rejectWithValue(msg);
+    }
+  },
+);
 
 export const loginUser = createAsyncThunk(
   "auth/login",
@@ -96,7 +113,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = "";
@@ -130,7 +146,26 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload || "Registration failed";
       })
-
+      .addCase(updateUser.pending, (state) => {
+        state.loading = true;
+        state.error = "";
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = "";
+        state.user.email = action.payload.email || "";
+        state.user.username = action.payload.username || "";
+        state.user.role = action.payload.role || "";
+        state.user.salary = action.payload.salary || initialState.user.salary;
+        notifications.show({
+          title: "Profile Updated",
+          classNames: classes,
+        });
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Update failed";
+      })
       .addCase(getUser.pending, (state) => {
         state.loading = true;
         state.error = "";
@@ -138,6 +173,7 @@ const authSlice = createSlice({
       .addCase(getUser.fulfilled, (state, action) => {
         state.loading = false;
         state.error = "";
+        state.user.email = action.payload.email || "";
         state.user.username = action.payload?.username || "";
         state.user.salary = action.payload?.salary || initialState.user.salary;
       })

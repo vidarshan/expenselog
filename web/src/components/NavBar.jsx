@@ -12,17 +12,21 @@ import {
   Switch,
   ThemeIcon,
   Button,
+  Avatar,
 } from "@mantine/core";
 import {
   IoAddOutline,
   IoCardOutline,
-  IoCashOutline,
   IoCheckboxOutline,
+  IoClose,
+  IoCloudyNightOutline,
   IoHappy,
   IoHomeOutline,
   IoListOutline,
   IoLogOutOutline,
+  IoMenu,
   IoMoonOutline,
+  IoPartlySunnyOutline,
   IoPersonAddOutline,
   IoPersonOutline,
   IoSunnyOutline,
@@ -34,11 +38,15 @@ import { getUser, logout } from "../store/slices/authSlice";
 import AddRecord from "./popups/AddRecord";
 import SidebarBalanceCard from "./cards/SidebarBalanceCard";
 import { getAccounts } from "../store/slices/accountsSlice";
+import { useViewportSize } from "@mantine/hooks";
+import AccountCard from "./cards/AccountCard";
+import Profile from "./popups/Profile";
 
-const NavBar = () => {
+const NavBar = ({ toggle }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { width } = useViewportSize();
 
   const authUser = useSelector((state) => state.auth.user);
   const token = authUser?.token || null;
@@ -47,6 +55,7 @@ const NavBar = () => {
   const { accounts } = useSelector((state) => state.accounts);
 
   const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const [accountOpened, setAccountOpened] = useState(false);
   const [opened, setOpened] = useState(false);
 
   const isAuthed = !!token;
@@ -77,8 +86,29 @@ const NavBar = () => {
 
   return (
     <>
-      <AddRecord expenseOpened={opened} setExpenseOpened={setOpened} />
-
+      {isAuthed && (
+        <Profile
+          opened={accountOpened}
+          setOpened={() => setAccountOpened(false)}
+          handleLogout={handleLogout}
+        />
+      )}
+      {isAuthed && (
+        <AddRecord expenseOpened={opened} setExpenseOpened={setOpened} />
+      )}
+      {width <= 768 && (
+        <ActionIcon
+          pos="fixed"
+          size="xl"
+          top={10}
+          right={10}
+          radius="xl"
+          variant="white"
+          onClick={toggle}
+        >
+          {!opened ? <IoClose /> : <IoMenu />}
+        </ActionIcon>
+      )}
       <Flex justify="center">
         <Logo titleSize={5} onClick={() => navigate("/")} />
       </Flex>
@@ -146,53 +176,39 @@ const NavBar = () => {
 
             <Divider />
 
-            <Stack px="sm">
+            <Stack py={0} px={0}>
               <Group justify="space-between">
-                <Text size="sm">Theme</Text>
-                <Switch
-                  size="sm"
-                  checked={colorScheme === "dark"}
-                  onLabel={<IoMoonOutline />}
-                  offLabel={<IoSunnyOutline />}
-                  onChange={(event) =>
-                    setColorScheme(
-                      event.currentTarget.checked ? "dark" : "light",
-                    )
+                <Text size="xs">Theme</Text>
+                <ActionIcon
+                  size="md"
+                  variant="light"
+                  color={colorScheme === "light" ? "blue" : "yellow"}
+                  onClick={() =>
+                    setColorScheme(colorScheme === "dark" ? "light" : "dark")
                   }
-                />
+                >
+                  {colorScheme === "light" ? (
+                    <IoCloudyNightOutline />
+                  ) : (
+                    <IoPartlySunnyOutline />
+                  )}
+                </ActionIcon>
               </Group>
             </Stack>
           </Stack>
 
-          <Paper
-            className="hover-class"
-            onClick={() => navigate("/profile")}
-            py="md"
-          >
+          <Paper className="hover-class" onClick={() => setAccountOpened(true)}>
             <Flex align="center" justify="space-between">
               <Group gap="xs" justify="flex-start">
-                <ThemeIcon>
-                  <IoHappy />
-                </ThemeIcon>
-
+                <Avatar color="lime" radius="xl">
+                  {username?.[0] || "U"}
+                </Avatar>
                 <Paper>
                   <Text size="sm" fw={700}>
                     {username || "User"}
                   </Text>
                 </Paper>
               </Group>
-
-              <ActionIcon
-                radius="sm"
-                color="red"
-                variant="light"
-                onClick={(e) => {
-                  e.stopPropagation(); // prevents triggering /profile click
-                  handleLogout();
-                }}
-              >
-                <IoLogOutOutline />
-              </ActionIcon>
             </Flex>
           </Paper>
         </Stack>

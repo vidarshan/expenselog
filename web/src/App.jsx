@@ -18,6 +18,8 @@ import InsightsPage from "./pages/InsightsPage";
 import BudgetsPage from "./pages/BudgetsPage";
 import AccountsPage from "./pages/AccountsPage";
 import CategoriesPage from "./pages/CategoriesPage";
+import AuthRoute from "./components/AuthRoute";
+import { Notifications } from "@mantine/notifications";
 
 function App() {
   const [opened, { toggle }] = useDisclosure(true);
@@ -30,6 +32,7 @@ function App() {
         primaryColor: "lime",
       }}
     >
+      <Notifications position="top-right" />
       <AppShell
         padding="md"
         navbar={{
@@ -39,7 +42,7 @@ function App() {
         }}
       >
         <AppShell.Navbar>
-          <NavBar />
+          <NavBar toggle={toggle} />
         </AppShell.Navbar>
         <AppShell.Main>
           <ActionIcon
@@ -54,8 +57,22 @@ function App() {
           </ActionIcon>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
+            <Route
+              path="/login"
+              element={
+                <AuthRoute>
+                  <LoginPage />
+                </AuthRoute>
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <AuthRoute>
+                  <SignupPage />
+                </AuthRoute>
+              }
+            />
             <Route
               path="/dashboard"
               element={
@@ -132,113 +149,6 @@ function App() {
           </Routes>
         </AppShell.Main>
       </AppShell>
-      {/* <AppShell
-        padding="md"
-        navbar={{
-          width: 240,
-          breakpoint: "sm",
-          collapsed: {
-            mobile: !opened,
-            desktop: false,
-          },
-        }}
-      >
-        <AppShell.Navbar>
-          <Flex justify="center">
-            <ActionIcon onClick={() => toggle()}>
-              <IoBrush />
-            </ActionIcon>
-            <Burger
-              opened={opened}
-              onClick={toggle}
-              hiddenFrom="sm"
-              size="sm"
-            />
-            <Logo titleSize={4} logoSize={20} />
-          </Flex>
-        </AppShell.Navbar>
-
-        <AppShell.Main>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/reports/:year"
-              element={
-                <ProtectedRoute>
-                  <YearlyPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/reports/:year/:month"
-              element={
-                <ProtectedRoute>
-                  <MonthlyPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </AppShell.Main>
-      </AppShell> */}
-      {/* <NavBar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/reports/:year"
-          element={
-            <ProtectedRoute>
-              <YearlyPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/reports/:year/:month"
-          element={
-            <ProtectedRoute>
-              <MonthlyPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-      {location.pathname === "/" && <Footer />} */}
     </MantineProvider>
   );
 }

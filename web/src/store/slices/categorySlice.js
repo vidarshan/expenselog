@@ -9,7 +9,8 @@ const initialState = {
 
 export const getCategories = createAsyncThunk(
   "categories/get",
-  async (_, thunkAPI) => {
+  async (pl, thunkAPI) => {
+    console.log(pl);
     try {
       const categoryRes = await api.get("/categories");
       const categoryData = categoryRes.data;

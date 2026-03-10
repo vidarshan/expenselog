@@ -4,7 +4,7 @@ const auth = async (req, res, next) => {
   const header = req.headers.authorization;
 
   if (!header || !header.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: "Incorrect credentials" });
   }
 
   const token = header.split(" ")[1];

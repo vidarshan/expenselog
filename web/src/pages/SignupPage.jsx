@@ -21,7 +21,6 @@ import {
 } from "@mantine/core";
 import {
   IoSparklesOutline,
-  IoShieldCheckmarkOutline,
   IoTrendingUpOutline,
   IoWalletOutline,
   IoReceiptOutline,
@@ -66,7 +65,6 @@ export default function RegistrationPage() {
     };
 
     await dispatch(signUpUser(newUser));
-    // await dispatch(getUser());
   };
 
   return (
@@ -98,6 +96,12 @@ export default function RegistrationPage() {
 
                 <Stack mt="lg" gap="sm">
                   <AuthFeature
+                    icon={<IoSparklesOutline />}
+                    color="cyan"
+                    title="AI spending insights"
+                    desc="Get intelligent insights about your spending habits and personalized suggestions to improve your finances."
+                  />
+                  <AuthFeature
                     icon={<IoReceiptOutline />}
                     color="orange"
                     title="Fast expense logging"
@@ -115,14 +119,9 @@ export default function RegistrationPage() {
                     title="Salary support"
                     desc="Works for fixed or variable income."
                   />
-                  <AuthFeature
-                    icon={<IoShieldCheckmarkOutline />}
-                    title="Secure by default"
-                    desc="Hashed passwords + JWT protected API."
-                  />
                 </Stack>
 
-                <Paper mt="lg" withBorder p="sm">
+                <Paper mt="lg" radius="lg" withBorder p="sm">
                   <Text size="sm" fw={700}>
                     Quick setup
                   </Text>
@@ -157,13 +156,12 @@ export default function RegistrationPage() {
                         <Text mt={2}>Start tracking your money today.</Text>
                       </Box>
                     </Group>
-
                     {error && (
                       <Alert
                         my="lg"
                         variant="light"
                         color="red"
-                        title="An error occurred"
+                        title={error}
                       />
                     )}
 
@@ -217,7 +215,7 @@ export default function RegistrationPage() {
                       Create account
                     </Button>
 
-                    <Group my="md" align="center" justify="space-between">
+                    <Group my="lg" align="center" justify="space-between">
                       <Text size="sm">Already have an account?</Text>
                       <Text
                         onClick={() => navigate("/login")}

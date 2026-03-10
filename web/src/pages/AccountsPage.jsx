@@ -1,21 +1,14 @@
 import {
   Box,
   Button,
-  Card,
   Container,
-  Divider,
-  Grid,
   Group,
-  Modal,
-  NumberInput,
-  Select,
   SimpleGrid,
   Stack,
   Text,
-  TextInput,
   Title,
 } from "@mantine/core";
-import React, { useEffect, useState } from "react";
+import useState from "react";
 import { IoAddOutline } from "react-icons/io5";
 import AddAccount from "../components/popups/AddAccount";
 import { useDispatch, useSelector } from "react-redux";

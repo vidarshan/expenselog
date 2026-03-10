@@ -4,11 +4,16 @@ import Transaction from "../models/Transaction.js";
 import Account from "../models/Account.js";
 import Category from "../models/Category.js";
 
-function ymdToUTCNoon(ymd) {
-  const [y, m, d] = String(ymd).split("-").map(Number);
+function ymdToUTCNoon(value) {
+  if (!value) return null;
+
+  const datePart = String(value).slice(0, 10); // gets YYYY-MM-DD
+  const [y, m, d] = datePart.split("-").map(Number);
+
+  if (!y || !m || !d) return null;
+
   return new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
 }
-
 function computeDelta(accountType, txType, amount) {
   const amt = Number(amount);
   if (!Number.isFinite(amt) || amt <= 0) throw new Error("Amount must be > 0");
@@ -26,11 +31,6 @@ function computeDelta(accountType, txType, amount) {
 
   throw new Error("Invalid account type");
 }
-
-
-
-
-
 
 async function getOrCreateMonthlyLog({ userId, date }) {
   const d = date ? new Date(date) : new Date();
@@ -88,7 +88,7 @@ export const deleteTransaction = async (req, res) => {
 export const createTransaction = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.userId);
-    const { accountId, type, amount, categoryId, date, source, name } =
+    const { accountId, type, amount, categoryId, date, time, source, name } =
       req.body;
 
     if (!accountId) throw new Error("accountId is required");
@@ -125,6 +125,7 @@ export const createTransaction = async (req, res) => {
       categoryId: type === "expense" ? categoryId : undefined,
       categoryName,
       date: date ? ymdToUTCNoon(date) : new Date(),
+      time: time ?? "",
       source: source ?? undefined,
       isDeleted: false,
     });
@@ -266,7 +267,7 @@ export const getTransactionsByMonth = async (req, res) => {
     const limit = parseInt(req.query.limit, 10) || 20;
     const skip = (page - 1) * limit;
 
-    const monthlyLog = await MonthlyLog.findOne({ userId, year, month }).lean();
+    const monthlyLog = await MonthlyLog.findOne({ userId, year, month });
 
     if (!monthlyLog) {
       return res.json({

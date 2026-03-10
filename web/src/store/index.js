@@ -6,6 +6,7 @@ import transactionsReducer from "./slices/transactionsSlice";
 import categoryReducer from "./slices/categorySlice";
 import accountsReducer from "./slices/accountsSlice";
 import appReducer from "./slices/appSlice";
+import budgetsReducer from "./slices/budgetsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     categories: categoryReducer,
     accounts: accountsReducer,
     app: appReducer,
+    budgets: budgetsReducer,
   },
   devTools: import.meta.env.MODE !== "production",
 });

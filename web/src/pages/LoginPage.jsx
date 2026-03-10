@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   Center,
@@ -22,6 +23,7 @@ import {
   IoTimeOutline,
   IoTrendingUpOutline,
   IoWalletOutline,
+  IoWarningOutline,
 } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { AuthFeature } from "../components/AuthFeature";
@@ -33,7 +35,7 @@ import { useEffect } from "react";
 const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const { user, error } = useSelector((state) => state.auth);
 
   const form = useForm({
     mode: "uncontrolled",
@@ -104,10 +106,10 @@ const LoginPage = () => {
                     desc="Supports fixed and variable income models."
                   />
                   <AuthFeature
-                    icon={<IoShieldCheckmarkOutline />}
-                    color="green"
-                    title="Secure authentication"
-                    desc="Hashed passwords + JWT protected endpoints."
+                    icon={<IoSparklesOutline />}
+                    color="cyan"
+                    title="AI spending insights"
+                    desc="Get intelligent insights about your spending habits and personalized suggestions to improve your finances."
                   />
                 </Stack>
 
@@ -142,7 +144,15 @@ const LoginPage = () => {
                       <Text mt={2}>Welcome back — sign in to continue.</Text>
                     </Box>
                   </Group>
-
+                  {error && (
+                    <Alert
+                      icon={<IoWarningOutline />}
+                      my="lg"
+                      variant="light"
+                      color="red"
+                      title={error}
+                    />
+                  )}
                   <form onSubmit={form.onSubmit(handleSubmit)}>
                     <TextInput
                       mt="xl"

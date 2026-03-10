@@ -24,7 +24,7 @@ import {
 } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { getCategories } from "../../store/slices/categorySlice";
-import { editAccount, getAccounts } from "../../store/slices/accountsSlice";
+import { getAccounts } from "../../store/slices/accountsSlice";
 import {
   createTransaction,
   getTransactions,
@@ -41,30 +41,36 @@ const AddRecord = ({
   const { categories } = useSelector((state) => state.categories);
   const { currentYear, currentMonth } = useSelector((state) => state.app);
 
-  function ymdToLocalDate(ymd) {
-    if (!ymd) return null;
-    const [y, m, d] = ymd.split("-").map(Number);
+  function ymdToLocalDate(value) {
+    if (!value) return null;
+
+    const datePart = String(value).slice(0, 10);
+    const [y, m, d] = datePart.split("-").map(Number);
+
+    if (!y || !m || !d) return null;
     return new Date(y, m - 1, d);
   }
 
-  function dateToYMD(date) {
-    if (!date) return "";
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
+  function getCurrentTime() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, "0");
+    const m = String(now.getMinutes()).padStart(2, "0");
+    return `${h}:${m}`;
   }
 
+  console.log(transaction);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const { accounts } = useSelector((state) => state.accounts);
   const form = useForm({
-    mode: "uncontrolled",
+    mode: "controlled",
     initialValues: {
       type: "expense",
       amount: 0,
       name: "",
       category: "",
-      date: null,
-      time: "",
+      date: today,
+      time: getCurrentTime(),
       notes: "",
       accountId: "",
     },
@@ -135,8 +141,8 @@ const AddRecord = ({
         amount: 0,
         name: "",
         category: "",
-        date: null,
-        time: "",
+        date: today,
+        time: getCurrentTime(),
         notes: "",
         accountId: "",
       });
@@ -145,9 +151,9 @@ const AddRecord = ({
   }, [expenseOpened, mode, transaction]);
 
   useEffect(() => {
-    dispatch(getCategories());
+    dispatch(getCategories("ar"));
   }, [dispatch]);
-
+  console.log(form);
   return (
     <Modal
       opened={expenseOpened}
@@ -222,7 +228,7 @@ const AddRecord = ({
               label="Time"
               leftSection={<IoTimeOutline />}
               placeholder="Select Time"
-              format="24h"
+              format="12h"
               key={form.key("time")}
               {...form.getInputProps("time")}
             />

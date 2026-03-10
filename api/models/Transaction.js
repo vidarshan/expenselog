@@ -44,7 +44,11 @@ const transactionSchema = new mongoose.Schema(
       },
       default: "",
     },
-    date: { type: String, required: true },
+    date: { type: Date, required: true },
+    time: {
+      type: String,
+      default: "",
+    },
     isDeleted: { type: Boolean, default: false, index: true },
   },
   { timestamps: true },

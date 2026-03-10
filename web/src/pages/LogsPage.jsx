@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Badge,
   Box,
   Button,
   Container,
@@ -20,12 +21,16 @@ import moment from "moment";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { getMonthlyLogs } from "../store/slices/logSlice";
 import {
   deleteTransaction,
   getTransactions,
 } from "../store/slices/transactionsSlice";
-import { IoCalendarOutline, IoGridOutline } from "react-icons/io5";
+import {
+  IoArrowDownSharp,
+  IoArrowUpSharp,
+  IoCalendarOutline,
+  IoGridOutline,
+} from "react-icons/io5";
 import {
   getMonthOptions,
   getYearOptions,
@@ -47,14 +52,8 @@ const LogsPage = () => {
 
   const { currentYear, currentMonth } = useSelector((state) => state.app);
 
-  const [mode, setMode] = useState("This Month");
+  const [mode] = useState("This Month");
   const [activePage, setActivePage] = useState(1);
-
-  const openCreateTx = () => {
-    setTxMode("create");
-    setSelectedTx(null);
-    setExpenseOpened(true);
-  };
 
   const openEditTx = (tx) => {
     setTxMode("edit");
@@ -87,25 +86,26 @@ const LogsPage = () => {
     );
   };
 
-  console.log("transactions", transactions);
-
-  const handleModeChange = (value) => {
-    if (value === "This Month") {
-      setMode(value);
-      dispatch(getTransactions({ year: 2026, month: 1, page: 1, limit: 10 }));
-    } else if (value === "Monthly") {
-      setMode(value);
-      dispatch(getMonthlyLogs({ page: 1, limit: 10 }));
-    }
-  };
-
   const thisLogs = transactions.data.map((element) => (
     <Table.Tr key={element._id}>
+      <Table.Td>{element.categoryName}</Table.Td>
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>{element.amount}</Table.Td>
-      <Table.Td>{element.type}</Table.Td>
-      <Table.Td>{element.categoryName}</Table.Td>
-      <Table.Td>{moment(element.date).format("MM-DD-YYYY hh:mm A")}</Table.Td>
+      <Table.Td>
+        {element.type === "expense" ? (
+          <Badge leftSection={<IoArrowDownSharp />} color="red" variant="light">
+            Expense
+          </Badge>
+        ) : (
+          <Badge leftSection={<IoArrowUpSharp />} color="green" variant="light">
+            Income
+          </Badge>
+        )}
+      </Table.Td>
+
+      <Table.Td>
+        {moment(element.date).format("MM-DD-YYYY")} {element.time}
+      </Table.Td>
       <Table.Td>
         <Button size="xs" onClick={() => openEditTx(element)}>
           Edit
@@ -199,10 +199,10 @@ const LogsPage = () => {
                   <Table>
                     <Table.Thead>
                       <Table.Tr>
+                        <Table.Th>Category</Table.Th>
                         <Table.Th>Name</Table.Th>
                         <Table.Th>Amount</Table.Th>
                         <Table.Th>Type</Table.Th>
-                        <Table.Th>Category</Table.Th>
                         <Table.Th>Date</Table.Th>
                         <Table.Th></Table.Th>
                         <Table.Th></Table.Th>

@@ -1,4 +1,12 @@
-import { Button, Group, Modal, Stack, Text, TextInput } from "@mantine/core";
+import {
+  Button,
+  Group,
+  Modal,
+  Select,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import React, { useEffect, useState } from "react";
 import { IoGridOutline, IoTextOutline } from "react-icons/io5";
@@ -83,7 +91,6 @@ const AddCategory = ({
             key={form.key("name")}
             {...form.getInputProps("name")}
           />
-
           <Button type="submit" loading={saving}>
             {mode === "create" ? "Create Category" : "Save Changes"}
           </Button>

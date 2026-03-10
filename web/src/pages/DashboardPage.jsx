@@ -1,66 +1,30 @@
-import { useState } from "react";
 import {
-  NAVBAR_HEIGHT,
-  recentTransactions,
-  yearlyMonthlyReports,
-} from "../data/mockdata";
-import {
-  ActionIcon,
-  Avatar,
   Badge,
   Box,
-  Button,
   Card,
   Container,
-  Divider,
   Flex,
   Grid,
   Group,
-  Loader,
-  Modal,
-  NumberInput,
-  Pagination,
-  PasswordInput,
-  Radio,
   Select,
-  Table,
   Text,
-  TextInput,
   Title,
 } from "@mantine/core";
-import {
-  IoBriefcaseOutline,
-  IoCalendarClearOutline,
-  IoCalendarOutline,
-  IoCashOutline,
-  IoFilterOutline,
-  IoLockClosedOutline,
-  IoMailOpenOutline,
-  IoTextOutline,
-  IoTrashOutline,
-  IoTrendingDownOutline,
-  IoTrendingUpOutline,
-} from "react-icons/io5";
-import { nanoid } from "nanoid";
+import { IoCalendarOutline } from "react-icons/io5";
 import ContributionChart from "../components/charts/ContributionChart";
 import OverviewCard from "../components/OverviewCard";
 import ComparisonChart from "../components/charts/ComparisonChart";
 import moment from "moment";
-import YearAndMonthly from "../components/tables/YearAndMonthly";
-import { useNavigate } from "react-router-dom";
-import { appData } from "../data/appData";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getComparisons, getDashboard } from "../store/slices/dashboardSlice";
 import Loading from "../components/Loading";
 import { getActivePeriods } from "../store/slices/logSlice";
 import { AIInsightsCard } from "../components/cards/AICard";
-import { getAccounts } from "../store/slices/accountsSlice";
 import { getMonthOptions, getYearOptions } from "../utils/getCurrentPeriod";
 import { setMonth, setYear } from "../store/slices/appSlice";
 
 const DashboardPage = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { dashboard, monthlyComparison, loading } = useSelector(
@@ -69,46 +33,6 @@ const DashboardPage = () => {
   const { currentYear, currentMonth } = useSelector((state) => state.app);
   const { logs } = useSelector((state) => state.logs);
   console.log(logs);
-
-  const [incomeOptions, setIncomeOptions] = useState("fixed");
-  const [incomeSources, setIncomeSources] = useState([
-    {
-      id: 1,
-      name: "",
-      salary: 0,
-    },
-  ]);
-
-  const [recordOpened, setRecordOpened] = useState(false);
-
-  const removeIncomeSource = (id) => {
-    if (incomeSources.length > 1) {
-      const newIncomeList = incomeSources.filter((i) => {
-        return i.id !== id;
-      });
-      setIncomeSources(newIncomeList);
-    }
-  };
-
-  const addIncomeSource = () => {
-    const newIncomeList = [
-      ...incomeSources,
-      {
-        id: nanoid(),
-        name: "",
-        salary: 0,
-      },
-    ];
-    setIncomeSources(newIncomeList);
-  };
-
-  const editIncomeSource = (id, newName, newSalary) => {
-    setIncomeSources((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, name: newName, salary: newSalary } : item,
-      ),
-    );
-  };
 
   useEffect(() => {
     dispatch(getDashboard({ year: currentYear, month: currentMonth }));
@@ -125,190 +49,6 @@ const DashboardPage = () => {
 
   return (
     <Container size="lg" py="md">
-      <Modal
-        opened={false}
-        onClose={() => setRecordOpened(false)}
-        title=""
-        closeOnClickOutside={false}
-        centered
-      >
-        <Group justify="space-between">
-          <Flex gap="xs">
-            <Avatar size="xl" color="cyan" radius="xl">
-              V
-            </Avatar>
-            <Group align="center" justify="space-between">
-              <Box>
-                <Title>Vidarshan</Title>
-                <Text>vidarshan@gmail.com</Text>
-              </Box>
-            </Group>
-          </Flex>
-          <Button color="red" variant="light">
-            Logout
-          </Button>
-        </Group>
-        <Divider label="Profile Information" my="sm" />
-        <TextInput
-          leftSection={<IoMailOpenOutline />}
-          label="Email"
-          placeholder="Type in your email"
-        />
-        <TextInput
-          leftSection={<IoTextOutline />}
-          mt="md"
-          label="Name"
-          placeholder="Type in your name"
-        />
-        <PasswordInput
-          leftSection={<IoLockClosedOutline />}
-          mt="md"
-          label="Password"
-          placeholder="Type in your password"
-        />
-        <Divider label="Financial Information" my="md" />
-        <Radio.Group
-          name="incomeTypes"
-          defaultValue={incomeOptions}
-          onChange={setIncomeOptions}
-          withAsterisk
-        >
-          <Group mt="xs">
-            <Radio
-              value="fixed"
-              label="Fixed salary (same amount every month)"
-            />
-            <Radio
-              value="variable"
-              label="Variable income (freelance / hourly / tips)"
-            />
-          </Group>
-        </Radio.Group>
-        {incomeOptions === "fixed" ? (
-          <NumberInput
-            mt="sm"
-            leftSection={<IoCashOutline />}
-            placeholder="Enter your salary"
-          />
-        ) : (
-          <Card withBorder>
-            {incomeSources.map(({ id, name, salary }) => {
-              return (
-                <Flex mb="sm" align="center">
-                  <TextInput
-                    w="100%"
-                    leftSection={<IoBriefcaseOutline />}
-                    value={name}
-                    placeholder="Source name"
-                    mr="xs"
-                    onChange={(e) =>
-                      editIncomeSource(id, e.target.value, salary)
-                    }
-                  />
-                  <NumberInput
-                    w="100%"
-                    leftSection={<IoCashOutline />}
-                    value={salary.toString()}
-                    placeholder="Salary"
-                    onChange={(e) => editIncomeSource(id, name, e.target.value)}
-                    mr="xs"
-                  />
-                  <ActionIcon
-                    color="red"
-                    onClick={() => removeIncomeSource(id)}
-                    variant="light"
-                  >
-                    <IoTrashOutline />
-                  </ActionIcon>
-                </Flex>
-              );
-            })}
-
-            <Button
-              mt="xs"
-              leftSection={<IoAddSharp />}
-              variant="light"
-              onClick={addIncomeSource}
-              fullWidth
-            >
-              Add Source
-            </Button>
-          </Card>
-        )}
-        <Divider label="Account Actions" my="md" />
-        <Group justify="space-between" mt="md">
-          <Button color="red">Delete Account</Button>
-          <Button>Update Information</Button>
-        </Group>
-      </Modal>
-      <Modal
-        opened={recordOpened}
-        onClose={() => setRecordOpened(false)}
-        title="How do you usually get paid?"
-        closeOnClickOutside={false}
-        centered
-      >
-        <Radio.Group
-          name="incomeTypes"
-          defaultValue={incomeOptions}
-          onChange={setIncomeOptions}
-          withAsterisk
-        >
-          <Group mt="xs">
-            <Radio
-              value="fixed"
-              label="Fixed salary (same amount every month)"
-            />
-            <Radio
-              value="variable"
-              label="Variable income (freelance / hourly / tips)"
-            />
-          </Group>
-        </Radio.Group>
-        <Divider my="md" />
-        {incomeOptions === "fixed" ? (
-          <NumberInput placeholder="Enter your salary" />
-        ) : (
-          <Card withBorder>
-            {incomeSources.map(({ id, name, salary }) => {
-              return (
-                <Flex align="center" key={id} mb="xs" gap="xs" grow>
-                  <TextInput
-                    value={name}
-                    placeholder="Source name"
-                    mr="xs"
-                    onChange={(e) =>
-                      editIncomeSource(id, e.target.value, salary)
-                    }
-                  />
-                  <NumberInput
-                    value={salary.toString()}
-                    placeholder="Salary"
-                    onChange={(e) => editIncomeSource(id, name, e.target.value)}
-                    mr="xs"
-                  />
-                  <ActionIcon
-                    color="red"
-                    onClick={() => removeIncomeSource(id)}
-                    variant="light"
-                  >
-                    <IoTrashOutline />
-                  </ActionIcon>
-                </Flex>
-              );
-            })}
-            <Button mt="xs" variant="light" onClick={addIncomeSource} fullWidth>
-              Add Source
-            </Button>
-          </Card>
-        )}
-        <Flex justify="flex-end" mt="md">
-          <Button variant="light" mr="xs">
-            Cancel
-          </Button>
-          <Button>Create</Button>
-        </Flex>
-      </Modal>
       {loading ? (
         <Loading title="Loading Dashboard" />
       ) : (
