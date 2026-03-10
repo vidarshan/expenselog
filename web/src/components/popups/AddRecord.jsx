@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Flex,
   Modal,
@@ -19,6 +20,7 @@ import {
   IoCalendarOutline,
   IoCardOutline,
   IoCashOutline,
+  IoInformationCircle,
   IoTextOutline,
   IoTimeOutline,
 } from "react-icons/io5";
@@ -58,7 +60,6 @@ const AddRecord = ({
     return `${h}:${m}`;
   }
 
-  console.log(transaction);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const { accounts } = useSelector((state) => state.accounts);
@@ -87,7 +88,6 @@ const AddRecord = ({
   });
 
   const addOrEditTransaction = async (_type, values) => {
-    console.log(values);
     const payload = {
       name: values.name,
       amount: Number(values.amount) || 0,
@@ -153,7 +153,6 @@ const AddRecord = ({
   useEffect(() => {
     dispatch(getCategories("ar"));
   }, [dispatch]);
-  console.log(form);
   return (
     <Modal
       opened={expenseOpened}
@@ -162,6 +161,10 @@ const AddRecord = ({
       centered
       closeOnClickOutside={false}
     >
+      <Alert color="gray" mb="md">
+        A record represents a financial transaction. Add income to track money
+        you receive, or expenses to track money you spend.
+      </Alert>
       <form
         onSubmit={form.onSubmit((values) =>
           addOrEditTransaction("add", values),

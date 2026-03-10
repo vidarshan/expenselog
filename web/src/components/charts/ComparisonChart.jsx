@@ -1,11 +1,8 @@
 import { BarChart } from "@mantine/charts";
 import { Card, Group, Select, Text } from "@mantine/core";
-import React from "react";
 import { IoCalendarOutline } from "react-icons/io5";
-import { categoryMonthlyComparison } from "../../data/mockdata";
 
 const ComparisonChart = ({ monthlyComparison }) => {
-  console.log("monthlyComparisonsss", monthlyComparison.labels.a);
   return (
     <Card h="100%" shadow="xl" withBorder>
       <Group justify="space-between" mb="lg">

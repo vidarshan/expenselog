@@ -21,7 +21,6 @@ const initialState = {
 export const updateUser = createAsyncThunk(
   "auth/update",
   async (payload, thunkAPI) => {
-    console.log(payload);
     try {
       const res = await api.patch("/auth/update", payload);
       return res.data;

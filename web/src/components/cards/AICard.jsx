@@ -63,7 +63,7 @@ export function AIInsightsCard({
               c="dark"
               variant="white"
               radius="md"
-              onClick={onRegenerate}
+              // onClick={onRegenerate}
               leftSection={<SiOpenai size={16} />}
             >
               Regenerate

@@ -60,19 +60,15 @@ const NavBar = ({ toggle }) => {
 
   const isAuthed = !!token;
 
-  // Only fetch profile if we have a token but no loaded username yet (common after refresh)
   const shouldFetchMe = useMemo(() => {
     return isAuthed && !username;
   }, [isAuthed, username]);
-
-  // Fetch accounts immediately after login (token becomes truthy)
   useEffect(() => {
     if (!isAuthed) return;
 
     dispatch(getAccounts());
   }, [dispatch, isAuthed]);
 
-  // Fetch /auth/me only when needed (prevents loops)
   useEffect(() => {
     if (!shouldFetchMe) return;
 
@@ -118,7 +114,6 @@ const NavBar = ({ toggle }) => {
           <Stack>
             <Button
               leftSection={<IoAddOutline />}
-              variant="light"
               onClick={() => setOpened(true)}
             >
               Create Log
@@ -176,7 +171,7 @@ const NavBar = ({ toggle }) => {
 
             <Divider />
 
-            <Stack py={0} px={0}>
+            <Stack py={0} px="sm">
               <Group justify="space-between">
                 <Text size="xs">Theme</Text>
                 <ActionIcon

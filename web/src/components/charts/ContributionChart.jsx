@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { expenseData } from "../../data/mockdata";
 import { Box, Card, Group, SegmentedControl, Text } from "@mantine/core";
 import { PieChart } from "@mantine/charts";
 
@@ -14,8 +13,6 @@ const ContributionChart = ({ categoryBreakdown }) => {
     percentage:
       totalSum === 0 ? 0 : Number(((x.total / totalSum) * 100).toFixed(1)),
   }));
-
-  console.log(mode);
 
   return (
     <Card h="100%" shadow="xl" withBorder>

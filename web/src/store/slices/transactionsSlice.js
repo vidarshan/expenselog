@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../api/axios";
+import { notifications } from "@mantine/notifications";
+import classes from "../../Demo.module.css";
 
 const initialState = {
   transactions: {
@@ -113,6 +115,10 @@ const transactionSlice = createSlice({
           p.total += 1;
           p.totalPages = Math.ceil(p.total / (p.limit || 20));
         }
+        notifications.show({
+          title: "Log Created",
+          classNames: classes,
+        });
       })
       .addCase(createTransaction.rejected, (state, action) => {
         state.loading = false;
@@ -133,6 +139,10 @@ const transactionSlice = createSlice({
         state.transactions.data = (state.transactions.data || []).map((t) =>
           t._id === updated._id ? updated : t,
         );
+        notifications.show({
+          title: "Log Updated",
+          classNames: classes,
+        });
       })
       .addCase(updateTransaction.rejected, (state, action) => {
         state.loading = false;
@@ -153,6 +163,11 @@ const transactionSlice = createSlice({
         state.transactions.data = (state.transactions.data || []).filter(
           (t) => t._id !== id,
         );
+        notifications.show({
+          title: "Log Deleted",
+          classNames: classes,
+          variant: "error",
+        });
       })
       .addCase(deleteTransaction.rejected, (state, action) => {
         state.loading = false;

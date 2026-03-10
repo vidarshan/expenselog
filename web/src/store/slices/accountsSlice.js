@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../api/axios";
+import { notifications } from "@mantine/notifications";
+import classes from "../../Demo.module.css";
 
 const initialState = {
   accounts: [],
@@ -106,6 +108,10 @@ const accountsSlice = createSlice({
         state.loading = false;
         state.error = "";
         state.accounts = [action.payload, ...state.accounts];
+        notifications.show({
+          title: "Account Created",
+          classNames: classes,
+        });
       })
       .addCase(createAccount.rejected, (state, action) => {
         state.loading = false;
@@ -137,6 +143,10 @@ const accountsSlice = createSlice({
         state.accounts = state.accounts.map((a) =>
           a._id === id ? { ...a, ...updated } : a,
         );
+        notifications.show({
+          title: "Account Updated",
+          classNames: classes,
+        });
       })
       .addCase(editAccount.rejected, (state, action) => {
         state.loading = false;

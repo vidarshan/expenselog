@@ -21,7 +21,7 @@ import {
 import { createAccount, editAccount } from "../../store/slices/accountsSlice";
 import { useDispatch } from "react-redux";
 
-const AddAccount = ({ opened, onClose, onSave, mode, setMode, account }) => {
+const AddAccount = ({ opened, onClose, onSave, mode, account }) => {
   const dispatch = useDispatch();
   const form = useForm({
     initialValues: {
@@ -44,7 +44,6 @@ const AddAccount = ({ opened, onClose, onSave, mode, setMode, account }) => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    console.log(account);
     if (!opened) return;
 
     if (mode === "edit" && account) {

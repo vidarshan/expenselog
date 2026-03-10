@@ -8,7 +8,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import useState from "react";
+import { useState } from "react";
 import { IoAddOutline } from "react-icons/io5";
 import AddAccount from "../components/popups/AddAccount";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +20,7 @@ import Loading from "../components/Loading";
 const AccountsPage = () => {
   const dispatch = useDispatch();
   const { loading, accounts } = useSelector((state) => state.accounts);
+  console.log(accounts);
   const [opened, setOpened] = useState(false);
   const [mode, setMode] = useState("create");
   const [account, setAccount] = useState();
@@ -56,6 +57,7 @@ const AccountsPage = () => {
         onClose={handleClose}
         onSave={() => dispatch(getAccounts())}
       />
+
       <Stack gap="md">
         <Group justify="space-between" align="center">
           <Box>
@@ -69,24 +71,25 @@ const AccountsPage = () => {
             Create Account
           </Button>
         </Group>
+
+        {loading ? (
+          <Loading />
+        ) : accounts.length > 0 ? (
+          <SimpleGrid mt="sm" cols={1}>
+            {accounts.map((a) => (
+              <AccountCard
+                key={a._id}
+                account={a}
+                onDelete={() => handleDelete(a._id)}
+                onEdit={() => openEdit(a)}
+                onSelect={() => openEdit(a)}
+              />
+            ))}
+          </SimpleGrid>
+        ) : (
+          <EmptyContainer message="You have no accounts" />
+        )}
       </Stack>
-      {loading ? (
-        <Loading />
-      ) : accounts.length > 0 ? (
-        <SimpleGrid mt="sm" cols={1}>
-          {accounts.map((a) => (
-            <AccountCard
-              key={a._id}
-              account={a}
-              onDelete={() => handleDelete(a._id)}
-              onEdit={() => openEdit(a)}
-              onSelect={() => openEdit(a)}
-            />
-          ))}
-        </SimpleGrid>
-      ) : (
-        <EmptyContainer message="You have no accounts" />
-      )}
     </Container>
   );
 };

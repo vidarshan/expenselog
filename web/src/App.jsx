@@ -32,7 +32,7 @@ function App() {
         primaryColor: "lime",
       }}
     >
-      <Notifications position="top-right" />
+      <Notifications position="top-center" />
       <AppShell
         padding="md"
         navbar={{

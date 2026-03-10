@@ -125,7 +125,6 @@ const Profile = ({ opened, setOpened, handleLogout }) => {
 
   useEffect(() => {
     if (!opened || !user) return;
-    console.log("user", user);
     form.setValues({
       username: user.username ?? "",
       email: user.email ?? "",

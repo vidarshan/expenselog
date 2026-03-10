@@ -9,8 +9,7 @@ const initialState = {
 
 export const getCategories = createAsyncThunk(
   "categories/get",
-  async (pl, thunkAPI) => {
-    console.log(pl);
+  async (_, thunkAPI) => {
     try {
       const categoryRes = await api.get("/categories");
       const categoryData = categoryRes.data;
@@ -93,7 +92,6 @@ const categoriesSlice = createSlice({
         state.loading = false;
         state.error = "";
         const created = action.payload;
-        console.log(action.payload);
         state.categories = [created, ...(state.categories || [])];
       })
       .addCase(createCategory.rejected, (state, action) => {

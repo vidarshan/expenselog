@@ -51,9 +51,7 @@ const CategoriesPage = () => {
     <Table.Tr key={element._id}>
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>
-        <Badge size="xs" variant="transparent">
-          {element.isDeleted ? "Yes" : "No"}
-        </Badge>
+        <Text> {element.isDeleted ? "Yes" : "No"}</Text>
       </Table.Td>
       <Table.Td>
         {moment(element.createdAt).format("MMM-DD-YYYY hh:mm A")}

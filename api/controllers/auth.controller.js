@@ -1,6 +1,19 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import Category from "../models/Category.js";
+
+const DEFAULT_CATEGORIES = [
+  { name: "Food", type: "expense" },
+  { name: "Transport", type: "expense" },
+  { name: "Housing", type: "expense" },
+  { name: "Utilities", type: "expense" },
+  { name: "Shopping", type: "expense" },
+  { name: "Entertainment", type: "expense" },
+  { name: "Health", type: "expense" },
+  { name: "Salary", type: "income" },
+  { name: "Freelance", type: "income" },
+];
 
 export const register = async (req, res) => {
   try {
@@ -13,12 +26,19 @@ export const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({
+    const newUser = await User.create({
       email,
       username: name,
       password: hashedPassword,
       salary,
     });
+    console.log(newUser);
+    await Category.insertMany(
+      DEFAULT_CATEGORIES.map((c) => ({
+        ...c,
+        userId: newUser._id,
+      })),
+    );
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
