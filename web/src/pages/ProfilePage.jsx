@@ -64,8 +64,8 @@ const ProfilePage = () => {
   const editIncomeSource = (id, newName, newSalary) => {
     setIncomeSources((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, name: newName, salary: newSalary } : item
-      )
+        item.id === id ? { ...item, name: newName, salary: newSalary } : item,
+      ),
     );
   };
 
@@ -79,7 +79,11 @@ const ProfilePage = () => {
       >
         Proceeding will delete all your data and this action is irreversible.
         <Group mt="md" justify="flex-end">
-          <Button color="gray" leftSection={<IoCloseOutline />} variant="light">
+          <Button
+            color="gray"
+            leftSection={<IoCloseOutline />}
+            variant="filled"
+          >
             Cancel
           </Button>
           <Button
@@ -174,7 +178,7 @@ const ProfilePage = () => {
                   <ActionIcon
                     color="red"
                     onClick={() => removeIncomeSource(id)}
-                    variant="light"
+                    variant="filled"
                   >
                     <IoTrashOutline />
                   </ActionIcon>
@@ -185,7 +189,7 @@ const ProfilePage = () => {
             <Button
               mt="xs"
               leftSection={<IoAddSharp />}
-              variant="light"
+              variant="filled"
               onClick={addIncomeSource}
               fullWidth
             >

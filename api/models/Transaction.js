@@ -37,6 +37,10 @@ const transactionSchema = new mongoose.Schema(
       ref: "Account",
       required: true,
     },
+    categoryColor: {
+      type: String,
+      default: "blue",
+    },
     categoryName: {
       type: String,
       required: function () {

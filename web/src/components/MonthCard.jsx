@@ -44,7 +44,7 @@ const MonthCard = ({ month, year, amount, logs, isCurrent, trend = "up" }) => {
             <Group gap="xs">
               <Text fw={600}>{month}</Text>
               {isCurrent && (
-                <Badge size="xs" color="green" variant="light">
+                <Badge size="xs" color="green" variant="filled">
                   Current
                 </Badge>
               )}
@@ -71,7 +71,7 @@ const MonthCard = ({ month, year, amount, logs, isCurrent, trend = "up" }) => {
 
           {/* Right: Trend icon */}
           <ActionIcon
-            variant="light"
+            variant="filled"
             color={trend === "up" ? "green" : trend === "down" ? "red" : "gray"}
             radius="xl"
             size="lg"

@@ -44,12 +44,12 @@ import { useNavigate } from "react-router-dom";
 const LogsPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const [expenseOpened, setExpenseOpened] = useState(false);
   const [txMode, setTxMode] = useState("create");
   const [selectedTx, setSelectedTx] = useState(null);
   const { transactions } = useSelector((state) => state.transactions);
-  const { monthlyLogs } = useSelector((state) => state.logs);
-
+  const { monthlyLogs, activePeriods } = useSelector((state) => state.logs);
   const { currentYear, currentMonth } = useSelector((state) => state.app);
 
   const [mode] = useState("This Month");
@@ -88,16 +88,32 @@ const LogsPage = () => {
 
   const thisLogs = transactions.data.map((element) => (
     <Table.Tr key={element._id}>
-      <Table.Td>{element.categoryName}</Table.Td>
       <Table.Td>{element.name}</Table.Td>
-      <Table.Td>{element.amount}</Table.Td>
+      <Table.Td>
+        {element.categoryName !== "" ? (
+          <Badge variant="dot" color={element.categoryColor}>
+            {element.categoryName}
+          </Badge>
+        ) : (
+          "—"
+        )}
+      </Table.Td>
+      <Table.Td>${element.amount?.toFixed(2)}</Table.Td>
       <Table.Td>
         {element.type === "expense" ? (
-          <Badge leftSection={<IoArrowDownSharp />} color="red" variant="light">
+          <Badge
+            leftSection={<IoArrowDownSharp />}
+            color="red"
+            variant="filled"
+          >
             Expense
           </Badge>
         ) : (
-          <Badge leftSection={<IoArrowUpSharp />} color="green" variant="light">
+          <Badge
+            leftSection={<IoArrowUpSharp />}
+            color="green"
+            variant="filled"
+          >
             Income
           </Badge>
         )}
@@ -176,7 +192,7 @@ const LogsPage = () => {
                 leftSection={<IoCalendarOutline />}
                 placeholder="Select Month"
                 onChange={(value) => dispatch(setMonth(value))}
-                data={getMonthOptions()}
+                data={getMonthOptions(activePeriods, currentYear)}
                 allowDeselect={false}
               />
               <Select
@@ -185,7 +201,7 @@ const LogsPage = () => {
                 leftSection={<IoCalendarOutline />}
                 placeholder="Select Year"
                 onChange={(value) => dispatch(setYear(value))}
-                data={getYearOptions()}
+                data={getYearOptions(activePeriods)}
                 allowDeselect={false}
               />
             </Flex>
@@ -199,8 +215,8 @@ const LogsPage = () => {
                   <Table>
                     <Table.Thead>
                       <Table.Tr>
-                        <Table.Th>Category</Table.Th>
                         <Table.Th>Name</Table.Th>
+                        <Table.Th>Category</Table.Th>
                         <Table.Th>Amount</Table.Th>
                         <Table.Th>Type</Table.Th>
                         <Table.Th>Date</Table.Th>

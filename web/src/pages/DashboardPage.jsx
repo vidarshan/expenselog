@@ -42,9 +42,7 @@ const DashboardPage = () => {
   );
   const { accounts, accountsLoading } = useSelector((state) => state.accounts);
   const { currentYear, currentMonth } = useSelector((state) => state.app);
-  const { monthlyLogs, activePeriods, logsLoading } = useSelector(
-    (state) => state.logs,
-  );
+  const { activePeriods, logsLoading } = useSelector((state) => state.logs);
   const authUser = useSelector((state) => state.auth.user);
   const token = authUser?.token || null;
   const [opened, setOpened] = useState(false);
@@ -53,10 +51,14 @@ const DashboardPage = () => {
   const accountsCount = accounts?.length || 0;
   const categoriesCount = categories?.length || 0;
   const hasTransactions = (dashboard?.recentTransactions?.length || 0) > 0;
-  console.log(monthlyLogs);
 
+  const now = new Date();
+  const isCurrentMonthAndYear =
+    Number(currentYear) === now.getFullYear() &&
+    Number(currentMonth) === now.getMonth() + 1;
   const showSetup =
-    accountsCount === 0 || categoriesCount === 0 || !hasTransactions;
+    isCurrentMonthAndYear &&
+    (accountsCount === 0 || categoriesCount === 0 || !hasTransactions);
   useEffect(() => {
     dispatch(getDashboard({ year: currentYear, month: currentMonth }));
     dispatch(
@@ -175,10 +177,15 @@ const DashboardPage = () => {
                         <Text size="sm" fw={600}>
                           {tx.name}
                         </Text>
-
-                        <Badge size="xs" variant="light">
-                          {tx.categoryName}
-                        </Badge>
+                        {tx.categoryName !== "" && (
+                          <Badge
+                            size="xs"
+                            variant="dot"
+                            color={tx.categoryColor}
+                          >
+                            {tx.categoryName}
+                          </Badge>
+                        )}
                       </Flex>
 
                       <Flex align="center" gap="sm">

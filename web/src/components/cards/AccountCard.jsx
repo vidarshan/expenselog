@@ -61,7 +61,7 @@ const AccountCard = ({ account, onEdit, onSelect }) => {
     >
       <Group justify="space-between" align="flex-start">
         <Group align="flex-start">
-          <ThemeIcon color={meta.color} variant="light" size="lg" radius="xl">
+          <ThemeIcon color={meta.color} variant="filled" size="lg" radius="xl">
             {meta.icon}
           </ThemeIcon>
 
@@ -97,7 +97,7 @@ const AccountCard = ({ account, onEdit, onSelect }) => {
           <MoreOptions
             options={({ close }) => (
               <Button
-                variant="light"
+                variant="filled"
                 leftSection={<IoPencilOutline />}
                 onClick={(e) => {
                   e.stopPropagation();

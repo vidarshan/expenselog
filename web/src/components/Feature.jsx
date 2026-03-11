@@ -5,7 +5,7 @@ const Feature = ({ icon, title, desc, color }) => {
   return (
     <Card h="100%" withBorder radius="lg" p="lg">
       <Group gap="sm">
-        <ThemeIcon variant="light" color={color} radius="xl" size={40}>
+        <ThemeIcon variant="filled" color={color} radius="xl" size={40}>
           {icon}
         </ThemeIcon>
 

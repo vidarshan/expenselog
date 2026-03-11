@@ -23,7 +23,7 @@ const SidebarBalanceCard = ({ title, balance, type }) => {
             color={
               type === "cash" ? "lime" : type === "credit" ? "grape" : "blue"
             }
-            variant="light"
+            variant="filled"
             radius="sm"
           >
             {meta.icon}

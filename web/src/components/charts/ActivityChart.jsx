@@ -68,9 +68,7 @@ const ActivityChart = () => {
   return (
     <Card className="hover" h="100%" shadow="xl" withBorder>
       <Group justify="space-between">
-        <Text fw={700}>
-          {startDate} to {endDate}
-        </Text>
+        <Text fw={700}>Activity</Text>
         <Select
           radius="lg"
           size="xs"
@@ -95,7 +93,7 @@ const ActivityChart = () => {
           withWeekdayLabels
           withTooltip
           getTooltipLabel={({ date, value }) =>
-            `${date} – $${value ?? 0} spent`
+            `${date} – $${value?.toFixed(2) ?? 0} spent`
           }
           data={formatHeatmapData(heatmap)}
         />

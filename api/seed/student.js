@@ -12,6 +12,18 @@ dotenv.config();
 
 const USER_ID = new mongoose.Types.ObjectId("69b0fdb5928997ddf463d0a8");
 
+const CATEGORY_COLORS = {
+  Food: "orange",
+  Transport: "cyan",
+  Housing: "grape",
+  Utilities: "yellow",
+  Shopping: "pink",
+  Entertainment: "violet",
+  Health: "red",
+  Salary: "green",
+  Freelance: "teal",
+};
+
 const CATEGORY_IDS = {
   Food: new mongoose.Types.ObjectId("69b0fdb5928997ddf463d0aa"),
   Transport: new mongoose.Types.ObjectId("69b0fdb5928997ddf463d0ab"),
@@ -372,8 +384,12 @@ async function seedTransactions(periods, accountIds) {
           ? CATEGORY_IDS[tx.category]
           : undefined;
         payload.categoryName = tx.category ? CATEGORY_NAMES[tx.category] : "";
+        payload.categoryColor = tx.category
+          ? CATEGORY_COLORS[tx.category]
+          : "blue";
       } else {
         payload.categoryName = "";
+        payload.categoryColor = "blue";
       }
 
       // avoid duplicates if rerun

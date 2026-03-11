@@ -148,7 +148,7 @@ const LoginPage = () => {
                     <Alert
                       icon={<IoWarningOutline />}
                       my="lg"
-                      variant="light"
+                      variant="filled"
                       color="red"
                       title={error}
                     />

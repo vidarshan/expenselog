@@ -97,18 +97,19 @@ export const createTransaction = async (req, res) => {
 
     const delta = computeDelta(account.type, type, amount);
 
-    const log = await getOrCreateMonthlyLog({ userId, date, session: null }); 
+    const log = await getOrCreateMonthlyLog({ userId, date, session: null });
     let categoryName = "";
     if (type === "expense") {
       const cat = await Category.findOne({
         _id: new mongoose.Types.ObjectId(categoryId),
         userId,
-        isDeleted: false, 
+        isDeleted: false,
       }).lean();
 
       if (!cat) return res.status(404).json({ message: "Category not found" });
 
       categoryName = cat.name;
+      categoryColor = cat.color;
     }
     const tx = await Transaction.create({
       userId,
@@ -119,6 +120,7 @@ export const createTransaction = async (req, res) => {
       name: name ?? "Transaction",
       categoryId: type === "expense" ? categoryId : undefined,
       categoryName,
+      categoryColor,
       date: date ? ymdToUTCNoon(date) : new Date(),
       time: time ?? "",
       source: source ?? undefined,
@@ -199,7 +201,6 @@ export const updateTransaction = async (req, res) => {
     tx.amount = Number(newAmount);
 
     if (patch.name !== undefined) tx.name = patch.name;
-
 
     if (newType === "expense") {
       if (patch.categoryId !== undefined) tx.categoryId = patch.categoryId;

@@ -165,7 +165,7 @@ const AddAccount = ({ opened, onClose, onSave, mode, account }) => {
           )}
 
           <Group justify="flex-end" mt="xs">
-            <Button variant="light" onClick={onClose} type="button">
+            <Button variant="filled" onClick={onClose} type="button">
               Cancel
             </Button>
             <Button type="submit" loading={saving}>

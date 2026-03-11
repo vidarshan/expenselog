@@ -76,11 +76,11 @@ const TransactionTable = ({ disableAddLog }) => {
         <Table.Td>{date}</Table.Td>
         <Table.Td>
           {type === "income" ? (
-            <Badge variant="light" size="xs">
+            <Badge variant="filled" size="xs">
               Income
             </Badge>
           ) : (
-            <Badge color="red" variant="light" size="xs">
+            <Badge color="red" variant="filled" size="xs">
               Expense
             </Badge>
           )}
@@ -89,7 +89,7 @@ const TransactionTable = ({ disableAddLog }) => {
         <Table.Td>
           <Popover width={200} position="bottom" withArrow shadow="md">
             <Popover.Target>
-              <ActionIcon variant="light">
+              <ActionIcon variant="filled">
                 <IoClipboardOutline />
               </ActionIcon>
             </Popover.Target>
@@ -106,7 +106,7 @@ const TransactionTable = ({ disableAddLog }) => {
               e.stopPropagation();
               deleteTransaction(index);
             }}
-            variant="light"
+            variant="filled"
             size="xs"
           >
             Delete

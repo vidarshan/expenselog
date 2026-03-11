@@ -37,7 +37,7 @@ const YearCard = ({ year, isCurrent }) => {
           <Flex align="center" gap="xs" style={{ minWidth: 120 }}>
             <Text weight={500}>{year}</Text>
             {isCurrent && (
-              <Badge color="green" variant="light">
+              <Badge color="green" variant="filled">
                 Current
               </Badge>
             )}

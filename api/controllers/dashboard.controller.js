@@ -145,7 +145,7 @@ async function aggregateRecentTransactions(logId) {
   return Transaction.find({ logId })
     .sort({ date: -1, createdAt: -1 })
     .limit(6)
-    .select("name amount type date categoryName")
+    .select("name amount type date categoryName categoryColor")
     .lean();
 }
 

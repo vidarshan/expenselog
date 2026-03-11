@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import Insight from "../models/Insight.js";
+import { buildMonthlySummary } from "../utils/buildMonthlySummary.js";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -17,34 +18,103 @@ export const getInsights = async (req, res) => {
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
     if (!month) return res.status(400).json({ message: "Month is required" });
 
-    // (optional) cache
     const existing = await Insight.findOne({ userId, month });
     if (existing) return res.json(existing.insights);
 
-    const summary = {
-      month: "2026-02",
-      totalIncome: 3200,
-      totalExpenses: 2500,
-      savings: 700,
-      savingsRate: 21.8,
-      topCategories: [
-        { name: "Food", amount: 900 },
-        { name: "Rent", amount: 1200 },
-      ],
-      monthOverMonthChange: { expenses: 8.2, income: 0 },
-      essentialRatio: 0.73,
-      discretionaryRatio: 0.27,
-
-      // OPTIONAL: if you can compute these, AI becomes 10x better
-      // categoryDeltas: [{ name: "Food", deltaAmount: 120, deltaPct: 18.0 }, ...]
-      // repeatMerchants: [{ name: "Starbucks", count: 9, total: 72.5 }, ...]
-      // anomalies: [{ description: "One-time purchase", amount: 180, category: "Auto" }, ...]
-    };
+    const summary = await buildMonthlySummary(userId, month);
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0.5,
-      response_format: { type: "json_object" },
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "financial_insights",
+          schema: {
+            type: "object",
+            properties: {
+              behavioral_insights: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    message: { type: "string" },
+                    evidence: { type: "string" },
+                  },
+                  required: ["title", "message", "evidence"],
+                },
+              },
+              root_cause_hypotheses: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    message: { type: "string" },
+                    what_to_check_next: { type: "string" },
+                  },
+                  required: ["title", "message", "what_to_check_next"],
+                },
+              },
+              micro_challenges: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    rules: { type: "array", items: { type: "string" } },
+                    target: { type: "string" },
+                    why: { type: "string" },
+                  },
+                  required: ["title", "rules", "target", "why"],
+                },
+              },
+              risk_flags: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string" },
+                    message: { type: "string" },
+                    severity: {
+                      type: "string",
+                      enum: ["low", "medium", "high"],
+                    },
+                  },
+                  required: ["title", "message", "severity"],
+                },
+              },
+              forecast: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  message: { type: "string" },
+                  assumption: { type: "string" },
+                },
+                required: ["title", "message", "assumption"],
+              },
+              next_best_move: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  message: { type: "string" },
+                  first_step_today: { type: "string" },
+                },
+                required: ["title", "message", "first_step_today"],
+              },
+            },
+            required: [
+              "behavioral_insights",
+              "root_cause_hypotheses",
+              "micro_challenges",
+              "risk_flags",
+              "forecast",
+              "next_best_move",
+            ],
+          },
+        },
+      },
       messages: [
         {
           role: "system",
@@ -54,6 +124,9 @@ You are a personalized financial coach inside an expense tracking app.
 Hard rules:
 - Speak in second person ("you").
 - Add value BEYOND the dashboard. Avoid repeating totals like income/expenses/savings unless needed to support a deeper insight.
+- Be specific and concise. Avoid generic advice.
+- Do not mention categories that are not present in topCategories, categoryDeltas, repeatMerchants, anomalies, or last10Transactions.
+- If evidence is weak, say so.
 - Use ONLY the provided data as evidence. Do NOT assume categories (e.g., entertainment) exist unless present in the data.
 - Do NOT say "check last 10 transactions" unless the data includes last10Transactions.
 - Prefer: root-cause hypotheses, concentration/flexibility insights, risk exposure, next-best action, and a simple forecast scenario.

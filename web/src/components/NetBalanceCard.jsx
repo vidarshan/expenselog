@@ -11,7 +11,7 @@ export function NetBalanceCard({ net, change }) {
           <Text size="sm" c="dimmed">
             Net Balance
           </Text>
-          <ThemeIcon variant="light" color="lime">
+          <ThemeIcon variant="filled" color="lime">
             <IoWalletOutline size={16} />
           </ThemeIcon>
         </Group>

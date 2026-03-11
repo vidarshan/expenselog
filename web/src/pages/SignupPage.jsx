@@ -159,7 +159,7 @@ export default function RegistrationPage() {
                     {error && (
                       <Alert
                         my="lg"
-                        variant="light"
+                        variant="filled"
                         color="red"
                         title={error}
                       />

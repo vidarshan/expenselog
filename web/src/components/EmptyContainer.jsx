@@ -6,7 +6,7 @@ const EmptyContainer = ({ message }) => {
     <Paper my="sm" h="40vh" withBorder p="md">
       <Flex h="100%" justify="center" align="center">
         <Stack align="center" gap="xs">
-          <ThemeIcon size={60} radius="xl" color="red" variant="light">
+          <ThemeIcon size={60} radius="xl" color="red" variant="filled">
             <PiHeartStraightBreakBold size={32} />
           </ThemeIcon>
 

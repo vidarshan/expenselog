@@ -165,7 +165,7 @@ const Profile = ({ opened, setOpened, handleLogout }) => {
         <Alert
           icon={<IoWarningOutline />}
           my="lg"
-          variant="light"
+          variant="filled"
           color="red"
           title={error}
         />
@@ -186,7 +186,7 @@ const Profile = ({ opened, setOpened, handleLogout }) => {
               </Box>
             </Flex>
 
-            <Button color="red" variant="light" onClick={handleLogout}>
+            <Button color="red" variant="filled" onClick={handleLogout}>
               Logout
             </Button>
           </Group>
@@ -230,7 +230,7 @@ const Profile = ({ opened, setOpened, handleLogout }) => {
 
           <Alert
             icon={<IoInformationCircleSharp />}
-            variant="light"
+            variant="filled"
             color="gray"
             title="Fixed income"
           >
@@ -243,7 +243,7 @@ const Profile = ({ opened, setOpened, handleLogout }) => {
             icon={<IoInformationCircleSharp />}
             my="xs"
             color="gray"
-            variant="light"
+            variant="filled"
             title="Variable income"
           >
             {info &&
@@ -300,7 +300,7 @@ const Profile = ({ opened, setOpened, handleLogout }) => {
 
                   <ActionIcon
                     color="red"
-                    variant="light"
+                    variant="filled"
                     onClick={() => removeIncomeSource(index)}
                     disabled={form.values.salary.variable.length === 1}
                   >
@@ -312,7 +312,7 @@ const Profile = ({ opened, setOpened, handleLogout }) => {
               <Button
                 mt="xs"
                 leftSection={<IoAddSharp />}
-                variant="light"
+                variant="filled"
                 onClick={addIncomeSource}
                 fullWidth
                 type="button"

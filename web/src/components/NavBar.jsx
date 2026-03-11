@@ -158,7 +158,7 @@ const NavBar = ({ toggle }) => {
             <Stack px="sm">
               <Group justify="space-between">
                 <Text size="sm">Accounts</Text>
-                <Badge variant="light"> {accounts.length} </Badge>
+                <Badge variant="filled"> {accounts.length} </Badge>
               </Group>
 
               {accounts?.length ? (
@@ -182,7 +182,7 @@ const NavBar = ({ toggle }) => {
                 <Text size="xs">Theme</Text>
                 <ActionIcon
                   size="md"
-                  variant="light"
+                  variant="filled"
                   color={colorScheme === "light" ? "blue" : "yellow"}
                   onClick={() =>
                     setColorScheme(colorScheme === "dark" ? "light" : "dark")

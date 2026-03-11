@@ -39,7 +39,7 @@ const QuickActions = ({ withActions, title }) => {
           you wish to continue?
         </Text>
         <Flex justify="flex-end" mt="md">
-          <Button leftSection={<IoCloseOutline />} variant="light" mr="xs">
+          <Button leftSection={<IoCloseOutline />} variant="filled" mr="xs">
             Cancel
           </Button>
           <Button leftSection={<IoTrashOutline />} color="red">
@@ -61,7 +61,7 @@ const QuickActions = ({ withActions, title }) => {
           placeholder="Enter Category Name"
         />
         <Flex justify="flex-end" mt="md">
-          <Button variant="light" mr="xs">
+          <Button variant="filled" mr="xs">
             Cancel
           </Button>
           <Button>Create</Button>
@@ -74,7 +74,7 @@ const QuickActions = ({ withActions, title }) => {
       {withActions && (
         <Popover width={200} position="bottom" withArrow shadow="md">
           <Popover.Target>
-            <ActionIcon variant="light" size="lg">
+            <ActionIcon variant="filled" size="lg">
               <IoEllipsisVerticalOutline />
             </ActionIcon>
           </Popover.Target>
