@@ -21,8 +21,6 @@ export const getInsights = async (req, res) => {
     const existing = await Insight.findOne({ userId, month });
     if (existing) return res.json(existing.insights);
 
-    // You SHOULD replace this with your real buildMonthlySummary()
-    // but it works with your current "summary" too.
     const summary = {
       month: "2026-02",
       totalIncome: 3200,

@@ -137,7 +137,7 @@ const DashboardPage = () => {
               </Grid.Col>
 
               <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-                {/* <AIInsightsCard
+                <AIInsightsCard
                   insights={[
                     "Your expense jump likely came from 1–2 categories—check Food vs last month.",
                     "Your spend is concentrated, so savings growth will come from optimizing the remaining flexible 30%.",
@@ -150,7 +150,7 @@ const DashboardPage = () => {
                     { label: "High essentials ratio", severity: "medium" },
                     { label: "Income flat", severity: "low" },
                   ]}
-                /> */}
+                />
               </Grid.Col>
 
               <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>

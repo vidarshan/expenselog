@@ -7,6 +7,7 @@ import categoryReducer from "./slices/categorySlice";
 import accountsReducer from "./slices/accountsSlice";
 import appReducer from "./slices/appSlice";
 import budgetsReducer from "./slices/budgetsSlice";
+import analyticsReducer from "./slices/analyticsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     accounts: accountsReducer,
     app: appReducer,
     budgets: budgetsReducer,
+    analytics: analyticsReducer,
   },
   devTools: import.meta.env.MODE !== "production",
 });

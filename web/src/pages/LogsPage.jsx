@@ -102,7 +102,7 @@ const LogsPage = () => {
           </Badge>
         )}
       </Table.Td>
-
+      {console.log(element)}
       <Table.Td>
         {moment(element.date).format("MM-DD-YYYY")} {element.time}
       </Table.Td>
@@ -208,6 +208,7 @@ const LogsPage = () => {
                         <Table.Th></Table.Th>
                       </Table.Tr>
                     </Table.Thead>
+
                     <Table.Tbody>{thisLogs}</Table.Tbody>
                   </Table>
                 </Flex>

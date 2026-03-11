@@ -1,9 +1,9 @@
+//AI generated sample data for a typical user: student
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 import User from "../models/User.js";
 import Account from "../models/Account.js";
-import Category from "../models/Category.js";
 import MonthlyLog from "../models/MonthlyLog.js";
 import Transaction from "../models/Transaction.js";
 import Budget from "../models/Budget.js";
@@ -371,9 +371,7 @@ async function seedTransactions(periods, accountIds) {
         payload.categoryId = tx.category
           ? CATEGORY_IDS[tx.category]
           : undefined;
-        payload.categoryName = tx.category
-          ? CATEGORY_NAMES[tx.category]
-          : "";
+        payload.categoryName = tx.category ? CATEGORY_NAMES[tx.category] : "";
       } else {
         payload.categoryName = "";
       }
@@ -446,7 +444,6 @@ async function main() {
 
   const accountIds = await upsertDefaultAccounts();
 
-  
   const periods = monthSeries(2024, 4, 24);
 
   await seedBudgets(periods);
@@ -455,12 +452,7 @@ async function main() {
 
   console.log("Seed complete");
   console.log("Accounts created/used:", accountIds);
-  console.log(
-    "Months seeded:",
-    periods[0],
-    "to",
-    periods[periods.length - 1],
-  );
+  console.log("Months seeded:", periods[0], "to", periods[periods.length - 1]);
 
   await mongoose.disconnect();
 }

@@ -7,7 +7,7 @@ import Category from "../models/Category.js";
 function ymdToUTCNoon(value) {
   if (!value) return null;
 
-  const datePart = String(value).slice(0, 10); // gets YYYY-MM-DD
+  const datePart = String(value).slice(0, 10);
   const [y, m, d] = datePart.split("-").map(Number);
 
   if (!y || !m || !d) return null;
@@ -49,7 +49,6 @@ export const deleteTransaction = async (req, res) => {
     const userId = new mongoose.Types.ObjectId(req.userId);
     const txId = new mongoose.Types.ObjectId(req.params.id);
 
-    // 1) Find tx (treat missing isDeleted as not deleted)
     const tx = await Transaction.findOne({
       _id: txId,
       userId,
@@ -58,7 +57,6 @@ export const deleteTransaction = async (req, res) => {
 
     if (!tx) return res.status(404).json({ message: "Transaction not found" });
 
-    // 2) Find account
     const account = await Account.findOne({
       _id: tx.accountId,
       userId,
@@ -67,14 +65,11 @@ export const deleteTransaction = async (req, res) => {
 
     if (!account) return res.status(404).json({ message: "Account not found" });
 
-    // 3) Compute its balance effect
     const delta = computeDelta(account.type, tx.type, tx.amount);
 
-    // 4) Soft-delete the tx
     tx.isDeleted = true;
     await tx.save();
 
-    // 5) Revert its effect on account balance
     await Account.updateOne(
       { _id: account._id },
       { $inc: { currentBalance: -delta } },
@@ -102,13 +97,13 @@ export const createTransaction = async (req, res) => {
 
     const delta = computeDelta(account.type, type, amount);
 
-    const log = await getOrCreateMonthlyLog({ userId, date, session: null }); // adjust helper to allow no session
+    const log = await getOrCreateMonthlyLog({ userId, date, session: null }); 
     let categoryName = "";
     if (type === "expense") {
       const cat = await Category.findOne({
         _id: new mongoose.Types.ObjectId(categoryId),
         userId,
-        isDeleted: false, // if you have this field
+        isDeleted: false, 
       }).lean();
 
       if (!cat) return res.status(404).json({ message: "Category not found" });
@@ -163,7 +158,6 @@ export const updateTransaction = async (req, res) => {
 
     if (!tx) return res.status(404).json({ message: "Transaction not found" });
 
-    // OLD account + old delta
     const oldAccount = await Account.findOne({
       _id: tx.accountId,
       userId,
@@ -175,7 +169,6 @@ export const updateTransaction = async (req, res) => {
 
     const oldDelta = computeDelta(oldAccount.type, tx.type, tx.amount);
 
-    // NEW values (fallback to existing tx values)
     const newAccountIdRaw = patch.accountId ?? tx.accountId;
     const newType = patch.type ?? tx.type;
     const newAmount = patch.amount ?? tx.amount;
@@ -193,7 +186,6 @@ export const updateTransaction = async (req, res) => {
 
     const newDelta = computeDelta(newAccount.type, newType, newAmount);
 
-    // Update log/date if date changed
     if (patch.date) {
       const log = await getOrCreateMonthlyLog({
         userId,
@@ -202,30 +194,24 @@ export const updateTransaction = async (req, res) => {
       tx.logId = log._id;
       tx.date = ymdToUTCNoon(patch.date);
     }
-
-    // Update tx fields
     tx.accountId = newAccountId;
     tx.type = newType;
     tx.amount = Number(newAmount);
 
     if (patch.name !== undefined) tx.name = patch.name;
 
-    // categoryId rules
+
     if (newType === "expense") {
-      // if expense, you can change categoryId
       if (patch.categoryId !== undefined) tx.categoryId = patch.categoryId;
     } else {
-      // if income, categoryId should not exist
       tx.categoryId = undefined;
     }
 
     await tx.save();
 
-    // Balance adjustment
     const sameAccount = String(oldAccount._id) === String(newAccount._id);
 
     if (sameAccount) {
-      // only apply the difference
       const diff = newDelta - oldDelta;
       if (diff !== 0) {
         await Account.updateOne(
@@ -234,7 +220,6 @@ export const updateTransaction = async (req, res) => {
         );
       }
     } else {
-      // revert old + apply new
       await Account.updateOne(
         { _id: oldAccount._id },
         { $inc: { currentBalance: -oldDelta } },

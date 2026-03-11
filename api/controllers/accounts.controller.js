@@ -49,8 +49,7 @@ export const updateAccount = async (req, res) => {
     const userId = new mongoose.Types.ObjectId(req.userId);
     const id = new mongoose.Types.ObjectId(req.params.id);
 
-    const { name, type, creditLimit, initialBalance, currentBalance } =
-      req.body;
+    const { name, type, creditLimit, initialBalance } = req.body;
 
     const updates = {};
     if (name !== undefined) updates.name = String(name).trim();

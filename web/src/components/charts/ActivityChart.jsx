@@ -1,7 +1,11 @@
 import { Heatmap } from "@mantine/charts";
-import { Card, Flex, Text } from "@mantine/core";
-import { useSelector } from "react-redux";
+import { Card, Flex, Group, Select, Text } from "@mantine/core";
+import { useDispatch, useSelector } from "react-redux";
 import Loading from "../Loading";
+import { getYearOptions } from "../../utils/getCurrentPeriod";
+import { useEffect, useState } from "react";
+import { IoCalendarOutline } from "react-icons/io5";
+import { getHeatMap } from "../../store/slices/analyticsSlice";
 
 function formatDate(date) {
   return date.toISOString().split("T")[0];
@@ -38,28 +42,46 @@ function generateDateRange(startDate, endDate) {
 }
 
 const ActivityChart = () => {
-  const { transactions, loading } = useSelector((state) => state.transactions);
+  const dispatch = useDispatch();
 
+  const { heatmap, loadingAnalytics } = useSelector((state) => state.analytics);
+  const { activePeriods } = useSelector((state) => state.logs);
+  const [year, setYear] = useState(String(new Date().getFullYear()));
   const { startDate, endDate } = getPastYearRange();
-  const baseRange = generateDateRange(startDate, endDate);
 
-  const heatmapData = (transactions?.data || []).reduce((acc, tx) => {
-    const day = formatDate(new Date(tx.date));
+  useEffect(() => {
+    dispatch(getHeatMap(year));
+  }, [dispatch, year]);
 
-    if (acc[day] !== undefined) {
-      acc[day] += tx.amount;
-    }
+  function formatHeatmapData(data) {
+    console.log(data);
+    return data.reduce((acc, item) => {
+      acc[item.date] = item.total;
+      return acc;
+    }, {});
+  }
 
-    return acc;
-  }, baseRange);
-
-  if (loading) {
+  if (loadingAnalytics) {
     return <Loading />;
   }
 
   return (
     <Card className="hover" h="100%" shadow="xl" withBorder>
-      <Text fw={700}>Activity in the past year</Text>
+      <Group justify="space-between">
+        <Text fw={700}>
+          {startDate} to {endDate}
+        </Text>
+        <Select
+          radius="lg"
+          size="xs"
+          value={year}
+          leftSection={<IoCalendarOutline />}
+          placeholder="Select Year"
+          onChange={(value) => setYear(value)}
+          data={getYearOptions(activePeriods)}
+          allowDeselect={false}
+        />
+      </Group>
 
       <Flex justify="center">
         <Heatmap
@@ -75,7 +97,7 @@ const ActivityChart = () => {
           getTooltipLabel={({ date, value }) =>
             `${date} – $${value ?? 0} spent`
           }
-          data={heatmapData}
+          data={formatHeatmapData(heatmap)}
         />
       </Flex>
     </Card>
