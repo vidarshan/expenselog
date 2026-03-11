@@ -39,9 +39,9 @@ export const createCategory = createAsyncThunk(
 
 export const updateCategory = createAsyncThunk(
   "categories/update",
-  async ({ id, name }, thunkAPI) => {
+  async ({ id, name, color }, thunkAPI) => {
     try {
-      const res = await api.patch(`/categories/${id}`, { name });
+      const res = await api.patch(`/categories/${id}`, { name, color });
       return res.data;
     } catch (err) {
       const msg =

@@ -15,11 +15,6 @@ import {
   IoSparklesOutline,
 } from "react-icons/io5";
 import { SiOpenai } from "react-icons/si";
-// import {
-//   IconSparkles,
-//   IconAlertTriangle,
-//   IconRocket,
-// } from "@tabler/icons-react";
 
 const sevColor = (s) =>
   s === "high" ? "red" : s === "medium" ? "yellow" : "green";

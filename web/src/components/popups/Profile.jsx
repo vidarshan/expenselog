@@ -176,7 +176,7 @@ const Profile = ({ opened, setOpened, handleLogout }) => {
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Group justify="space-between">
             <Flex gap="xs">
-              <Avatar size="lg" color="lime" radius="xl">
+              <Avatar size="lg" color="indigo" variant="filled" radius="xl">
                 {user?.username?.[0] || "U"}
               </Avatar>
 

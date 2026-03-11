@@ -132,7 +132,7 @@ const OverviewCard = ({ summary }) => {
                   <Text size="sm" c="dimmed">
                     Net Gain
                   </Text>
-                  <Title order={3}>${net}</Title>
+                  <Title order={3}>${net.toFixed(2)}</Title>
                 </Flex>
               </Flex>
             </Stack>

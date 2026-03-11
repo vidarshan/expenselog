@@ -5,6 +5,7 @@ export const createCategory = async (req, res) => {
     const category = await Category.create({
       name: req.body.name,
       userId: req.userId,
+      color: req.body.color,
     });
 
     res.status(201).json(category);
@@ -32,7 +33,7 @@ export const updateCategory = async (req, res) => {
   try {
     const category = await Category.findOneAndUpdate(
       { _id: req.params.id, userId: req.userId },
-      { name: req.body.name },
+      { name: req.body.name, color: req.body.color },
       { new: true },
     );
     res.json(category);

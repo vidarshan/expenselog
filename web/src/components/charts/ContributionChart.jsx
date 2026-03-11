@@ -47,47 +47,18 @@ const palette = [
 const ContributionChart = ({ categoryBreakdown }) => {
   const [mode, setMode] = useState("percent");
   const totalSum = categoryBreakdown.reduce((sum, x) => sum + x.total, 0);
+  console.log("categoryBreakdown", categoryBreakdown);
   const { transactions } = useSelector((state) => state.transactions);
-  const pieData = categoryBreakdown.map((x, index) => ({
+  const pieData = categoryBreakdown.map((x) => ({
     id: x.categoryId, // optional
     name: x.categoryName, // label
     value: x.total, // numeric value used for slices
+    color: x.color,
     percentage:
       totalSum === 0 ? 0 : Number(((x.total / totalSum) * 100).toFixed(1)),
-    color: palette[index % palette.length],
   }));
 
   console.log(transactions);
-
-  function generateDateRange(startDate, endDate) {
-    const result = {};
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    const current = new Date(start);
-
-    while (current <= end) {
-      const key = current.toISOString().split("T")[0];
-      result[key] = 0;
-      current.setDate(current.getDate() + 1);
-    }
-
-    return result;
-  }
-
-  const baseRange = generateDateRange("2026-03-01", "2026-03-10");
-
-  const heatmapData = transactions.data.reduce((acc, tx) => {
-    const day = new Date(tx.date).toISOString().split("T")[0];
-
-    if (acc[day] !== undefined) {
-      acc[day] += tx.amount;
-    }
-
-    return acc;
-  }, baseRange);
-
-  console.log(heatmapData);
 
   return (
     <Card h="100%" shadow="xl" withBorder>
@@ -116,7 +87,7 @@ const ContributionChart = ({ categoryBreakdown }) => {
           }}
         />
       </Group>
-      <Group justify="center">
+      <Group h="100%" justify="center">
         <PieChart
           withLabelsLine
           withTooltip

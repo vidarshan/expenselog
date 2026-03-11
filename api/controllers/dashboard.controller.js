@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import MonthlyLog from "../models/MonthlyLog.js";
 import Transaction from "../models/Transaction.js";
+import Budget from "../models/Budget.js";
 
 function parseYearMonth(req) {
   const year = Number(req.query.year);
@@ -56,8 +57,88 @@ async function aggregateSummary(logId) {
   return { income, expenses, net, savingsRate, txCount };
 }
 
-async function buildBudgetProgress() {
-  return [];
+async function buildBudgetProgress(userId, year, month, logId) {
+  const userObjectId = new mongoose.Types.ObjectId(userId);
+
+  const [budgets, spentRows] = await Promise.all([
+    Budget.find({ userId, year, month })
+      .select("categoryId categoryName limit")
+      .lean(),
+
+    Transaction.aggregate([
+      {
+        $match: {
+          userId: userObjectId,
+          logId,
+          type: "expense",
+        },
+      },
+      {
+        $group: {
+          _id: "$categoryId",
+          spent: { $sum: "$amount" },
+          categoryName: {
+            $first: { $ifNull: ["$categoryName", "Uncategorized"] },
+          },
+        },
+      },
+    ]),
+  ]);
+
+  const spentMap = new Map();
+  for (const row of spentRows) {
+    const key = row._id ? String(row._id) : "uncategorized";
+    spentMap.set(key, {
+      spent: row.spent || 0,
+      categoryName: row.categoryName || "Uncategorized",
+    });
+  }
+
+  const items = budgets.map((budget) => {
+    const key = budget.categoryId ? String(budget.categoryId) : "uncategorized";
+    const spentInfo = spentMap.get(key);
+
+    const limit = Number(budget.limit) || 0;
+    const spent = Number(spentInfo?.spent || 0);
+    const remaining = limit - spent;
+    const percent = limit > 0 ? (spent / limit) * 100 : 0;
+
+    let status = "ok";
+    if (limit <= 0) {
+      status = spent > 0 ? "over" : "ok";
+    } else if (spent > limit) {
+      status = "over";
+    } else if (spent / limit >= 0.85) {
+      status = "warning";
+    }
+
+    return {
+      categoryId: budget.categoryId || null,
+      categoryName:
+        budget.categoryName || spentInfo?.categoryName || "Uncategorized",
+      limit,
+      spent,
+      remaining,
+      percent: Number(percent.toFixed(1)),
+      status,
+    };
+  });
+
+  const totalLimit = items.reduce((sum, item) => sum + item.limit, 0);
+  const totalSpent = items.reduce((sum, item) => sum + item.spent, 0);
+  const overBudgetCount = items.filter((item) => item.status === "over").length;
+  const warningCount = items.filter((item) => item.status === "warning").length;
+
+  return {
+    items,
+    summary: {
+      totalLimit,
+      totalSpent,
+      remaining: totalLimit - totalSpent,
+      overBudgetCount,
+      warningCount,
+    },
+  };
 }
 
 async function aggregateRecentTransactions(logId) {
@@ -77,14 +158,38 @@ async function aggregateCategoryBreakdown(userId, year, month) {
       $match: {
         userId: new mongoose.Types.ObjectId(userId),
         type: "expense",
+        isDeleted: { $ne: true },
         date: { $gte: start, $lte: end },
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "categoryId",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $unwind: {
+        path: "$category",
+        preserveNullAndEmptyArrays: true,
       },
     },
     {
       $group: {
         _id: "$categoryId",
-        name: { $first: { $ifNull: ["$categoryName", "Uncategorized"] } },
         total: { $sum: "$amount" },
+        categoryName: {
+          $first: {
+            $ifNull: ["$category.name", "$categoryName", "Uncategorized"],
+          },
+        },
+        color: {
+          $first: {
+            $ifNull: ["$category.color", "gray"],
+          },
+        },
       },
     },
     { $sort: { total: -1 } },
@@ -92,7 +197,8 @@ async function aggregateCategoryBreakdown(userId, year, month) {
       $project: {
         _id: 0,
         categoryId: "$_id",
-        categoryName: "$name",
+        categoryName: 1,
+        color: 1,
         total: 1,
       },
     },
@@ -105,12 +211,34 @@ async function aggregateMonthCategoryTotals(userId, start, end) {
       $match: {
         userId: new mongoose.Types.ObjectId(userId),
         type: "expense",
+        isDeleted: { $ne: true },
         date: { $gte: start, $lte: end },
       },
     },
     {
+      $lookup: {
+        from: "categories",
+        localField: "categoryId",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $unwind: {
+        path: "$category",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
       $group: {
-        _id: { $ifNull: ["$categoryName", "Uncategorized"] },
+        _id: {
+          name: {
+            $ifNull: ["$category.name", "$categoryName", "Uncategorized"],
+          },
+          color: {
+            $ifNull: ["$category.color", "gray"],
+          },
+        },
         total: { $sum: "$amount" },
       },
     },
@@ -153,10 +281,20 @@ async function buildCategoryMonthlyComparison(userId, year, month) {
   ]);
 
   const currTotals = {};
-  for (const r of curr) currTotals[r._id] = r.total;
+  for (const r of curr) {
+    currTotals[r._id.name] = {
+      total: r.total,
+      color: r._id.color,
+    };
+  }
 
   const prevTotals = {};
-  for (const r of prevRows) prevTotals[r._id] = r.total;
+  for (const r of prevRows) {
+    prevTotals[r._id.name] = {
+      total: r.total,
+      color: r._id.color,
+    };
+  }
 
   const labelA = monthLabel(prev.year, prev.month);
   const labelB = monthLabel(year, month);
@@ -167,11 +305,11 @@ async function buildCategoryMonthlyComparison(userId, year, month) {
 
   return categories.map((cat) => ({
     category: cat,
-    [labelA]: prevTotals[cat] ?? 0,
-    [labelB]: currTotals[cat] ?? 0,
+    color: currTotals[cat]?.color || prevTotals[cat]?.color || "gray",
+    [labelA]: prevTotals[cat]?.total ?? 0,
+    [labelB]: currTotals[cat]?.total ?? 0,
   }));
 }
-
 async function buildCategoryCompareAnyTwoMonths(
   userId,
   yearA,
@@ -191,10 +329,20 @@ async function buildCategoryCompareAnyTwoMonths(
   const labelB = monthLabel(yearB, monthB);
 
   const aTotals = {};
-  for (const r of aRows) aTotals[r._id] = r.total;
+  for (const r of aRows) {
+    aTotals[r._id.name] = {
+      total: r.total,
+      color: r._id.color,
+    };
+  }
 
   const bTotals = {};
-  for (const r of bRows) bTotals[r._id] = r.total;
+  for (const r of bRows) {
+    bTotals[r._id.name] = {
+      total: r.total,
+      color: r._id.color,
+    };
+  }
 
   const categories = Array.from(
     new Set([...Object.keys(aTotals), ...Object.keys(bTotals)]),
@@ -204,8 +352,9 @@ async function buildCategoryCompareAnyTwoMonths(
     labels: { a: labelA, b: labelB },
     data: categories.map((cat) => ({
       category: cat,
-      [labelA]: aTotals[cat] ?? 0,
-      [labelB]: bTotals[cat] ?? 0,
+      color: aTotals[cat]?.color || bTotals[cat]?.color || "gray",
+      [labelA]: aTotals[cat]?.total ?? 0,
+      [labelB]: bTotals[cat]?.total ?? 0,
     })),
   };
 }

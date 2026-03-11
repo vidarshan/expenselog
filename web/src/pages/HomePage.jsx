@@ -89,7 +89,7 @@ const HomePage = () => {
 
         <Text ta="center" fw={500} size="md" c="dimmed" maw={720}>
           Most expense trackers push budgeting rules and restrictions.
-          ExpenseLog focuses on awareness instead — helping you understand your
+          ExpenseLog focuses on awareness instead. Helping you understand your
           spending without pressure, automation, or unnecessary complexity.
         </Text>
       </Stack>
@@ -164,7 +164,7 @@ const HomePage = () => {
 
         <Text ta="center" c="dimmed" maw={600}>
           Set up your income, log your expenses, and gain clear insights into
-          your finances — all in minutes, with no clutter or complexity.
+          your finances, all in minutes, with no clutter or complexity.
         </Text>
       </Stack>
 

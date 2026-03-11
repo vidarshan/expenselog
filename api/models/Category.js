@@ -10,6 +10,10 @@ const categorySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    color: {
+      type: String,
+      default: "blue",
+    },
     isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true },

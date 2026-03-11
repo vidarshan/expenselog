@@ -6,9 +6,11 @@ import {
   Flex,
   Grid,
   Group,
+  Progress,
   Select,
   Text,
   Title,
+  Tooltip,
 } from "@mantine/core";
 import { IoCalendarOutline } from "react-icons/io5";
 import ContributionChart from "../components/charts/ContributionChart";
@@ -26,6 +28,8 @@ import { setMonth, setYear } from "../store/slices/appSlice";
 import AddRecord from "../components/popups/AddRecord";
 import GettingStartedCard from "../components/cards/GettingStartedCard";
 import { getTransactions } from "../store/slices/transactionsSlice";
+import BudgetsChart from "../components/charts/BudgetsChart";
+import ActivityChart from "../components/charts/ActivityChart";
 
 const DashboardPage = () => {
   const dispatch = useDispatch();
@@ -76,7 +80,7 @@ const DashboardPage = () => {
   console.log("gm", getMonthOptions(activePeriods, currentYear));
 
   return (
-    <Container size="lg" py="md">
+    <Container size="xl" py="md">
       {isAuthed && (
         <AddRecord expenseOpened={opened} setExpenseOpened={setOpened} />
       )}
@@ -129,7 +133,11 @@ const DashboardPage = () => {
                 <OverviewCard summary={dashboard?.summary} unit="month" />
               </Grid.Col>
               <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-                <AIInsightsCard
+                <BudgetsChart summary={dashboard?.budgets?.summary} />
+              </Grid.Col>
+
+              <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+                {/* <AIInsightsCard
                   insights={[
                     "Your expense jump likely came from 1–2 categories—check Food vs last month.",
                     "Your spend is concentrated, so savings growth will come from optimizing the remaining flexible 30%.",
@@ -142,45 +150,52 @@ const DashboardPage = () => {
                     { label: "High essentials ratio", severity: "medium" },
                     { label: "Income flat", severity: "low" },
                   ]}
-                />
+                /> */}
               </Grid.Col>
+
               <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
                 <ContributionChart
                   categoryBreakdown={dashboard?.categoryBreakdown}
                 />
               </Grid.Col>
+
               <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
                 <Card h="100%" shadow="xl" withBorder>
-                  <Flex>
+                  <Flex mb="sm">
                     <Text fw={700}>Most Recent transactions</Text>
                   </Flex>
-                  {dashboard?.recentTransactions?.map((tx) => {
-                    return (
-                      <Card
-                        key={tx._id}
-                        mt="xs"
-                        radius="lg"
-                        style={{ cursor: "pointer" }}
-                        withBorder
-                      >
-                        <Flex align="center" justify="space-between">
-                          <Flex align="center">
-                            <Text fw={600} size="sm">
-                              {tx.name}
-                            </Text>
-                            <Badge ml="xs" variant="light">
-                              {tx.categoryName}
-                            </Badge>
-                          </Flex>
-                          <Text></Text>
-                          <Text fw={600} size="sm">
-                            ${tx.amount} | {moment(tx.date).fromNow()}
-                          </Text>
-                        </Flex>
-                      </Card>
-                    );
-                  })}
+                  {dashboard?.recentTransactions?.map((tx) => (
+                    <Flex
+                      key={tx._id}
+                      justify="space-between"
+                      align="center"
+                      py="md"
+                    >
+                      <Flex align="center" gap="xs">
+                        <Text size="sm" fw={600}>
+                          {tx.name}
+                        </Text>
+
+                        <Badge size="xs" variant="light">
+                          {tx.categoryName}
+                        </Badge>
+                      </Flex>
+
+                      <Flex align="center" gap="sm">
+                        <Text size="xs" c="dimmed">
+                          {moment(tx.date).format("MMM D")}
+                        </Text>
+
+                        <Text size="sm" fw={600}>
+                          ${Number(tx.amount).toFixed(2)}
+                        </Text>
+                      </Flex>
+                    </Flex>
+                  ))}
                 </Card>
+              </Grid.Col>
+              <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+                <ActivityChart />
               </Grid.Col>
               <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
                 <ComparisonChart monthlyComparison={monthlyComparison} />

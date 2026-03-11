@@ -13,6 +13,7 @@ import {
   ThemeIcon,
   Button,
   Avatar,
+  Badge,
 } from "@mantine/core";
 import {
   IoAddOutline,
@@ -155,7 +156,10 @@ const NavBar = ({ toggle }) => {
             <Divider />
 
             <Stack px="sm">
-              <Text size="sm">Balances</Text>
+              <Group justify="space-between">
+                <Text size="sm">Accounts</Text>
+                <Badge variant="light"> {accounts.length} </Badge>
+              </Group>
 
               {accounts?.length ? (
                 accounts.map((a) => (
@@ -197,7 +201,7 @@ const NavBar = ({ toggle }) => {
           <Paper className="hover-class" onClick={() => setAccountOpened(true)}>
             <Flex align="center" justify="space-between">
               <Group gap="xs" justify="flex-start">
-                <Avatar color="lime" radius="xl">
+                <Avatar color="violet" variant="filled" radius="xl">
                   {username?.[0] || "U"}
                 </Avatar>
                 <Paper>

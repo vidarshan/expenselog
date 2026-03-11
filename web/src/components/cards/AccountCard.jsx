@@ -69,7 +69,7 @@ const AccountCard = ({ account, onEdit, onSelect }) => {
             <Text fw={700}>{account?.name || "Unnamed"}</Text>
 
             <Group gap="xs">
-              <Badge color={meta.color} variant="light">
+              <Badge color={meta.color} variant="filled">
                 {meta.label}
               </Badge>
 

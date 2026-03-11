@@ -7,6 +7,7 @@ import {
   Group,
   Table,
   Text,
+  ThemeIcon,
   Title,
 } from "@mantine/core";
 import React, { useEffect, useState } from "react";
@@ -51,7 +52,7 @@ const CategoriesPage = () => {
     <Table.Tr key={element._id}>
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>
-        <Text> {element.isDeleted ? "Yes" : "No"}</Text>
+        <ThemeIcon color={element.color} />
       </Table.Td>
       <Table.Td>
         {moment(element.createdAt).format("MMM-DD-YYYY hh:mm A")}
