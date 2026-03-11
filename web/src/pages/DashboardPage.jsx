@@ -25,6 +25,7 @@ import { getMonthOptions, getYearOptions } from "../utils/getCurrentPeriod";
 import { setMonth, setYear } from "../store/slices/appSlice";
 import AddRecord from "../components/popups/AddRecord";
 import GettingStartedCard from "../components/cards/GettingStartedCard";
+import { getTransactions } from "../store/slices/transactionsSlice";
 
 const DashboardPage = () => {
   const dispatch = useDispatch();
@@ -37,7 +38,9 @@ const DashboardPage = () => {
   );
   const { accounts, accountsLoading } = useSelector((state) => state.accounts);
   const { currentYear, currentMonth } = useSelector((state) => state.app);
-  const { monthlyLogs, logsLoading } = useSelector((state) => state.logs);
+  const { monthlyLogs, activePeriods, logsLoading } = useSelector(
+    (state) => state.logs,
+  );
   const authUser = useSelector((state) => state.auth.user);
   const token = authUser?.token || null;
   const [opened, setOpened] = useState(false);
@@ -61,7 +64,16 @@ const DashboardPage = () => {
       }),
     );
     dispatch(getActivePeriods());
+    dispatch(
+      getTransactions({
+        year: currentYear,
+        month: currentMonth,
+      }),
+    );
   }, [currentMonth, currentYear, dispatch]);
+
+  console.log("av", activePeriods);
+  console.log("gm", getMonthOptions(activePeriods, currentYear));
 
   return (
     <Container size="lg" py="md">
@@ -93,21 +105,21 @@ const DashboardPage = () => {
                   </Group>
                   <Flex gap="sm">
                     <Select
-                      radius="md"
+                      radius="lg"
                       value={currentMonth}
                       leftSection={<IoCalendarOutline />}
                       placeholder="Select Month"
                       onChange={(value) => dispatch(setMonth(value))}
-                      data={getMonthOptions()}
+                      data={getMonthOptions(activePeriods, currentYear)}
                       allowDeselect={false}
                     />
                     <Select
-                      radius="md"
+                      radius="lg"
                       value={currentYear}
                       leftSection={<IoCalendarOutline />}
                       placeholder="Select Year"
                       onChange={(value) => dispatch(setYear(value))}
-                      data={getYearOptions()}
+                      data={getYearOptions(activePeriods)}
                       allowDeselect={false}
                     />
                   </Flex>

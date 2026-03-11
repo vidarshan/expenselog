@@ -62,7 +62,7 @@ export function AIInsightsCard({
               size="xs"
               c="dark"
               variant="white"
-              radius="md"
+              radius="lg"
               // onClick={onRegenerate}
               leftSection={<SiOpenai size={16} />}
             >

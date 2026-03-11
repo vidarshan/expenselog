@@ -171,7 +171,7 @@ const LogsPage = () => {
                 Categories
               </Button>
               <Select
-                radius="md"
+                radius="lg"
                 value={currentMonth}
                 leftSection={<IoCalendarOutline />}
                 placeholder="Select Month"
@@ -180,7 +180,7 @@ const LogsPage = () => {
                 allowDeselect={false}
               />
               <Select
-                radius="md"
+                radius="lg"
                 value={currentYear}
                 leftSection={<IoCalendarOutline />}
                 placeholder="Select Year"

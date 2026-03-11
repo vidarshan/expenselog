@@ -30,7 +30,7 @@ const GettingStartedCard = ({
       </Text>
 
       <Stack gap="md">
-        <Card withBorder radius="md" p="md">
+        <Card withBorder radius="lg" p="md">
           <Group align="flex-start" wrap="nowrap">
             <ThemeIcon
               color={accountsCount > 0 ? "lime" : "red"}
@@ -62,7 +62,7 @@ const GettingStartedCard = ({
                 <Text c="green">Done</Text>
               ) : (
                 <Button
-                  radius="md"
+                  radius="lg"
                   variant="filled"
                   w="fit-content"
                   onClick={() => navigate("/accounts")}
@@ -74,7 +74,7 @@ const GettingStartedCard = ({
           </Group>
         </Card>
 
-        <Card withBorder radius="md" p="md">
+        <Card withBorder radius="lg" p="md">
           <Group align="flex-start" wrap="nowrap">
             <ThemeIcon
               color={categoriesCount > 0 ? "lime" : "red"}
@@ -106,7 +106,7 @@ const GettingStartedCard = ({
                 <Text c="green">We've created some for you</Text>
               ) : (
                 <Button
-                  radius="md"
+                  radius="lg"
                   variant="filled"
                   w="fit-content"
                   onClick={() => navigate("/categories")}
@@ -118,7 +118,7 @@ const GettingStartedCard = ({
           </Group>
         </Card>
 
-        <Card withBorder radius="md" p="md">
+        <Card withBorder radius="lg" p="md">
           <Group align="flex-start" wrap="nowrap">
             <ThemeIcon
               color={hasTransactions ? "lime" : "orange"}
@@ -152,7 +152,7 @@ const GettingStartedCard = ({
                 </Text>
               ) : (
                 <Button
-                  radius="md"
+                  radius="lg"
                   variant="filled"
                   w="fit-content"
                   disabled={accountsCount === 0 || categoriesCount === 0}

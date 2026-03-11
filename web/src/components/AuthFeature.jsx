@@ -4,7 +4,7 @@ import React from "react";
 export const AuthFeature = ({ icon, title, desc, color }) => {
   return (
     <Group align="flex-start" wrap="nowrap" gap="sm">
-      <ThemeIcon radius="md" size={34} variant="filled" color={color}>
+      <ThemeIcon radius="lg" size={34} variant="filled" color={color}>
         {icon}
       </ThemeIcon>
 

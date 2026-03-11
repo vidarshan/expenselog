@@ -79,7 +79,7 @@ export default function RegistrationPage() {
             >
               <Paper p="sm" w={{ base: "100%", md: "50%" }} h="100%">
                 <Group gap="sm" mb="xs">
-                  <ThemeIcon radius="md" variant="filled" size="xl">
+                  <ThemeIcon radius="lg" variant="filled" size="xl">
                     <IoSparklesOutline size={18} />
                   </ThemeIcon>
 
@@ -148,7 +148,7 @@ export default function RegistrationPage() {
                 >
                   <Paper radius="xl" w="100%" h="100%" p="md" withBorder>
                     <Group gap="sm" wrap="nowrap">
-                      <ThemeIcon radius="md" variant="filled" size="xl">
+                      <ThemeIcon radius="lg" variant="filled" size="xl">
                         <IoPersonAddOutline size={18} />
                       </ThemeIcon>
                       <Box>
@@ -168,7 +168,7 @@ export default function RegistrationPage() {
                     <TextInput
                       label="Name"
                       placeholder="Your name"
-                      radius="md"
+                      radius="lg"
                       {...form.getInputProps("name")}
                     />
 
@@ -176,7 +176,7 @@ export default function RegistrationPage() {
                       mt="md"
                       label="Email"
                       placeholder="you@example.com"
-                      radius="md"
+                      radius="lg"
                       {...form.getInputProps("email")}
                     />
 
@@ -184,7 +184,7 @@ export default function RegistrationPage() {
                       mt="md"
                       label="Password"
                       placeholder="Create a strong password"
-                      radius="md"
+                      radius="lg"
                       {...form.getInputProps("password")}
                     />
 
@@ -192,7 +192,7 @@ export default function RegistrationPage() {
                       mt="md"
                       label="Salary type"
                       placeholder="Choose salary type"
-                      radius="md"
+                      radius="lg"
                       data={[
                         { value: "fixed", label: "Fixed" },
                         { value: "variable", label: "Variable" },
@@ -208,7 +208,7 @@ export default function RegistrationPage() {
                       type="submit"
                       fullWidth
                       mt="lg"
-                      radius="md"
+                      radius="lg"
                       size="md"
                       loading={loading}
                     >

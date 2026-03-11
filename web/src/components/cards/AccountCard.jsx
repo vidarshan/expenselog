@@ -55,7 +55,7 @@ const AccountCard = ({ account, onEdit, onSelect }) => {
     <Card
       withBorder
       p="md"
-      radius="md"
+      radius="lg"
       onClick={onSelect}
       style={{ cursor: "pointer" }}
     >

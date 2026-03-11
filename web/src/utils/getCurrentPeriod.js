@@ -1,20 +1,28 @@
-export const getMonthOptions = () => {
-  return [
-    { value: "1", label: "January" },
-    { value: "2", label: "February" },
-    { value: "3", label: "March" },
-    { value: "4", label: "April" },
-    { value: "5", label: "May" },
-    { value: "6", label: "June" },
-    { value: "7", label: "July" },
-    { value: "8", label: "August" },
-    { value: "9", label: "September" },
-    { value: "10", label: "October" },
-    { value: "11", label: "November" },
-    { value: "12", label: "December" },
-  ];
-};
+export const getMonthOptions = (periods = [], selectedYear) => {
+  const yearEntry = periods.find((p) => p.year === Number(selectedYear));
 
+  if (!yearEntry) return [];
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  return yearEntry.months.map((m) => ({
+    value: String(m),
+    label: monthNames[m - 1],
+  }));
+};
 export const months = () => {
   return [
     "January",
@@ -32,18 +40,9 @@ export const months = () => {
   ];
 };
 
-const currentYear = new Date().getFullYear();
-
-export const getYearOptions = () => {
-  return [
-    {
-      value: (currentYear - 2).toString(),
-      label: (currentYear - 2).toString(),
-    },
-    {
-      value: (currentYear - 1).toString(),
-      label: (currentYear - 1).toString(),
-    },
-    { value: currentYear.toString(), label: currentYear.toString() },
-  ];
+export const getYearOptions = (periods = []) => {
+  return periods.map((p) => ({
+    value: String(p.year),
+    label: String(p.year),
+  }));
 };

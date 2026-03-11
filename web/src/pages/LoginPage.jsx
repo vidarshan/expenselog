@@ -71,7 +71,7 @@ const LoginPage = () => {
             >
               <Paper p="sm" w={{ base: "100%", md: "50%" }} h="100%">
                 <Group gap="sm" mb="xs">
-                  <ThemeIcon radius="md" variant="filled" size="xl">
+                  <ThemeIcon radius="lg" variant="filled" size="xl">
                     <IoSparklesOutline size={18} />
                   </ThemeIcon>
 
@@ -135,7 +135,7 @@ const LoginPage = () => {
               >
                 <Paper radius="xl" w="100%" h="100%" p="md" withBorder>
                   <Group gap="sm" wrap="nowrap">
-                    <ThemeIcon radius="md" size="xl" variant="filled">
+                    <ThemeIcon radius="lg" size="xl" variant="filled">
                       <IoPersonOutline size={18} />
                     </ThemeIcon>
 
@@ -158,7 +158,7 @@ const LoginPage = () => {
                       mt="xl"
                       label="Email"
                       placeholder="you@example.com"
-                      radius="md"
+                      radius="lg"
                       {...form.getInputProps("email")}
                     />
 
@@ -166,7 +166,7 @@ const LoginPage = () => {
                       mt="md"
                       label="Password"
                       placeholder="••••••••"
-                      radius="md"
+                      radius="lg"
                       {...form.getInputProps("password")}
                     />
 
@@ -187,7 +187,7 @@ const LoginPage = () => {
                       type="submit"
                       fullWidth
                       mt="lg"
-                      radius="md"
+                      radius="lg"
                       size="md"
                     >
                       Login

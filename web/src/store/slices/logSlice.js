@@ -2,9 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../api/axios";
 
 const initialState = {
-  logs: [],
+  activePeriods: [],
   monthlyLogs: { data: [], pagination: {} },
-  pagination: {},
   loading: false,
   error: "",
 };
@@ -13,10 +12,8 @@ export const getActivePeriods = createAsyncThunk(
   "logs/active/get",
   async (_, thunkAPI) => {
     try {
-      const logActiveRes = await api.get("/logs/active");
-      const logData = logActiveRes.data;
-
-      return logData;
+      const res = await api.get("/logs/active");
+      return res.data;
     } catch (err) {
       const msg =
         err?.response?.data?.message || err?.message || "Fetch failed";
@@ -29,12 +26,10 @@ export const getMonthlyLogs = createAsyncThunk(
   "logs/monthly/get",
   async ({ page, limit }, thunkAPI) => {
     try {
-      const logActiveRes = await api.get("/logs/monthly", {
+      const res = await api.get("/logs/monthly", {
         params: { page, limit },
       });
-      const logData = logActiveRes.data;
-
-      return logData;
+      return res.data;
     } catch (err) {
       const msg =
         err?.response?.data?.message || err?.message || "Fetch failed";
@@ -56,13 +51,13 @@ const logsSlice = createSlice({
       .addCase(getActivePeriods.fulfilled, (state, action) => {
         state.loading = false;
         state.error = "";
-        state.logs = action.payload.data;
-        state.pagination = action.payload.pagination;
+        state.activePeriods = action.payload || [];
       })
       .addCase(getActivePeriods.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Fetch failed";
       })
+
       .addCase(getMonthlyLogs.pending, (state) => {
         state.loading = true;
         state.error = "";
@@ -70,7 +65,7 @@ const logsSlice = createSlice({
       .addCase(getMonthlyLogs.fulfilled, (state, action) => {
         state.loading = false;
         state.error = "";
-        state.monthlyLogs = action.payload;
+        state.monthlyLogs = action.payload || { data: [], pagination: {} };
       })
       .addCase(getMonthlyLogs.rejected, (state, action) => {
         state.loading = false;

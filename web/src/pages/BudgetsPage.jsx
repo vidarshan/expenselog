@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  ActionIcon,
   Badge,
   Box,
   Button,
@@ -9,6 +10,7 @@ import {
   Group,
   Loader,
   Paper,
+  Progress,
   ScrollArea,
   Select,
   Stack,
@@ -17,9 +19,14 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { IoSearchOutline } from "react-icons/io5";
+import {
+  IoAddOutline,
+  IoPencilOutline,
+  IoSearchOutline,
+} from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { getBudgets } from "../store/slices/budgetsSlice";
+import AddBudget from "../components/popups/AddBudget";
 
 const MONTHS = [
   { value: "1", label: "Jan" },
@@ -47,6 +54,12 @@ function getStatusBadge(status) {
   if (status === "over") return <Badge color="red">Over</Badge>;
   if (status === "warning") return <Badge color="yellow">Warning</Badge>;
   return <Badge color="green">OK</Badge>;
+}
+
+function getColor(status) {
+  if (status === "over") return "red";
+  if (status === "warning") return "yellow";
+  return "green";
 }
 
 function PeriodPicker({ value, onChange }) {
@@ -78,7 +91,7 @@ function PeriodPicker({ value, onChange }) {
 function SummaryCards({ summary, budgetedCount }) {
   return (
     <Group grow>
-      <Paper h="100%" withBorder p="sm" radius="md">
+      <Paper h="100%" withBorder p="sm" radius="lg">
         <Text size="xs" c="dimmed">
           Total Budget
         </Text>
@@ -88,21 +101,21 @@ function SummaryCards({ summary, budgetedCount }) {
         </Text>
       </Paper>
 
-      <Paper h="100%" withBorder p="sm" radius="md">
+      <Paper h="100%" withBorder p="sm" radius="lg">
         <Text size="xs" c="dimmed">
           Budgeted Spent
         </Text>
         <Text fw={700}>${summary.totalSpentBudgeted.toFixed(2)}</Text>
       </Paper>
 
-      <Paper withBorder p="sm" radius="md">
+      <Paper withBorder p="sm" radius="lg">
         <Text size="xs" c="dimmed">
           Total Spent
         </Text>
         <Text fw={700}>${summary.totalSpentAll.toFixed(2)}</Text>
       </Paper>
 
-      <Paper withBorder p="sm" radius="md">
+      <Paper withBorder p="sm" radius="lg">
         <Text size="xs" c="dimmed">
           Over Budget
         </Text>
@@ -112,69 +125,87 @@ function SummaryCards({ summary, budgetedCount }) {
   );
 }
 
-function BudgetedTable({ items, search, filter }) {
-  const rows = [];
+function BudgetedList({ items, search, filter, onEdit, year, month }) {
   const q = search.trim().toLowerCase();
 
-  for (const item of items) {
+  const filtered = items.filter((item) => {
     const matchesSearch = q
       ? item.categoryName.toLowerCase().includes(q)
       : true;
 
-    if (!matchesSearch) continue;
+    if (!matchesSearch) return false;
 
     const status = getStatus(item.spent, item.limit);
+    if (filter !== "all" && status !== filter) return false;
 
-    if (filter !== "all" && status !== filter) continue;
-
-    const remaining = item.limit - item.spent;
-    const percent = item.limit > 0 ? (item.spent / item.limit) * 100 : 0;
-
-    rows.push(
-      <Table.Tr key={item.categoryId}>
-        <Table.Td>{item.categoryName}</Table.Td>
-        <Table.Td>${item.limit.toFixed(2)}</Table.Td>
-        <Table.Td>${item.spent.toFixed(2)}</Table.Td>
-        <Table.Td c={remaining < 0 ? "red" : undefined}>
-          ${remaining.toFixed(2)}
-        </Table.Td>
-        <Table.Td>{percent.toFixed(0)}%</Table.Td>
-        <Table.Td>{getStatusBadge(status)}</Table.Td>
-      </Table.Tr>,
-    );
-  }
+    return item.categoryName !== "Unknown";
+  });
 
   return (
-    <Card withBorder radius="md" p="md">
-      <Title order={4} mb="sm">
+    <Card withBorder radius="lg" p="md">
+      <Title order={4} mb="md">
         Budgeted Categories
       </Title>
 
-      <ScrollArea>
-        <Table striped highlightOnHover>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Category</Table.Th>
-              <Table.Th>Limit</Table.Th>
-              <Table.Th>Spent</Table.Th>
-              <Table.Th>Remaining</Table.Th>
-              <Table.Th>Used</Table.Th>
-              <Table.Th>Status</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {rows.length > 0 ? (
-              rows
-            ) : (
-              <Table.Tr>
-                <Table.Td colSpan={6}>
-                  <Text c="dimmed">No budgeted categories found.</Text>
-                </Table.Td>
-              </Table.Tr>
-            )}
-          </Table.Tbody>
-        </Table>
-      </ScrollArea>
+      {filtered.length > 0 ? (
+        <Stack gap="sm">
+          {filtered.map((item) => {
+            const status = getStatus(item.spent, item.limit);
+            const remaining = item.limit - item.spent;
+            const percent =
+              item.limit > 0 ? (item.spent / item.limit) * 100 : 0;
+
+            return (
+              <Paper
+                key={item.categoryId}
+                withBorder
+                radius="lg"
+                p="md"
+                style={{ cursor: "pointer" }}
+                onClick={() =>
+                  onEdit({
+                    year,
+                    month,
+                    categoryId: item.categoryId ? String(item.categoryId) : "",
+                    categoryName: item.categoryName,
+                    limit: item.limit,
+                  })
+                }
+              >
+                <Group justify="space-between" align="flex-start" mb="xs">
+                  <Box>
+                    <Text fw={700}>{item.categoryName}</Text>
+                    <Text size="sm" c="dimmed">
+                      ${item.spent.toFixed(2)} spent of ${item.limit.toFixed(2)}
+                    </Text>
+                  </Box>
+
+                  <Group gap="xs">{getStatusBadge(status)}</Group>
+                </Group>
+
+                <Progress
+                  size="sm"
+                  color={getColor(status)}
+                  value={Math.min(percent, 100)}
+                  radius="xl"
+                />
+
+                <Group justify="space-between" mt="xs">
+                  <Text size="sm" c="dimmed">
+                    {percent.toFixed(0)}% used
+                  </Text>
+                  <Text size="sm" c={remaining < 0 ? "red" : "dimmed"}>
+                    {remaining < 0 ? "Over by" : "Remaining"}: $
+                    {Math.abs(remaining).toFixed(2)}
+                  </Text>
+                </Group>
+              </Paper>
+            );
+          })}
+        </Stack>
+      ) : (
+        <Text c="dimmed">No budgeted categories found.</Text>
+      )}
     </Card>
   );
 }
@@ -199,7 +230,7 @@ function UnbudgetedTable({ items, search }) {
   }
 
   return (
-    <Card withBorder radius="md" p="md">
+    <Card withBorder radius="lg" p="md">
       <Title order={4} mb="sm">
         Unbudgeted Spending
       </Title>
@@ -233,11 +264,16 @@ export default function BudgetsPage() {
   const dispatch = useDispatch();
   const { budgets, loading } = useSelector((state) => state.budgets);
 
+  const [opened, setOpened] = useState(false);
+  const [mode, setMode] = useState("create");
+  const [selectedBudget, setSelectedBudget] = useState(null);
+
   const now = new Date();
   const [period, setPeriod] = useState({
     year: now.getFullYear(),
     month: now.getMonth() + 1,
   });
+
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
 
@@ -262,6 +298,25 @@ export default function BudgetsPage() {
   const monthLabel =
     MONTHS.find((m) => Number(m.value) === period.month)?.label || period.month;
 
+  const openCreate = () => {
+    setMode("create");
+    setSelectedBudget(null);
+    setOpened(true);
+  };
+
+  const openEdit = (budget) => {
+    setMode("edit");
+    console.log("budget", budget);
+    setSelectedBudget(budget);
+    setOpened(true);
+  };
+
+  const handleClose = () => {
+    setOpened(false);
+    setMode("create");
+    setSelectedBudget(null);
+  };
+
   if (loading) {
     return (
       <Container py="md">
@@ -272,6 +327,14 @@ export default function BudgetsPage() {
 
   return (
     <Container size="lg" py="md">
+      <AddBudget
+        opened={opened}
+        setOpened={setOpened}
+        mode={mode}
+        budget={selectedBudget}
+        onClose={handleClose}
+      />
+
       <Stack gap="md">
         <Group justify="space-between" align="end">
           <Box>
@@ -281,14 +344,19 @@ export default function BudgetsPage() {
             </Text>
           </Box>
 
-          <PeriodPicker value={period} onChange={setPeriod} />
+          <Group>
+            <Button leftSection={<IoAddOutline />} onClick={openCreate}>
+              Create
+            </Button>
+            <PeriodPicker value={period} onChange={setPeriod} />
+          </Group>
         </Group>
 
         <SummaryCards summary={summary} budgetedCount={items.length} />
 
         <Divider />
 
-        <Card withBorder radius="md" p="md">
+        <Card withBorder radius="lg" p="md">
           <Group>
             <TextInput
               placeholder="Search category"
@@ -311,7 +379,14 @@ export default function BudgetsPage() {
           </Group>
         </Card>
 
-        <BudgetedTable items={items} search={search} filter={filter} />
+        <BudgetedList
+          items={items}
+          search={search}
+          filter={filter}
+          onEdit={openEdit}
+          year={period.year}
+          month={period.month}
+        />
 
         <UnbudgetedTable items={unbudgeted} search={search} />
       </Stack>

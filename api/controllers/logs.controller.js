@@ -6,20 +6,39 @@ export const getActivePeriods = async (req, res) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.userId);
 
-    const logs = await MonthlyLog.aggregate([
-      { $match: { userId } },
+    const periods = await Transaction.aggregate([
+      {
+        $match: {
+          userId,
+          isDeleted: false,
+        },
+      },
       {
         $group: {
-          _id: "$year",
-          months: { $addToSet: "$month" },
+          _id: "$logId",
+        },
+      },
+      {
+        $lookup: {
+          from: "monthlylogs",
+          localField: "_id",
+          foreignField: "_id",
+          as: "log",
+        },
+      },
+      { $unwind: "$log" },
+      {
+        $group: {
+          _id: "$log.year",
+          months: { $addToSet: "$log.month" },
         },
       },
       { $sort: { _id: -1 } },
     ]);
 
-    const result = logs.map((y) => ({
-      year: y._id,
-      months: y.months.sort((a, b) => a - b),
+    const result = periods.map((item) => ({
+      year: item._id,
+      months: item.months.sort((a, b) => a - b),
     }));
 
     return res.json(result);

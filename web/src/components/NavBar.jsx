@@ -41,6 +41,7 @@ import { getAccounts } from "../store/slices/accountsSlice";
 import { useViewportSize } from "@mantine/hooks";
 import AccountCard from "./cards/AccountCard";
 import Profile from "./popups/Profile";
+import { getActivePeriods } from "../store/slices/logSlice";
 
 const NavBar = ({ toggle }) => {
   const dispatch = useDispatch();
@@ -67,6 +68,7 @@ const NavBar = ({ toggle }) => {
     if (!isAuthed) return;
 
     dispatch(getAccounts());
+    dispatch(getActivePeriods());
   }, [dispatch, isAuthed]);
 
   useEffect(() => {

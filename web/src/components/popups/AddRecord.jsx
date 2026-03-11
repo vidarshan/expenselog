@@ -33,6 +33,7 @@ import {
   updateTransaction,
 } from "../../store/slices/transactionsSlice";
 import { getDashboard } from "../../store/slices/dashboardSlice";
+import { getBudgets } from "../../store/slices/budgetsSlice";
 
 const AddRecord = ({
   expenseOpened,
@@ -118,6 +119,12 @@ const AddRecord = ({
     );
     await dispatch(getDashboard({ year: currentYear, month: currentMonth }));
     await dispatch(getAccounts());
+    dispatch(
+      getBudgets({
+        year: currentYear,
+        month: currentMonth,
+      }),
+    );
 
     form.reset();
     setExpenseOpened(false);
@@ -153,7 +160,7 @@ const AddRecord = ({
   }, [expenseOpened, mode, transaction]);
 
   useEffect(() => {
-    dispatch(getCategories("ar"));
+    dispatch(getCategories());
   }, [dispatch]);
   return (
     <Modal

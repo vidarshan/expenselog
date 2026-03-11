@@ -9,7 +9,7 @@ const Logo = ({ logoSize = 20, titleSize = 1, onClick, noMargin = true }) => {
       onClick={onClick}
       px={0}
       w="fit-content"
-      radius="md"
+      radius="lg"
       bg="transparent"
     >
       <Flex direction="row" align="center">
