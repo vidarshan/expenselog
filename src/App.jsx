@@ -26,7 +26,7 @@ function App() {
 
   return (
     <MantineProvider
-      defaultColorScheme="filled"
+      defaultColorScheme="dark"
       theme={{
         defaultRadius: "lg",
         primaryColor: "lime",
