@@ -47,7 +47,7 @@ const DashboardPage = () => {
   const { insights, loading: insightLoading } = useSelector(
     (state) => state.insights,
   );
-  console.log(insightLoading);
+
   const authUser = useSelector((state) => state.auth.user);
   const token = authUser?.token || null;
   const [opened, setOpened] = useState(false);

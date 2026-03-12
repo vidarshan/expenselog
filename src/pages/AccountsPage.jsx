@@ -73,7 +73,7 @@ const AccountsPage = () => {
         </Group>
 
         {loading ? (
-          <Loading />
+          <Loading title="Loading accounts..." />
         ) : accounts.length > 0 ? (
           <SimpleGrid mt="sm" cols={1}>
             {accounts.map((a) => (

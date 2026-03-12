@@ -12,6 +12,7 @@ import {
   Button,
   Avatar,
   Badge,
+  Loader,
 } from "@mantine/core";
 import {
   IoAddOutline,
@@ -36,6 +37,7 @@ import { getAccounts } from "../store/slices/accountsSlice";
 import { useViewportSize } from "@mantine/hooks";
 import Profile from "./popups/Profile";
 import { getActivePeriods } from "../store/slices/logSlice";
+import Loading from "./Loading";
 
 const NavBar = ({ toggle }) => {
   const dispatch = useDispatch();
@@ -43,11 +45,11 @@ const NavBar = ({ toggle }) => {
   const { pathname } = useLocation();
   const { width } = useViewportSize();
 
-  const authUser = useSelector((state) => state.auth.user);
+  const { user: authUser, loading } = useSelector((state) => state.auth);
   const token = authUser?.token || null;
   const username = authUser?.username || "";
 
-  const { accounts } = useSelector((state) => state.accounts);
+  const { accounts, accountsLoading } = useSelector((state) => state.accounts);
 
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const [accountOpened, setAccountOpened] = useState(false);
@@ -153,18 +155,23 @@ const NavBar = ({ toggle }) => {
                 <Text size="sm">Accounts</Text>
                 <Badge variant="filled"> {accounts.length} </Badge>
               </Group>
-
-              {accounts?.length ? (
-                accounts.map((a) => (
-                  <SidebarBalanceCard
-                    key={a._id}
-                    title={a.name}
-                    type={a.type}
-                    balance={a.currentBalance}
-                  />
-                ))
+              {accountsLoading ? (
+                <Loading h="auto" size="xs" title="" />
               ) : (
-                <Text size="xs">No accounts found.</Text>
+                <>
+                  {accounts?.length ? (
+                    accounts.map((a) => (
+                      <SidebarBalanceCard
+                        key={a._id}
+                        title={a.name}
+                        type={a.type}
+                        balance={a.currentBalance}
+                      />
+                    ))
+                  ) : (
+                    <Text size="xs">No accounts found.</Text>
+                  )}
+                </>
               )}
             </Stack>
 
@@ -190,21 +197,27 @@ const NavBar = ({ toggle }) => {
               </Group>
             </Stack>
           </Stack>
-
-          <Paper className="hover-class" onClick={() => setAccountOpened(true)}>
-            <Flex align="center" justify="space-between">
-              <Group gap="xs" justify="flex-start">
-                <Avatar color="violet" variant="filled" radius="xl">
-                  {username?.[0] || "U"}
-                </Avatar>
-                <Paper>
-                  <Text size="sm" fw={700}>
-                    {username || "User"}
-                  </Text>
-                </Paper>
-              </Group>
-            </Flex>
-          </Paper>
+          {loading ? (
+            <Loading h="auto" size="xs" title="" />
+          ) : (
+            <Paper
+              className="hover-class"
+              onClick={() => setAccountOpened(true)}
+            >
+              <Flex align="center" justify="space-between">
+                <Group gap="xs" justify="flex-start">
+                  <Avatar color="violet" variant="filled" radius="xl">
+                    {username?.[0] || "U"}
+                  </Avatar>
+                  <Paper>
+                    <Text size="sm" fw={700}>
+                      {username || "User"}
+                    </Text>
+                  </Paper>
+                </Group>
+              </Flex>
+            </Paper>
+          )}
         </Stack>
       ) : (
         <Stack h="100%" justify="space-between" p="sm">

@@ -40,6 +40,7 @@ import { setMonth, setYear } from "../store/slices/appSlice";
 import { getAccounts } from "../store/slices/accountsSlice";
 import AddRecord from "../components/popups/AddRecord";
 import { useNavigate } from "react-router-dom";
+import Loading from "../components/Loading";
 
 const LogsPage = () => {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ const LogsPage = () => {
   const [expenseOpened, setExpenseOpened] = useState(false);
   const [txMode, setTxMode] = useState("create");
   const [selectedTx, setSelectedTx] = useState(null);
-  const { transactions } = useSelector((state) => state.transactions);
+  const { transactions, loading } = useSelector((state) => state.transactions);
   const { monthlyLogs, activePeriods } = useSelector((state) => state.logs);
   const { currentYear, currentMonth } = useSelector((state) => state.app);
 
@@ -206,71 +207,75 @@ const LogsPage = () => {
             </Flex>
           </Group>
         </Grid.Col>
-        <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          {mode === "This Month" ? (
-            <Box>
-              <ScrollArea h="80vh">
-                <Flex direction="column" h="100%">
-                  <Table>
-                    <Table.Thead>
-                      <Table.Tr>
-                        <Table.Th>Name</Table.Th>
-                        <Table.Th>Category</Table.Th>
-                        <Table.Th>Amount</Table.Th>
-                        <Table.Th>Type</Table.Th>
-                        <Table.Th>Date</Table.Th>
-                        <Table.Th></Table.Th>
-                        <Table.Th></Table.Th>
-                      </Table.Tr>
-                    </Table.Thead>
+        {loading ? (
+          <Loading title="Loading Logs" />
+        ) : (
+          <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+            {mode === "This Month" ? (
+              <Box>
+                <ScrollArea h="80vh">
+                  <Flex direction="column" h="100%">
+                    <Table>
+                      <Table.Thead>
+                        <Table.Tr>
+                          <Table.Th>Name</Table.Th>
+                          <Table.Th>Category</Table.Th>
+                          <Table.Th>Amount</Table.Th>
+                          <Table.Th>Type</Table.Th>
+                          <Table.Th>Date</Table.Th>
+                          <Table.Th></Table.Th>
+                          <Table.Th></Table.Th>
+                        </Table.Tr>
+                      </Table.Thead>
 
-                    <Table.Tbody>{thisLogs}</Table.Tbody>
-                  </Table>
-                </Flex>
-              </ScrollArea>
-              {transactions.pagination.totalPages > 0 && (
-                <Flex justify="flex-end" mt="auto" p="md">
-                  <Pagination
-                    total={transactions.pagination.totalPages}
-                    value={activePage}
-                    onChange={(v) => handlePageChange(v)}
-                  />
-                </Flex>
-              )}
-            </Box>
-          ) : (
-            <Box>
-              <ScrollArea h="80vh">
-                <Flex direction="column" h="100%">
-                  <Table>
-                    <Table.Thead>
-                      <Table.Tr>
-                        <Table.Th>Year</Table.Th>
-                        <Table.Th>Month</Table.Th>
-                        <Table.Th>Income</Table.Th>
-                        <Table.Th>Expenses</Table.Th>
-                        <Table.Th>Outcome</Table.Th>
-                        <Table.Th>Status</Table.Th>
-                        <Table.Th>Transactions</Table.Th>
-                        <Table.Th></Table.Th>
-                      </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>{monthlyRows}</Table.Tbody>
-                  </Table>
-                </Flex>
-              </ScrollArea>
-              {transactions.pagination.totalPages > 0 && (
-                <Flex justify="flex-end" mt="auto" p="md">
-                  <Pagination
-                    total={transactions.pagination.totalPages}
-                    value={activePage}
-                    onChange={(v) => handlePageChange(v)}
-                  />
-                </Flex>
-              )}
-            </Box>
-          )}
-        </Grid.Col>
+                      <Table.Tbody>{thisLogs}</Table.Tbody>
+                    </Table>
+                  </Flex>
+                </ScrollArea>
+                {transactions.pagination.totalPages > 0 && (
+                  <Flex justify="flex-end" mt="auto" p="md">
+                    <Pagination
+                      total={transactions.pagination.totalPages}
+                      value={activePage}
+                      onChange={(v) => handlePageChange(v)}
+                    />
+                  </Flex>
+                )}
+              </Box>
+            ) : (
+              <Box>
+                <ScrollArea h="80vh">
+                  <Flex direction="column" h="100%">
+                    <Table>
+                      <Table.Thead>
+                        <Table.Tr>
+                          <Table.Th>Year</Table.Th>
+                          <Table.Th>Month</Table.Th>
+                          <Table.Th>Income</Table.Th>
+                          <Table.Th>Expenses</Table.Th>
+                          <Table.Th>Outcome</Table.Th>
+                          <Table.Th>Status</Table.Th>
+                          <Table.Th>Transactions</Table.Th>
+                          <Table.Th></Table.Th>
+                        </Table.Tr>
+                      </Table.Thead>
+                      <Table.Tbody>{monthlyRows}</Table.Tbody>
+                    </Table>
+                  </Flex>
+                </ScrollArea>
+                {transactions.pagination.totalPages > 0 && (
+                  <Flex justify="flex-end" mt="auto" p="md">
+                    <Pagination
+                      total={transactions.pagination.totalPages}
+                      value={activePage}
+                      onChange={(v) => handlePageChange(v)}
+                    />
+                  </Flex>
+                )}
+              </Box>
+            )}
+          </Grid.Col>
+        )}
       </Grid>
     </Container>
   );

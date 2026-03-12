@@ -35,7 +35,7 @@ import { useEffect } from "react";
 const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, error } = useSelector((state) => state.auth);
+  const { user, error, loading } = useSelector((state) => state.auth);
 
   const form = useForm({
     mode: "uncontrolled",
@@ -189,6 +189,7 @@ const LoginPage = () => {
                       mt="lg"
                       radius="lg"
                       size="md"
+                      loading={loading}
                     >
                       Login
                     </Button>

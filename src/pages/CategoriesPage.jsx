@@ -16,10 +16,11 @@ import { deleteCategory, getCategories } from "../store/slices/categorySlice";
 import { IoAddOutline } from "react-icons/io5";
 import AddCategory from "../components/popups/AddCategory";
 import moment from "moment";
+import Loading from "../components/Loading";
 
 const CategoriesPage = () => {
   const dispatch = useDispatch();
-  const { categories = [] } = useSelector((state) => state.categories);
+  const { categories = [], loading } = useSelector((state) => state.categories);
 
   const [opened, setOpened] = useState(false);
   const [mode, setMode] = useState("create"); // "create" | "edit"
@@ -101,21 +102,24 @@ const CategoriesPage = () => {
             </Button>
           </Group>
         </Grid.Col>
-
-        <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          <Table>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Name</Table.Th>
-                <Table.Th>Deleted</Table.Th>
-                <Table.Th>Created</Table.Th>
-                <Table.Th></Table.Th>
-                <Table.Th></Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
-        </Grid.Col>
+        {loading ? (
+          <Loading title="Loading Categories..." />
+        ) : (
+          <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
+            <Table>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Name</Table.Th>
+                  <Table.Th>Deleted</Table.Th>
+                  <Table.Th>Created</Table.Th>
+                  <Table.Th></Table.Th>
+                  <Table.Th></Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </Grid.Col>
+        )}
       </Grid>
     </Container>
   );

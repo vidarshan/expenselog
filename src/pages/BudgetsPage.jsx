@@ -31,6 +31,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { getBudgets } from "../store/slices/budgetsSlice";
 import AddBudget from "../components/popups/AddBudget";
+import Loading from "../components/Loading";
 
 const MONTHS = [
   { value: "1", label: "Jan" },
@@ -331,14 +332,6 @@ export default function BudgetsPage() {
     setSelectedBudget(null);
   };
 
-  if (loading) {
-    return (
-      <Container py="md">
-        <Loader />
-      </Container>
-    );
-  }
-
   return (
     <Container size="xl" py="md">
       <AddBudget
@@ -364,56 +357,62 @@ export default function BudgetsPage() {
             </Button>
           </Group>
         </Group>
+        {loading ? (
+          <Loading title="Loading Budgets" />
+        ) : (
+          <>
+            <SummaryCards summary={summary} />
 
-        <SummaryCards summary={summary} />
+            <Divider />
+            <Alert
+              icon={<IoInformationCircleSharp />}
+              title="How budgets work?"
+              radius="lg"
+              color="gray"
+            >
+              Set a monthly spending limit for each category. Spending in
+              categories with a budget will appear under Budgeted Categories.
+              Spending in categories without a budget will appear under
+              Unbudgeted Spending. Status updates automatically as you approach
+              or exceed your limit.
+            </Alert>
 
-        <Divider />
-        <Alert
-          icon={<IoInformationCircleSharp />}
-          title="How budgets work?"
-          radius="lg"
-          color="gray"
-        >
-          Set a monthly spending limit for each category. Spending in categories
-          with a budget will appear under Budgeted Categories. Spending in
-          categories without a budget will appear under Unbudgeted Spending.
-          Status updates automatically as you approach or exceed your limit.
-        </Alert>
+            <Group justify="space-between">
+              <PeriodPicker value={period} onChange={setPeriod} />
+              <Flex gap="xs">
+                <TextInput
+                  placeholder="Search category"
+                  leftSection={<IoSearchOutline />}
+                  value={search}
+                  onChange={(e) => setSearch(e.currentTarget.value)}
+                  w={250}
+                />
 
-        <Group justify="space-between">
-          <PeriodPicker value={period} onChange={setPeriod} />
-          <Flex gap="xs">
-            <TextInput
-              placeholder="Search category"
-              leftSection={<IoSearchOutline />}
-              value={search}
-              onChange={(e) => setSearch(e.currentTarget.value)}
-              w={250}
+                <Select
+                  value={filter}
+                  onChange={(v) => setFilter(v || "all")}
+                  data={[
+                    { value: "all", label: "All" },
+                    { value: "warning", label: "Warning" },
+                    { value: "over", label: "Over" },
+                  ]}
+                  w={160}
+                />
+              </Flex>
+            </Group>
+            <BudgetedList
+              items={items}
+              search={search}
+              filter={filter}
+              onEdit={openEdit}
+              year={period.year}
+              month={period.month}
+              budgetedCount={items.length}
             />
 
-            <Select
-              value={filter}
-              onChange={(v) => setFilter(v || "all")}
-              data={[
-                { value: "all", label: "All" },
-                { value: "warning", label: "Warning" },
-                { value: "over", label: "Over" },
-              ]}
-              w={160}
-            />
-          </Flex>
-        </Group>
-        <BudgetedList
-          items={items}
-          search={search}
-          filter={filter}
-          onEdit={openEdit}
-          year={period.year}
-          month={period.month}
-          budgetedCount={items.length}
-        />
-
-        <UnbudgetedTable items={unbudgeted} search={search} />
+            <UnbudgetedTable items={unbudgeted} search={search} />
+          </>
+        )}
       </Stack>
     </Container>
   );
