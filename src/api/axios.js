@@ -2,7 +2,7 @@ import axios from "axios";
 import { logout } from "../store/slices/authSlice";
 
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: `${import.meta.env.VITE_APP_BE_URL}/api`,
 });
 
 api.interceptors.request.use((config) => {
