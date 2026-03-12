@@ -1,0 +1,179 @@
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import api from "../../api/axios";
+import { notifications } from "@mantine/notifications";
+import classes from "../../Demo.module.css";
+
+const initialState = {
+  transactions: {
+    data: [],
+    pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
+  },
+  loading: false,
+  error: "",
+};
+
+// GET (by month/year + pagination)
+export const getTransactions = createAsyncThunk(
+  "transactions/get",
+  async ({ year, month, page = 1, limit = 20 }, thunkAPI) => {
+    try {
+      const res = await api.get("/transactions", {
+        params: { year, month, page, limit },
+      });
+      return res.data; // { data, pagination }
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message || err?.message || "Fetch failed";
+      return thunkAPI.rejectWithValue(msg);
+    }
+  },
+);
+
+// CREATE
+export const createTransaction = createAsyncThunk(
+  "transactions/create",
+  async (payload, thunkAPI) => {
+    try {
+      const res = await api.post("/transactions", payload);
+      return res.data; // created transaction doc
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message || err?.message || "Create failed";
+      return thunkAPI.rejectWithValue(msg);
+    }
+  },
+);
+
+// UPDATE
+export const updateTransaction = createAsyncThunk(
+  "transactions/update",
+  async ({ id, patch }, thunkAPI) => {
+    try {
+      const res = await api.patch(`/transactions/${id}`, patch);
+      return res.data; // updated transaction doc
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message || err?.message || "Update failed";
+      return thunkAPI.rejectWithValue(msg);
+    }
+  },
+);
+
+// DELETE
+export const deleteTransaction = createAsyncThunk(
+  "transactions/delete",
+  async (id, thunkAPI) => {
+    try {
+      await api.delete(`/transactions/${id}`);
+      return id;
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message || err?.message || "Delete failed";
+      return thunkAPI.rejectWithValue(msg);
+    }
+  },
+);
+
+const transactionSlice = createSlice({
+  name: "transactions",
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      // GET
+      .addCase(getTransactions.pending, (state) => {
+        state.loading = true;
+        state.error = "";
+      })
+      .addCase(getTransactions.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = "";
+        state.transactions = action.payload; // { data, pagination }
+      })
+      .addCase(getTransactions.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Fetch failed";
+      })
+
+      // CREATE (optimistic insert to current page)
+      .addCase(createTransaction.pending, (state) => {
+        state.loading = true;
+        state.error = "";
+      })
+      .addCase(createTransaction.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = "";
+
+        const created = action.payload;
+
+        // Insert at top of current page list
+        state.transactions.data = [created, ...(state.transactions.data || [])];
+
+        // Optional: keep pagination total in sync if you want
+        const p = state.transactions.pagination;
+        if (p && typeof p.total === "number") {
+          p.total += 1;
+          p.totalPages = Math.ceil(p.total / (p.limit || 20));
+        }
+        notifications.show({
+          title: "Log Created",
+          classNames: classes,
+        });
+      })
+      .addCase(createTransaction.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Create failed";
+      })
+
+      // UPDATE (update in-place if it exists in current page)
+      .addCase(updateTransaction.pending, (state) => {
+        state.loading = true;
+        state.error = "";
+      })
+      .addCase(updateTransaction.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = "";
+
+        const updated = action.payload;
+
+        state.transactions.data = (state.transactions.data || []).map((t) =>
+          t._id === updated._id ? updated : t,
+        );
+        notifications.show({
+          title: "Log Updated",
+          classNames: classes,
+        });
+      })
+      .addCase(updateTransaction.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Update failed";
+      })
+
+      // DELETE (remove from current page list)
+      .addCase(deleteTransaction.pending, (state) => {
+        state.loading = true;
+        state.error = "";
+      })
+      .addCase(deleteTransaction.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = "";
+
+        const id = action.payload;
+
+        state.transactions.data = (state.transactions.data || []).filter(
+          (t) => t._id !== id,
+        );
+        notifications.show({
+          title: "Log Deleted",
+          classNames: classes,
+          variant: "error",
+        });
+      })
+      .addCase(deleteTransaction.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Delete failed";
+      });
+  },
+});
+
+export default transactionSlice.reducer;
