@@ -4,8 +4,7 @@ import { logout } from "../store/slices/authSlice";
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_APP_BE_URL}/api`,
 });
-console.log("BE URL:", import.meta.env.VITE_APP_BE_URL);
-console.log("MODE:", import.meta.env.MODE);
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("expenselog-token");
   if (token) config.headers.Authorization = `Bearer ${token}`;

@@ -40,9 +40,9 @@ export default function RegistrationPage() {
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
-      name: "test",
-      email: "test11@expenselog.com",
-      password: "password123",
+      name: "",
+      email: "",
+      password: "",
       type: "fixed",
     },
     validate: {
