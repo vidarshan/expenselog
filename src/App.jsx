@@ -1,5 +1,10 @@
 import "./App.css";
-import { ActionIcon, AppShell, MantineProvider } from "@mantine/core";
+import {
+  ActionIcon,
+  Affix,
+  AppShell,
+  MantineProvider,
+} from "@mantine/core";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -18,9 +23,11 @@ import AccountsPage from "./pages/AccountsPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import AuthRoute from "./components/AuthRoute";
 import { Notifications } from "@mantine/notifications";
+import { FiGithub } from "react-icons/fi";
 
 function App() {
   const [opened, { toggle }] = useDisclosure(true);
+
 
   return (
     <MantineProvider
@@ -147,6 +154,20 @@ function App() {
           </Routes>
         </AppShell.Main>
       </AppShell>
+      <Affix position={{ bottom: 20, right: 20 }}>
+        <ActionIcon
+          component="a"
+          href="https://github.com/vidarshan/expenselog"
+          target="_blank"
+          rel="noopener noreferrer"
+          radius="xl"
+          variant="gradient"
+          gradient={{ from: "violet", to: "yellow", deg: 22 }}
+          size="xl"
+        >
+          <FiGithub />
+        </ActionIcon>
+      </Affix>
     </MantineProvider>
   );
 }
