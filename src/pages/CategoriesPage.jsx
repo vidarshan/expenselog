@@ -23,7 +23,7 @@ const CategoriesPage = () => {
   const { categories = [], loading } = useSelector((state) => state.categories);
 
   const [opened, setOpened] = useState(false);
-  const [mode, setMode] = useState("create"); // "create" | "edit"
+  const [mode, setMode] = useState("create"); 
   const [selected, setSelected] = useState(null);
 
   const openCreate = () => {

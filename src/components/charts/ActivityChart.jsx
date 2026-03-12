@@ -25,22 +25,6 @@ function getPastYearRange() {
   };
 }
 
-function generateDateRange(startDate, endDate) {
-  const result = {};
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-
-  const current = new Date(start);
-
-  while (current <= end) {
-    const key = current.toISOString().split("T")[0];
-    result[key] = null; // empty day
-    current.setDate(current.getDate() + 1);
-  }
-
-  return result;
-}
-
 const ActivityChart = () => {
   const dispatch = useDispatch();
 

@@ -6,8 +6,6 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import NavBar from "./components/NavBar";
 import DashboardPage from "./pages/DashboardPage";
-import YearlyPage from "./pages/YearlyPage";
-import MonthlyPage from "./pages/MonthlyPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -129,7 +127,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
+            {/* <Route
               path="/reports/:year"
               element={
                 <ProtectedRoute>
@@ -144,7 +142,7 @@ function App() {
                   <MonthlyPage />
                 </ProtectedRoute>
               }
-            />
+            /> */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </AppShell.Main>

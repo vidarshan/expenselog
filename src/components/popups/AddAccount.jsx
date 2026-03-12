@@ -53,7 +53,7 @@ const AddAccount = ({ opened, onClose, onSave, mode, account }) => {
         initialBalance: Number(account?.initialBalance ?? 0),
         creditLimit: Number(account?.creditLimit ?? 0),
       });
-      form.resetDirty(); // optional: so Save button/dirty checks behave
+      form.resetDirty();
     }
 
     if (mode === "create") {

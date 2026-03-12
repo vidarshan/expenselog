@@ -12,7 +12,6 @@ const initialState = {
   error: "",
 };
 
-// GET (by month/year + pagination)
 export const getTransactions = createAsyncThunk(
   "transactions/get",
   async ({ year, month, page = 1, limit = 20 }, thunkAPI) => {
@@ -20,7 +19,7 @@ export const getTransactions = createAsyncThunk(
       const res = await api.get("/transactions", {
         params: { year, month, page, limit },
       });
-      return res.data; // { data, pagination }
+      return res.data;
     } catch (err) {
       const msg =
         err?.response?.data?.message || err?.message || "Fetch failed";
@@ -29,13 +28,12 @@ export const getTransactions = createAsyncThunk(
   },
 );
 
-// CREATE
 export const createTransaction = createAsyncThunk(
   "transactions/create",
   async (payload, thunkAPI) => {
     try {
       const res = await api.post("/transactions", payload);
-      return res.data; // created transaction doc
+      return res.data;
     } catch (err) {
       const msg =
         err?.response?.data?.message || err?.message || "Create failed";
@@ -44,13 +42,12 @@ export const createTransaction = createAsyncThunk(
   },
 );
 
-// UPDATE
 export const updateTransaction = createAsyncThunk(
   "transactions/update",
   async ({ id, patch }, thunkAPI) => {
     try {
       const res = await api.patch(`/transactions/${id}`, patch);
-      return res.data; // updated transaction doc
+      return res.data;
     } catch (err) {
       const msg =
         err?.response?.data?.message || err?.message || "Update failed";
@@ -59,7 +56,6 @@ export const updateTransaction = createAsyncThunk(
   },
 );
 
-// DELETE
 export const deleteTransaction = createAsyncThunk(
   "transactions/delete",
   async (id, thunkAPI) => {
@@ -88,7 +84,7 @@ const transactionSlice = createSlice({
       .addCase(getTransactions.fulfilled, (state, action) => {
         state.loading = false;
         state.error = "";
-        state.transactions = action.payload; // { data, pagination }
+        state.transactions = action.payload;
       })
       .addCase(getTransactions.rejected, (state, action) => {
         state.loading = false;
