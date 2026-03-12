@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../api/axios";
+import { notifications } from "@mantine/notifications";
+import classes from "../../Demo.module.css";
 
 const initialState = {
   heatmap: [],
@@ -41,6 +43,11 @@ const analyticsSlice = createSlice({
       .addCase(getHeatMap.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch";
+        notifications.show({
+          title: "Error generating activity",
+          classNames: classes,
+          color: "red",
+        });
       });
   },
 });

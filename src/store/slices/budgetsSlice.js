@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../api/axios";
+import { notifications } from "@mantine/notifications";
+import classes from "../../Demo.module.css";
 
 const initialState = {
   budgets: {
@@ -77,10 +79,19 @@ const budgetsSlice = createSlice({
       .addCase(createBudget.fulfilled, (state) => {
         state.loading = false;
         state.error = "";
+        notifications.show({
+          title: "Budget created",
+          classNames: classes,
+        });
       })
       .addCase(createBudget.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Create failed";
+        notifications.show({
+          title: "Error creating budget",
+          classNames: classes,
+          color: "red",
+        });
       });
   },
 });

@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../api/axios";
+import { notifications } from "@mantine/notifications";
+import classes from "../../Demo.module.css";
 
 const initialState = {
   categories: [],
@@ -93,10 +95,19 @@ const categoriesSlice = createSlice({
         state.error = "";
         const created = action.payload;
         state.categories = [created, ...(state.categories || [])];
+        notifications.show({
+          title: "Category created",
+          classNames: classes,
+        });
       })
       .addCase(createCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Create failed";
+        notifications.show({
+          title: "Category creation failed",
+          classNames: classes,
+          color: "red",
+        });
       })
       .addCase(updateCategory.pending, (state) => {
         state.loading = true;
@@ -109,10 +120,19 @@ const categoriesSlice = createSlice({
         state.categories = (state.categories.data || []).map((t) =>
           t._id === updated._id ? updated : t,
         );
+        notifications.show({
+          title: "Updated category",
+          classNames: classes,
+        });
       })
       .addCase(updateCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Update failed";
+        notifications.show({
+          title: "Category update failed",
+          classNames: classes,
+          color: "red",
+        });
       })
       .addCase(deleteCategory.pending, (state) => {
         state.loading = true;
@@ -123,10 +143,19 @@ const categoriesSlice = createSlice({
         state.error = "";
         const id = action.payload;
         state.categories = (state.categories || []).filter((t) => t._id !== id);
+        notifications.show({
+          title: "Category Deleted",
+          classNames: classes,
+        });
       })
       .addCase(deleteCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Delete failed";
+        notifications.show({
+          title: "Category deletion failed",
+          classNames: classes,
+          color: "red",
+        });
       });
   },
 });

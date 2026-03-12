@@ -127,6 +127,11 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Login failed";
+        notifications.show({
+          title: "Login failed",
+          classNames: classes,
+          color: "red",
+        });
       })
 
       .addCase(signUpUser.pending, (state) => {
@@ -140,10 +145,19 @@ const authSlice = createSlice({
         state.user.username = action.payload.user?.username || "";
         state.user.salary =
           action.payload.user?.salary || initialState.user.salary;
+        notifications.show({
+          title: "You've been signed up",
+          classNames: classes,
+        });
       })
       .addCase(signUpUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Registration failed";
+        notifications.show({
+          title: "Signup failed",
+          classNames: classes,
+          color: "red",
+        });
       })
       .addCase(updateUser.pending, (state) => {
         state.loading = true;
@@ -164,6 +178,11 @@ const authSlice = createSlice({
       .addCase(updateUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Update failed";
+        notifications.show({
+          title: "Profile update failed",
+          classNames: classes,
+          color: "red",
+        });
       })
       .addCase(getUser.pending, (state) => {
         state.loading = true;

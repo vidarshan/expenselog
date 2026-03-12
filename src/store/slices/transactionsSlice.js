@@ -80,7 +80,7 @@ const transactionSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // GET
+
       .addCase(getTransactions.pending, (state) => {
         state.loading = true;
         state.error = "";
@@ -95,7 +95,6 @@ const transactionSlice = createSlice({
         state.error = action.payload || "Fetch failed";
       })
 
-      // CREATE (optimistic insert to current page)
       .addCase(createTransaction.pending, (state) => {
         state.loading = true;
         state.error = "";
@@ -106,10 +105,8 @@ const transactionSlice = createSlice({
 
         const created = action.payload;
 
-        // Insert at top of current page list
         state.transactions.data = [created, ...(state.transactions.data || [])];
 
-        // Optional: keep pagination total in sync if you want
         const p = state.transactions.pagination;
         if (p && typeof p.total === "number") {
           p.total += 1;
@@ -125,7 +122,6 @@ const transactionSlice = createSlice({
         state.error = action.payload || "Create failed";
       })
 
-      // UPDATE (update in-place if it exists in current page)
       .addCase(updateTransaction.pending, (state) => {
         state.loading = true;
         state.error = "";
@@ -149,7 +145,6 @@ const transactionSlice = createSlice({
         state.error = action.payload || "Update failed";
       })
 
-      // DELETE (remove from current page list)
       .addCase(deleteTransaction.pending, (state) => {
         state.loading = true;
         state.error = "";
