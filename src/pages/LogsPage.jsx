@@ -41,6 +41,7 @@ import { getAccounts } from "../store/slices/accountsSlice";
 import AddRecord from "../components/popups/AddRecord";
 import { useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
+import { Helmet } from "react-helmet";
 
 const LogsPage = () => {
   const navigate = useNavigate();
@@ -163,6 +164,9 @@ const LogsPage = () => {
 
   return (
     <Container size="xl">
+      <Helmet>
+        <title>Transactions | ExpenseLog</title>
+      </Helmet>
       <AddRecord
         expenseOpened={expenseOpened}
         setExpenseOpened={setExpenseOpened}

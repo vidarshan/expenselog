@@ -31,6 +31,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "@mantine/form";
 import { useDispatch, useSelector } from "react-redux";
 import { signUpUser } from "../store/slices/authSlice";
+import { Helmet } from "react-helmet";
 
 export default function RegistrationPage() {
   const navigate = useNavigate();
@@ -69,6 +70,9 @@ export default function RegistrationPage() {
 
   return (
     <Container size="lg" h="calc(100vh - 28px)">
+      <Helmet>
+        <title>Sign up | ExpenseLog</title>
+      </Helmet>
       <Center h="100%">
         <Box style={{ width: "100%", maxWidth: rem(980) }}>
           <Paper h="100%" withBorder radius="xl" p={rem(18)}>

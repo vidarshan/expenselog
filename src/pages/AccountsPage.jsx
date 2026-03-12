@@ -16,6 +16,7 @@ import { deleteAccount, getAccounts } from "../store/slices/accountsSlice";
 import EmptyContainer from "../components/EmptyContainer";
 import AccountCard from "../components/cards/AccountCard";
 import Loading from "../components/Loading";
+import { Helmet } from "react-helmet";
 
 const AccountsPage = () => {
   const dispatch = useDispatch();
@@ -49,6 +50,9 @@ const AccountsPage = () => {
 
   return (
     <Container size="lg" py="md">
+      <Helmet>
+        <title>Accounts | ExpenseLog</title>
+      </Helmet>
       <AddAccount
         account={account}
         mode={mode}

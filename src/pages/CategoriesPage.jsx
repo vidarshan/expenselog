@@ -17,13 +17,14 @@ import { IoAddOutline } from "react-icons/io5";
 import AddCategory from "../components/popups/AddCategory";
 import moment from "moment";
 import Loading from "../components/Loading";
+import { Helmet } from "react-helmet";
 
 const CategoriesPage = () => {
   const dispatch = useDispatch();
   const { categories = [], loading } = useSelector((state) => state.categories);
 
   const [opened, setOpened] = useState(false);
-  const [mode, setMode] = useState("create"); 
+  const [mode, setMode] = useState("create");
   const [selected, setSelected] = useState(null);
 
   const openCreate = () => {
@@ -77,6 +78,9 @@ const CategoriesPage = () => {
 
   return (
     <Container size="xl">
+      <Helmet>
+        <title>Categories | ExpenseLog</title>
+      </Helmet>
       <AddCategory
         opened={opened}
         mode={mode}

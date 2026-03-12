@@ -31,6 +31,7 @@ import { useForm } from "@mantine/form";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser, loginUser } from "../store/slices/authSlice";
 import { useEffect } from "react";
+import { Helmet } from "react-helmet";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -61,6 +62,9 @@ const LoginPage = () => {
 
   return (
     <Container size="lg" h="calc(100vh - 28px)">
+      <Helmet>
+        <title>Login | ExpenseLog</title>
+      </Helmet>
       <Center h="100%">
         <Box w="100%" maw={rem(980)}>
           <Paper withBorder radius="xl" p="md">

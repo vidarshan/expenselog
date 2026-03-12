@@ -31,6 +31,7 @@ import { getTransactions } from "../store/slices/transactionsSlice";
 import BudgetsChart from "../components/charts/BudgetsChart";
 import ActivityChart from "../components/charts/ActivityChart";
 import { getInsights } from "../store/slices/insightsSlice";
+import { Helmet } from "react-helmet";
 
 const DashboardPage = () => {
   const dispatch = useDispatch();
@@ -86,6 +87,9 @@ const DashboardPage = () => {
 
   return (
     <Container size="xl" py="md">
+      <Helmet>
+        <title>Dashboard | ExpenseLog</title>
+      </Helmet>
       {isAuthed && (
         <AddRecord expenseOpened={opened} setExpenseOpened={setOpened} />
       )}

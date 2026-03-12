@@ -32,6 +32,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getBudgets } from "../store/slices/budgetsSlice";
 import AddBudget from "../components/popups/AddBudget";
 import Loading from "../components/Loading";
+import { Helmet } from "react-helmet";
 
 const MONTHS = [
   { value: "1", label: "Jan" },
@@ -334,6 +335,9 @@ export default function BudgetsPage() {
 
   return (
     <Container size="xl" py="md">
+      <Helmet>
+        <title>Budgets | ExpenseLog</title>
+      </Helmet>
       <AddBudget
         opened={opened}
         setOpened={setOpened}

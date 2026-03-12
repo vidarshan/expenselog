@@ -10,10 +10,14 @@ import {
 import React from "react";
 import { IoCalendarOutline } from "react-icons/io5";
 import { AIInsightsCard } from "../components/cards/AICard";
+import { Helmet } from "react-helmet";
 
 const InsightsPage = () => {
   return (
     <Container size="xl">
+      <Helmet>
+        <title>Insights | ExpenseLog</title>
+      </Helmet>
       <Grid>
         <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
           <Group my="sm" align="center" justify="space-between">
