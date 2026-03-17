@@ -37,7 +37,7 @@ const OverviewCard = ({ summary }) => {
                 <Text size="sm" c="dimmed">
                   Income
                 </Text>
-                <Title order={3}>${income}</Title>
+                <Title order={3}>${income?.toFixed(2)}</Title>
               </Flex>
             </Flex>
           </Stack>
@@ -65,7 +65,7 @@ const OverviewCard = ({ summary }) => {
                 <Text size="sm" c="dimmed">
                   Expenses
                 </Text>
-                <Title order={3}>${expenses}</Title>
+                <Title order={3}>${expenses?.toFixed(2)}</Title>
               </Flex>
             </Flex>
           </Stack>

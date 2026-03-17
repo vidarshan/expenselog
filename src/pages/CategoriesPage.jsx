@@ -114,7 +114,7 @@ const CategoriesPage = () => {
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>Name</Table.Th>
-                  <Table.Th>Deleted</Table.Th>
+                  <Table.Th>Color</Table.Th>
                   <Table.Th>Created</Table.Th>
                   <Table.Th></Table.Th>
                   <Table.Th></Table.Th>
