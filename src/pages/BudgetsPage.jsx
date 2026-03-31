@@ -1,21 +1,19 @@
 import { useEffect, useState } from "react";
 import {
-  ActionIcon,
   Alert,
   Badge,
   Box,
   Button,
-  Card,
   Container,
   Divider,
   Flex,
   Grid,
   Group,
-  Loader,
   Paper,
   Progress,
   ScrollArea,
   Select,
+  SimpleGrid,
   Stack,
   Table,
   Text,
@@ -25,8 +23,8 @@ import {
 import {
   IoAddOutline,
   IoInformationCircleSharp,
-  IoPencilOutline,
   IoSearchOutline,
+  IoWalletOutline,
 } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { getBudgets } from "../store/slices/budgetsSlice";
@@ -79,16 +77,18 @@ function PeriodPicker({ value, onChange }) {
   return (
     <Group gap="sm">
       <Select
+        radius="xl"
         data={years}
         value={String(value.year)}
         onChange={(v) => v && onChange({ ...value, year: Number(v) })}
-        w={100}
+        w={110}
       />
       <Select
+        radius="xl"
         data={MONTHS}
         value={String(value.month)}
         onChange={(v) => v && onChange({ ...value, month: Number(v) })}
-        w={100}
+        w={110}
       />
     </Group>
   );
@@ -96,35 +96,23 @@ function PeriodPicker({ value, onChange }) {
 
 function SummaryCards({ summary }) {
   return (
-    <Group grow>
-      <Paper h="100%" withBorder p="sm" radius="lg">
-        <Text size="xs" c="dimmed">
-          Total Budget
-        </Text>
-        <Text fw={700}>${summary.totalLimit.toFixed(2)}</Text>
-      </Paper>
-
-      <Paper h="100%" withBorder p="sm" radius="lg">
-        <Text size="xs" c="dimmed">
-          Budgeted Spent
-        </Text>
-        <Text fw={700}>${summary.totalSpentBudgeted.toFixed(2)}</Text>
-      </Paper>
-
-      <Paper withBorder p="sm" radius="lg">
-        <Text size="xs" c="dimmed">
-          Total Spent
-        </Text>
-        <Text fw={700}>${summary.totalSpentAll.toFixed(2)}</Text>
-      </Paper>
-
-      <Paper withBorder p="sm" radius="lg">
-        <Text size="xs" c="dimmed">
-          Over Budget
-        </Text>
-        <Text fw={700}>{summary.overBudgetCount}</Text>
-      </Paper>
-    </Group>
+    <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
+      {[
+        ["Total Budget", `$${summary.totalLimit.toFixed(2)}`],
+        ["Budgeted Spent", `$${summary.totalSpentBudgeted.toFixed(2)}`],
+        ["Total Spent", `$${summary.totalSpentAll.toFixed(2)}`],
+        ["Over Budget", String(summary.overBudgetCount)],
+      ].map(([label, value]) => (
+        <Paper key={label} withBorder p="md" radius="xl">
+          <Text size="xs" c="dimmed">
+            {label}
+          </Text>
+          <Text fw={700} size="xl" mt={4}>
+            {value}
+          </Text>
+        </Paper>
+      ))}
+    </SimpleGrid>
   );
 }
 
@@ -153,11 +141,19 @@ function BudgetedList({
   });
 
   return (
-    <Card withBorder radius="lg" p="md">
-      <Group align="center" mb="md">
-        <Title order={4}>Budgeted Categories</Title>
-        <Badge size="lg">{budgetedCount}</Badge>
+    <Paper withBorder radius="1.5rem" p="md">
+      <Group align="center" justify="space-between" mb="md">
+        <Box>
+          <Text size="xs" fw={700} tt="uppercase" c="dimmed">
+            Budgeted categories
+          </Text>
+          <Title order={4}>Tracked categories</Title>
+        </Box>
+        <Badge size="lg" variant="light">
+          {budgetedCount}
+        </Badge>
       </Group>
+
       <Grid>
         {filtered.length > 0 ? (
           filtered.map((item) => {
@@ -170,9 +166,14 @@ function BudgetedList({
               <Grid.Col key={item.categoryId} span={{ base: 12, sm: 6, lg: 4 }}>
                 <Paper
                   withBorder
-                  radius="lg"
+                  radius="xl"
                   p="md"
-                  style={{ cursor: "pointer", height: "100%" }}
+                  h="100%"
+                  style={{
+                    cursor: "pointer",
+                    background:
+                      "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
+                  }}
                   onClick={() =>
                     onEdit({
                       year,
@@ -185,34 +186,33 @@ function BudgetedList({
                     })
                   }
                 >
-                  <Group justify="space-between" align="flex-start" mb="xs">
-                    <Box>
-                      <Text fw={700}>{item.categoryName}</Text>
+                  <Stack gap="sm">
+                    <Group justify="space-between" align="flex-start">
+                      <Box>
+                        <Text fw={700}>{item.categoryName}</Text>
+                        <Text size="sm" c="dimmed">
+                          ${item.spent.toFixed(2)} spent of ${item.limit.toFixed(2)}
+                        </Text>
+                      </Box>
+                      {getStatusBadge(status)}
+                    </Group>
+
+                    <Progress
+                      size="sm"
+                      color={getColor(status)}
+                      value={Math.min(percent, 100)}
+                      radius="xl"
+                    />
+
+                    <Group justify="space-between">
                       <Text size="sm" c="dimmed">
-                        ${item.spent.toFixed(2)} spent of $
-                        {item.limit.toFixed(2)}
+                        {percent.toFixed(0)}% used
                       </Text>
-                    </Box>
-
-                    <Group gap="xs">{getStatusBadge(status)}</Group>
-                  </Group>
-
-                  <Progress
-                    size="sm"
-                    color={getColor(status)}
-                    value={Math.min(percent, 100)}
-                    radius="xl"
-                  />
-
-                  <Group justify="space-between" mt="xs">
-                    <Text size="sm" c="dimmed">
-                      {percent.toFixed(0)}% used
-                    </Text>
-                    <Text size="sm" c={remaining < 0 ? "red" : "dimmed"}>
-                      {remaining < 0 ? "Over by" : "Remaining"}: $
-                      {Math.abs(remaining).toFixed(2)}
-                    </Text>
-                  </Group>
+                      <Text size="sm" c={remaining < 0 ? "red" : "dimmed"}>
+                        {remaining < 0 ? "Over by" : "Remaining"}: ${Math.abs(remaining).toFixed(2)}
+                      </Text>
+                    </Group>
+                  </Stack>
                 </Paper>
               </Grid.Col>
             );
@@ -223,7 +223,7 @@ function BudgetedList({
           </Grid.Col>
         )}
       </Grid>
-    </Card>
+    </Paper>
   );
 }
 
@@ -247,13 +247,13 @@ function UnbudgetedTable({ items, search }) {
   }
 
   return (
-    <Card withBorder radius="lg" p="md">
+    <Paper withBorder radius="1.5rem" p="md">
       <Title order={4} mb="sm">
         Unbudgeted Spending
       </Title>
 
       <ScrollArea>
-        <Table striped highlightOnHover>
+        <Table highlightOnHover verticalSpacing="md">
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Category</Table.Th>
@@ -273,7 +273,7 @@ function UnbudgetedTable({ items, search }) {
           </Table.Tbody>
         </Table>
       </ScrollArea>
-    </Card>
+    </Paper>
   );
 }
 
@@ -346,64 +346,81 @@ export default function BudgetsPage() {
         onClose={handleClose}
       />
 
-      <Stack gap="md">
-        <Group justify="space-between" align="end">
-          <Box>
-            <Title order={2}>Budgets</Title>
-            <Text size="sm" c="dimmed">
-              Track spending for {monthLabel} {period.year}
-            </Text>
-          </Box>
+      <Stack gap="lg">
+        <Paper
+          withBorder
+          radius="1.75rem"
+          p="lg"
+          style={{
+            background:
+              "linear-gradient(160deg, rgba(244, 114, 182, 0.12), rgba(255, 255, 255, 0.02) 42%, rgba(255, 255, 255, 0.01))",
+          }}
+        >
+          <Group justify="space-between" align="end">
+            <Box>
+              <Text size="xs" fw={700} tt="uppercase" c="dimmed">
+                Budget planning
+              </Text>
+              <Title order={2}>Budgets</Title>
+              <Text size="sm" c="dimmed" mt={4}>
+                Track spending and limits for {monthLabel} {period.year}.
+              </Text>
+            </Box>
 
-          <Group>
-            <Button leftSection={<IoAddOutline />} onClick={openCreate}>
-              Create
+            <Button leftSection={<IoAddOutline />} radius="xl" size="md" onClick={openCreate}>
+              Create Budget
             </Button>
           </Group>
-        </Group>
+        </Paper>
+
         {loading ? (
           <Loading title="Loading Budgets" />
         ) : (
           <>
             <SummaryCards summary={summary} />
 
-            <Divider />
             <Alert
               icon={<IoInformationCircleSharp />}
-              title="How budgets work?"
-              radius="lg"
+              title="How budgets work"
+              radius="xl"
               color="gray"
             >
-              Set a monthly spending limit for each category. Spending in
-              categories with a budget will appear under Budgeted Categories.
-              Spending in categories without a budget will appear under
-              Unbudgeted Spending. Status updates automatically as you approach
-              or exceed your limit.
+              Set a monthly limit for each category. Budgeted categories show live usage and status updates automatically. Spending without a category budget remains visible under unbudgeted spending.
             </Alert>
 
-            <Group justify="space-between">
-              <PeriodPicker value={period} onChange={setPeriod} />
-              <Flex gap="xs">
-                <TextInput
-                  placeholder="Search category"
-                  leftSection={<IoSearchOutline />}
-                  value={search}
-                  onChange={(e) => setSearch(e.currentTarget.value)}
-                  w={250}
-                />
+            <Paper withBorder radius="1.5rem" p="md">
+              <Group justify="space-between" align="end" wrap="wrap">
+                <Box>
+                  <Text size="xs" fw={700} tt="uppercase" c="dimmed">
+                    Controls
+                  </Text>
+                  <Text fw={700}>Refine the current budget view</Text>
+                </Box>
+                <Flex gap="xs" wrap="wrap">
+                  <PeriodPicker value={period} onChange={setPeriod} />
+                  <TextInput
+                    radius="xl"
+                    placeholder="Search category"
+                    leftSection={<IoSearchOutline />}
+                    value={search}
+                    onChange={(e) => setSearch(e.currentTarget.value)}
+                    w={240}
+                  />
+                  <Select
+                    radius="xl"
+                    value={filter}
+                    onChange={(v) => setFilter(v || "all")}
+                    data={[
+                      { value: "all", label: "All" },
+                      { value: "warning", label: "Warning" },
+                      { value: "over", label: "Over" },
+                    ]}
+                    w={150}
+                  />
+                </Flex>
+              </Group>
+            </Paper>
 
-                <Select
-                  value={filter}
-                  onChange={(v) => setFilter(v || "all")}
-                  data={[
-                    { value: "all", label: "All" },
-                    { value: "warning", label: "Warning" },
-                    { value: "over", label: "Over" },
-                  ]}
-                  w={160}
-                />
-              </Flex>
-            </Group>
             <BudgetedList
               items={items}
               search={search}

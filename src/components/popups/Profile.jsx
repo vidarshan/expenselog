@@ -230,7 +230,7 @@ const Profile = ({ opened, setOpened, handleLogout }) => {
 
           <Alert
             icon={<IoInformationCircleSharp />}
-            variant="filled"
+            variant="light"
             color="gray"
             title="Fixed income"
           >
@@ -243,7 +243,7 @@ const Profile = ({ opened, setOpened, handleLogout }) => {
             icon={<IoInformationCircleSharp />}
             my="xs"
             color="gray"
-            variant="filled"
+            variant="light"
             title="Variable income"
           >
             {info &&

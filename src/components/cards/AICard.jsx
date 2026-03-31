@@ -1,32 +1,32 @@
 import {
-  Card,
-  Group,
-  Text,
   Badge,
-  Stack,
-  Divider,
-  Button,
-  Paper,
   Box,
-  ThemeIcon,
-  List,
+  Button,
+  Card,
   Collapse,
+  Divider,
+  Group,
+  List,
+  Paper,
   Skeleton,
+  Stack,
+  Text,
+  ThemeIcon,
 } from "@mantine/core";
 import { useState } from "react";
 import {
   IoAlertCircleOutline,
-  IoRocketOutline,
-  IoSparklesOutline,
-  IoTrendingUpOutline,
-  IoCheckmarkCircleOutline,
-  IoSearchOutline,
   IoArrowDown,
   IoArrowUp,
+  IoCheckmarkCircleOutline,
+  IoRocketOutline,
+  IoSearchOutline,
+  IoSparklesOutline,
+  IoTrendingUpOutline,
 } from "react-icons/io5";
 
-const sevColor = (s) =>
-  s === "high" ? "red" : s === "medium" ? "yellow" : "green";
+const sevColor = (severity) =>
+  severity === "high" ? "red" : severity === "medium" ? "yellow" : "green";
 
 function SectionBlock({ icon, title, children, iconStyles }) {
   return (
@@ -66,23 +66,30 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
   const riskFlags = content?.risk_flags || [];
   const forecast = content?.forecast;
   const nextBestMove = content?.next_best_move;
+  const insightCount =
+    behavioralInsights.length +
+    rootCauseHypotheses.length +
+    microChallenges.length +
+    riskFlags.length +
+    (forecast ? 1 : 0) +
+    (nextBestMove ? 1 : 0);
 
   const cardStyle = {
     background: `
-      radial-gradient(circle at top left, rgba(255,105,180,0.12), transparent 30%),
-      radial-gradient(circle at top right, rgba(255,159,67,0.12), transparent 28%),
-      linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,192,203,0.05) 45%, rgba(255,165,0,0.06) 100%)
+      radial-gradient(circle at top left, rgba(255,105,180,0.18), transparent 28%),
+      radial-gradient(circle at top right, rgba(255,159,67,0.16), transparent 26%),
+      linear-gradient(135deg, rgba(255,255,255,0.09) 0%, rgba(255,192,203,0.07) 45%, rgba(255,165,0,0.08) 100%)
     `,
-    border: "1px solid rgba(255,160,140,0.18)",
+    border: "1px solid rgba(255,160,140,0.2)",
     boxShadow:
-      "0 0 0 1px rgba(255,255,255,0.03) inset, 0 10px 30px rgba(0,0,0,0.10)",
+      "0 0 0 1px rgba(255,255,255,0.03) inset, 0 12px 36px rgba(0,0,0,0.14)",
     backdropFilter: "blur(12px)",
     overflow: "hidden",
   };
 
   const innerPaperStyle = {
     background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(255,255,255,0.10)",
+
     backdropFilter: "blur(10px)",
   };
 
@@ -124,8 +131,10 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
     },
   };
 
+  console.log(riskFlags);
+
   return (
-    <Card radius="lg" withBorder p="lg" style={cardStyle}>
+    <Card radius="1.5rem" withBorder p="lg" style={cardStyle}>
       <Stack gap="lg">
         <Group justify="space-between" align="flex-start" wrap="nowrap">
           <Group gap="sm" wrap="nowrap">
@@ -152,7 +161,7 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
             size="xs"
             radius="xl"
             variant="subtle"
-            onClick={() => setCollapsed((p) => !p)}
+            onClick={() => setCollapsed((value) => !value)}
             leftSection={
               collapsed ? <IoArrowDown size={14} /> : <IoArrowUp size={14} />
             }
@@ -160,6 +169,33 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
           >
             {collapsed ? "Expand" : "Collapse"}
           </Button>
+        </Group>
+
+        <Group grow>
+          <Paper p="sm" radius="lg" withBorder style={innerPaperStyle}>
+            <Text size="xs" c="dimmed">
+              Signals surfaced
+            </Text>
+            <Text fw={800} size="xl" mt={4}>
+              {insightCount}
+            </Text>
+          </Paper>
+          <Paper p="sm" radius="lg" withBorder style={innerPaperStyle}>
+            <Text size="xs" c="dimmed">
+              Risk flags
+            </Text>
+            <Text fw={800} size="xl" mt={4}>
+              {riskFlags.length}
+            </Text>
+          </Paper>
+          <Paper p="sm" radius="lg" withBorder style={innerPaperStyle}>
+            <Text size="xs" c="dimmed">
+              Next move
+            </Text>
+            <Text fw={700} size="sm" mt={6}>
+              {nextBestMove?.title || "Waiting for more data"}
+            </Text>
+          </Paper>
         </Group>
 
         {loading ? (
@@ -172,13 +208,9 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
             <Skeleton height={20} radius="sm" />
           </Stack>
         ) : (
-          <Collapse
-            in={!collapsed}
-            transitionDuration={260}
-            transitionTimingFunction="ease"
-          >
+          <Collapse in={!collapsed}>
             <Stack gap="lg">
-              <Divider />
+              <Divider style={{ borderColor: "rgba(255,255,255,0.08)" }} />
 
               <SectionBlock
                 icon={<IoSparklesOutline />}
@@ -187,18 +219,18 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
               >
                 {behavioralInsights.length ? (
                   <Stack gap="xs">
-                    {behavioralInsights.map((item, i) => (
+                    {behavioralInsights.map((item, index) => (
                       <InfoCard
-                        key={i}
+                        key={index}
                         title={item.title}
                         paperStyle={innerPaperStyle}
                       >
                         <Text size="sm">{item.message}</Text>
-                        {item.evidence && (
+                        {item.evidence ? (
                           <Text size="xs" c="dimmed">
                             {item.evidence}
                           </Text>
-                        )}
+                        ) : null}
                       </InfoCard>
                     ))}
                   </Stack>
@@ -216,18 +248,18 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
               >
                 {rootCauseHypotheses.length ? (
                   <Stack gap="xs">
-                    {rootCauseHypotheses.map((item, i) => (
+                    {rootCauseHypotheses.map((item, index) => (
                       <InfoCard
-                        key={i}
+                        key={index}
                         title={item.title}
                         paperStyle={innerPaperStyle}
                       >
                         <Text size="sm">{item.message}</Text>
-                        {item.what_to_check_next && (
+                        {item.what_to_check_next ? (
                           <Text size="xs" c="dimmed">
                             Next check: {item.what_to_check_next}
                           </Text>
-                        )}
+                        ) : null}
                       </InfoCard>
                     ))}
                   </Stack>
@@ -245,9 +277,9 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
               >
                 {microChallenges.length ? (
                   <Stack gap="xs">
-                    {microChallenges.map((item, i) => (
+                    {microChallenges.map((item, index) => (
                       <Paper
-                        key={i}
+                        key={index}
                         p="sm"
                         radius="md"
                         withBorder
@@ -259,25 +291,25 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
                           </Text>
 
                           {Array.isArray(item.rules) &&
-                            item.rules.length > 0 && (
-                              <List size="sm" spacing={4}>
-                                {item.rules.map((rule, idx) => (
-                                  <List.Item key={idx}>{rule}</List.Item>
-                                ))}
-                              </List>
-                            )}
+                          item.rules.length > 0 ? (
+                            <List size="sm" spacing={4}>
+                              {item.rules.map((rule, ruleIndex) => (
+                                <List.Item key={ruleIndex}>{rule}</List.Item>
+                              ))}
+                            </List>
+                          ) : null}
 
-                          {item.target && (
+                          {item.target ? (
                             <Badge variant="light" styles={accentBadgeStyles}>
                               Target: {item.target}
                             </Badge>
-                          )}
+                          ) : null}
 
-                          {item.why && (
+                          {item.why ? (
                             <Text size="xs" c="dimmed">
                               {item.why}
                             </Text>
-                          )}
+                          ) : null}
                         </Stack>
                       </Paper>
                     ))}
@@ -296,9 +328,9 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
               >
                 {riskFlags.length ? (
                   <Stack gap="xs">
-                    {riskFlags.map((item, i) => (
+                    {(riskFlags || []).map((item, index) => (
                       <Paper
-                        key={i}
+                        key={index}
                         p="sm"
                         radius="md"
                         withBorder
@@ -335,24 +367,24 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
                 )}
               </SectionBlock>
 
-              {forecast && (
+              {forecast ? (
                 <SectionBlock
-                  icon={<IoTrendingUpOutline  />}
+                  icon={<IoTrendingUpOutline />}
                   title="Forecast"
                   iconStyles={iconStyles}
                 >
                   <InfoCard title={forecast.title} paperStyle={innerPaperStyle}>
                     <Text size="sm">{forecast.message}</Text>
-                    {forecast.assumption && (
+                    {forecast.assumption ? (
                       <Text size="xs" c="dimmed">
                         Assumption: {forecast.assumption}
                       </Text>
-                    )}
+                    ) : null}
                   </InfoCard>
                 </SectionBlock>
-              )}
+              ) : null}
 
-              {nextBestMove && (
+              {nextBestMove ? (
                 <SectionBlock
                   icon={<IoRocketOutline />}
                   title="Next best move"
@@ -363,14 +395,14 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
                     paperStyle={innerPaperStyle}
                   >
                     <Text size="sm">{nextBestMove.message}</Text>
-                    {nextBestMove.first_step_today && (
+                    {nextBestMove.first_step_today ? (
                       <Badge variant="light" styles={accentBadgeStyles}>
                         Today: {nextBestMove.first_step_today}
                       </Badge>
-                    )}
+                    ) : null}
                   </InfoCard>
                 </SectionBlock>
-              )}
+              ) : null}
             </Stack>
           </Collapse>
         )}

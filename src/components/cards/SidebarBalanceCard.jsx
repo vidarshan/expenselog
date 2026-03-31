@@ -16,7 +16,7 @@ const SidebarBalanceCard = ({ title, balance, type }) => {
   const meta = getTypeMeta(type);
 
   return (
-    <Paper>
+    <Paper p="xs" radius="md">
       <Flex align="center" justify="space-between" gap="xs">
         <Group gap={6} style={{ flex: 1, minWidth: 0 }}>
           <ActionIcon
@@ -24,7 +24,7 @@ const SidebarBalanceCard = ({ title, balance, type }) => {
               type === "cash" ? "lime" : type === "credit" ? "grape" : "blue"
             }
             variant="filled"
-            radius="sm"
+            radius="md"
           >
             {meta.icon}
           </ActionIcon>

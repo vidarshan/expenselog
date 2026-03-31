@@ -117,7 +117,7 @@ const categoriesSlice = createSlice({
         state.loading = false;
         state.error = "";
         const updated = action.payload;
-        state.categories = (state.categories.data || []).map((t) =>
+        state.categories = (state.categories || []).map((t) =>
           t._id === updated._id ? updated : t,
         );
         notifications.show({

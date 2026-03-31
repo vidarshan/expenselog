@@ -1,65 +1,116 @@
 import Logo from "./Logo";
 import {
-  Divider,
-  Flex,
-  Text,
-  NavLink,
-  Paper,
-  Group,
   ActionIcon,
-  Stack,
-  useMantineColorScheme,
-  Button,
   Avatar,
   Badge,
-  Loader,
+  Box,
+  Button,
+  Divider,
+  Group,
+  NavLink,
+  Paper,
+  Stack,
+  Text,
+  ThemeIcon,
+  Tooltip,
+  useMantineColorScheme,
 } from "@mantine/core";
 import {
   IoAddOutline,
   IoCardOutline,
   IoCheckboxOutline,
-  IoClose,
   IoCloudyNightOutline,
   IoHomeOutline,
   IoListOutline,
-  IoMenu,
   IoPartlySunnyOutline,
   IoPersonAddOutline,
   IoPersonOutline,
 } from "react-icons/io5";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getUser, logout } from "../store/slices/authSlice";
+import { getAccounts } from "../store/slices/accountsSlice";
+import { getActivePeriods } from "../store/slices/logSlice";
 import AddRecord from "./popups/AddRecord";
 import SidebarBalanceCard from "./cards/SidebarBalanceCard";
-import { getAccounts } from "../store/slices/accountsSlice";
-import { useViewportSize } from "@mantine/hooks";
 import Profile from "./popups/Profile";
-import { getActivePeriods } from "../store/slices/logSlice";
 import Loading from "./Loading";
+import { FiSidebar } from "react-icons/fi";
 
-const NavBar = ({ toggle }) => {
+const NAV_ITEMS = [
+  {
+    label: "Dashboard",
+    description: "Overview and recent activity",
+    path: "/dashboard",
+    icon: <IoHomeOutline size={18} />,
+  },
+  {
+    label: "Logs",
+    description: "Track and edit entries",
+    path: "/logs",
+    icon: <IoListOutline size={18} />,
+  },
+  {
+    label: "Budgets",
+    description: "Monthly limits and progress",
+    path: "/budgets",
+    icon: <IoCheckboxOutline size={18} />,
+  },
+  {
+    label: "Accounts",
+    description: "Balances and account details",
+    path: "/accounts",
+    icon: <IoCardOutline size={18} />,
+  },
+  {
+    label: "Categories",
+    description: "Organize spending",
+    path: "/categories",
+    icon: <IoCheckboxOutline size={18} />,
+  },
+];
+
+const GUEST_ITEMS = [
+  {
+    label: "Login",
+    description: "Access your workspace",
+    path: "/login",
+    icon: <IoPersonOutline size={18} />,
+  },
+  {
+    label: "Register",
+    description: "Create a new account",
+    path: "/signup",
+    icon: <IoPersonAddOutline size={18} />,
+  },
+];
+
+const NavBar = ({ opened, close, expanded, isDesktop, onToggleExpand }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { width } = useViewportSize();
 
-  const { user: authUser, loading } = useSelector((state) => state.auth);
+  const { user: authUser, loading: authLoading } = useSelector(
+    (state) => state.auth,
+  );
+  const { accounts, loading: accountsLoading } = useSelector(
+    (state) => state.accounts,
+  );
+
   const token = authUser?.token || null;
   const username = authUser?.username || "";
-
-  const { accounts, accountsLoading } = useSelector((state) => state.accounts);
-
-  const { colorScheme, setColorScheme } = useMantineColorScheme();
-  const [accountOpened, setAccountOpened] = useState(false);
-  const [opened, setOpened] = useState(false);
-
   const isAuthed = !!token;
 
-  const shouldFetchMe = useMemo(() => {
-    return isAuthed && !username;
-  }, [isAuthed, username]);
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const [profileOpened, setProfileOpened] = useState(false);
+  const [recordOpened, setRecordOpened] = useState(false);
+
+  const shouldFetchMe = useMemo(
+    () => isAuthed && !username,
+    [isAuthed, username],
+  );
+
   useEffect(() => {
     if (!isAuthed) return;
 
@@ -69,176 +120,330 @@ const NavBar = ({ toggle }) => {
 
   useEffect(() => {
     if (!shouldFetchMe) return;
-
     dispatch(getUser());
   }, [dispatch, shouldFetchMe]);
 
+  const goTo = (path) => {
+    navigate(path);
+    if (opened) {
+      close();
+    }
+  };
+
   const handleLogout = () => {
     dispatch(logout());
+    setProfileOpened(false);
     navigate("/", { replace: true });
+    if (opened) {
+      close();
+    }
+  };
+
+  const compactDesktop = isDesktop && !expanded;
+
+  const renderExpandToggle = () =>
+    isDesktop ? (
+      <ActionIcon
+        size="lg"
+        variant="subtle"
+        color="gray"
+        aria-label={expanded ? "Collapse sidebar" : "Expand sidebar"}
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleExpand();
+        }}
+      >
+        <FiSidebar />
+      </ActionIcon>
+    ) : null;
+
+  const renderNavItem = (item) => {
+    if (compactDesktop) {
+      return (
+        <Tooltip key={item.path} label={item.label} position="right" withArrow>
+          <ActionIcon
+            size={44}
+            radius="lg"
+            variant={pathname === item.path ? "light" : "white"}
+            color={pathname === item.path ? "lime" : "gray"}
+            onClick={() => goTo(item.path)}
+          >
+            {item.icon}
+          </ActionIcon>
+        </Tooltip>
+      );
+    }
+
+    return (
+      <NavLink
+        key={item.path}
+        className="rounded-link"
+        label={item.label}
+        description={item.description}
+        leftSection={
+          <ThemeIcon
+            size={34}
+            radius="md"
+            variant={pathname === item.path ? "filled" : "light"}
+            color={pathname === item.path ? "lime" : "gray"}
+          >
+            {item.icon}
+          </ThemeIcon>
+        }
+        active={pathname === item.path}
+        onClick={() => goTo(item.path)}
+        styles={{
+          root: {
+            paddingBlock: 10,
+            paddingInline: 10,
+            borderRadius: 16,
+          },
+          body: {
+            overflow: "hidden",
+          },
+          label: {
+            fontSize: 14,
+            fontWeight: 700,
+          },
+          description: {
+            fontSize: 11,
+            lineHeight: 1.3,
+          },
+        }}
+      />
+    );
   };
 
   return (
     <>
       {isAuthed && (
         <Profile
-          opened={accountOpened}
-          setOpened={() => setAccountOpened(false)}
+          opened={profileOpened}
+          setOpened={() => setProfileOpened(false)}
           handleLogout={handleLogout}
         />
       )}
+
       {isAuthed && (
-        <AddRecord expenseOpened={opened} setExpenseOpened={setOpened} />
+        <AddRecord
+          expenseOpened={recordOpened}
+          setExpenseOpened={setRecordOpened}
+        />
       )}
-      {width <= 768 && (
-        <ActionIcon
-          pos="fixed"
-          size="xl"
-          top={10}
-          right={10}
-          radius="xl"
-          variant="white"
-          onClick={toggle}
+
+      <Stack h="100%" justify="space-between" gap="md">
+        <Stack
+          className="sidebar-scroll"
+          gap={compactDesktop ? "lg" : "md"}
+          align={compactDesktop ? "center" : "stretch"}
+          style={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: "auto",
+            overflowX: "hidden",
+            paddingRight: compactDesktop ? 0 : 4,
+          }}
         >
-          {!opened ? <IoClose /> : <IoMenu />}
-        </ActionIcon>
-      )}
-      <Flex justify="center">
-        <Logo titleSize={5} onClick={() => navigate("/")} />
-      </Flex>
-
-      {isAuthed ? (
-        <Stack h="100%" justify="space-between" p="sm">
-          <Stack>
-            <Button
-              leftSection={<IoAddOutline />}
-              onClick={() => setOpened(true)}
-            >
-              Create Log
-            </Button>
-
-            <Divider />
-
-            <NavLink
-              className="rounded-link"
-              label="Dashboard"
-              leftSection={<IoHomeOutline />}
-              onClick={() => navigate("/dashboard")}
-              c={pathname === "/dashboard" ? "lime" : "gray"}
-            />
-            <NavLink
-              className="rounded-link"
-              label="Logs"
-              leftSection={<IoListOutline />}
-              onClick={() => navigate("/logs")}
-              c={pathname === "/logs" ? "lime" : "gray"}
-            />
-            <NavLink
-              className="rounded-link"
-              label="Budgets"
-              leftSection={<IoCheckboxOutline />}
-              onClick={() => navigate("/budgets")}
-              c={pathname === "/budgets" ? "lime" : "gray"}
-            />
-            <NavLink
-              className="rounded-link"
-              label="Accounts"
-              leftSection={<IoCardOutline />}
-              onClick={() => navigate("/accounts")}
-              c={pathname === "/accounts" ? "lime" : "gray"}
-            />
-
-            <Divider />
-
-            <Stack px="sm">
-              <Group justify="space-between">
-                <Text size="sm">Accounts</Text>
-                <Badge variant="filled"> {accounts.length} </Badge>
-              </Group>
-              {accountsLoading ? (
-                <Loading h="auto" size="xs" title="" />
-              ) : (
-                <>
-                  {accounts?.length ? (
-                    accounts.map((a) => (
-                      <SidebarBalanceCard
-                        key={a._id}
-                        title={a.name}
-                        type={a.type}
-                        balance={a.currentBalance}
-                      />
-                    ))
-                  ) : (
-                    <Text size="xs">No accounts found.</Text>
-                  )}
-                </>
-              )}
+          {compactDesktop ? (
+            <Stack align="center" gap="xs">
+              <Logo
+                titleSize={5}
+                logoSize={28}
+                withTitle={false}
+                onClick={() => goTo("/")}
+              />
             </Stack>
-
-            <Divider />
-
-            <Stack py={0} px="sm">
-              <Group justify="space-between">
-                <Text size="xs">Theme</Text>
-                <ActionIcon
-                  size="md"
-                  variant="filled"
-                  color={colorScheme === "light" ? "blue" : "yellow"}
-                  onClick={() =>
-                    setColorScheme(colorScheme === "dark" ? "light" : "dark")
-                  }
-                >
-                  {colorScheme === "light" ? (
-                    <IoCloudyNightOutline />
-                  ) : (
-                    <IoPartlySunnyOutline />
-                  )}
-                </ActionIcon>
-              </Group>
-            </Stack>
-          </Stack>
-          {loading ? (
-            <Loading h="auto" size="xs" title="" />
           ) : (
-            <Paper
-              className="hover-class"
-              onClick={() => setAccountOpened(true)}
+            <Group>
+              <Stack gap={6}>
+                <Group justify="space-between" align="flex-start" wrap="nowrap">
+                  <Logo
+                    titleSize={4}
+                    logoSize={22}
+                    withTitle
+                    onClick={() => goTo("/")}
+                  />
+                </Group>
+              </Stack>
+            </Group>
+          )}
+
+          {isAuthed ? (
+            <>
+              {compactDesktop ? (
+                <Tooltip label="Create Log" position="right" withArrow>
+                  <ActionIcon
+                    size={48}
+                    radius="lg"
+                    variant="filled"
+                    color="lime"
+                    onClick={() => setRecordOpened(true)}
+                  >
+                    <IoAddOutline />
+                  </ActionIcon>
+                </Tooltip>
+              ) : (
+                <Button
+                  leftSection={<IoAddOutline />}
+                  onClick={() => setRecordOpened(true)}
+                  fullWidth
+                  size="md"
+                  radius="xl"
+                >
+                  Create Log
+                </Button>
+              )}
+
+              {compactDesktop ? (
+                <Stack gap="sm" align="center">
+                  {NAV_ITEMS.map(renderNavItem)}
+                </Stack>
+              ) : (
+                <Paper withBorder radius="lg" p="xs">
+                  <Stack gap={4}>{NAV_ITEMS.map(renderNavItem)}</Stack>
+                </Paper>
+              )}
+
+              {compactDesktop ? null : (
+                <Paper withBorder radius="lg" p="sm">
+                  <Stack gap="xs">
+                    <Group justify="space-between">
+                      <Text size="xs" fw={700} c="dimmed">
+                        ACCOUNTS
+                      </Text>
+                      <Badge variant="light">{accounts.length}</Badge>
+                    </Group>
+
+                    {accountsLoading ? (
+                      <Loading h="auto" size="xs" title="Loading accounts" />
+                    ) : accounts.length > 0 ? (
+                      <Stack gap="xs">
+                        {accounts.map((account) => (
+                          <SidebarBalanceCard
+                            key={account._id}
+                            title={account.name}
+                            type={account.type}
+                            balance={account.currentBalance}
+                          />
+                        ))}
+                      </Stack>
+                    ) : (
+                      <Paper withBorder p="sm" radius="lg">
+                        <Text size="sm" c="dimmed">
+                          No accounts yet. Create one to start tracking
+                          balances.
+                        </Text>
+                      </Paper>
+                    )}
+                  </Stack>
+                </Paper>
+              )}
+
+              <Divider />
+
+              <Group justify={compactDesktop ? "center" : "space-between"}>
+                {compactDesktop ? null : <Text size="sm">Theme</Text>}
+                <Tooltip
+                  label={`Switch to ${colorScheme === "dark" ? "light" : "dark"} mode`}
+                  position="right"
+                  withArrow
+                  disabled={!compactDesktop}
+                >
+                  <ActionIcon
+                    size="xl"
+                    variant="light"
+                    color={colorScheme === "light" ? "blue" : "yellow"}
+                    onClick={() =>
+                      setColorScheme(colorScheme === "dark" ? "light" : "dark")
+                    }
+                  >
+                    {colorScheme === "light" ? (
+                      <IoCloudyNightOutline />
+                    ) : (
+                      <IoPartlySunnyOutline />
+                    )}
+                  </ActionIcon>
+                </Tooltip>
+              </Group>
+            </>
+          ) : (
+            <Stack
+              gap={compactDesktop ? "sm" : 6}
+              align={compactDesktop ? "center" : "stretch"}
             >
-              <Flex align="center" justify="space-between">
-                <Group gap="xs" justify="flex-start">
+              {GUEST_ITEMS.map(renderNavItem)}
+            </Stack>
+          )}
+        </Stack>
+        {isAuthed ? (
+          authLoading ? (
+            <Loading h="auto" size="xs" title="Loading profile" />
+          ) : (
+            <Tooltip
+              label="Manage profile"
+              position="right"
+              withArrow
+              disabled={!compactDesktop}
+            >
+              <Paper
+                withBorder
+                radius="lg"
+                p="sm"
+                style={{
+                  display: "flex",
+                  flexDirection: compactDesktop ? "column" : "row",
+                  alignItems: "center",
+                  justifyContent: compactDesktop ? "center" : "space-between",
+                  gap: 6,
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setProfileOpened(true);
+                }}
+              >
+                <Group
+                  justify={compactDesktop ? "center" : "flex-start"}
+                  wrap="nowrap"
+                  style={{ flex: compactDesktop ? "unset" : 1, minWidth: 0 }}
+                >
                   <Avatar color="violet" variant="filled" radius="xl">
                     {username?.[0] || "U"}
                   </Avatar>
-                  <Paper>
-                    <Text size="sm" fw={700}>
-                      {username || "User"}
-                    </Text>
-                  </Paper>
+
+                  {compactDesktop ? null : (
+                    <Stack gap={0} style={{ minWidth: 0 }}>
+                      <Text size="sm" fw={700}>
+                        {username || "User"}
+                      </Text>
+                      <Text size="xs" c="dimmed">
+                        Manage profile and salary
+                      </Text>
+                    </Stack>
+                  )}
                 </Group>
-              </Flex>
-            </Paper>
-          )}
-        </Stack>
-      ) : (
-        <Stack h="100%" justify="space-between" p="sm">
-          <Stack>
-            <NavLink
-              className="rounded-link"
-              label="Login"
-              leftSection={<IoPersonOutline />}
-              onClick={() => navigate("/login")}
-              c={pathname === "/login" ? "lime" : "gray"}
-            />
-            <NavLink
-              className="rounded-link"
-              label="Register"
-              leftSection={<IoPersonAddOutline />}
-              onClick={() => navigate("/signup")}
-              c={pathname === "/signup" ? "lime" : "gray"}
-            />
-          </Stack>
-        </Stack>
-      )}
+
+                {renderExpandToggle()}
+              </Paper>
+            </Tooltip>
+          )
+        ) : isDesktop ? (
+          <Paper
+            withBorder
+            radius="lg"
+            p="sm"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: compactDesktop ? "center" : "space-between",
+              gap: 8,
+            }}
+          >
+            {compactDesktop ? null : <Box></Box>}
+
+            {renderExpandToggle()}
+          </Paper>
+        ) : null}
+      </Stack>
     </>
   );
 };

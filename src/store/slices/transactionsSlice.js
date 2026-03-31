@@ -9,6 +9,7 @@ const initialState = {
     pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
   },
   loading: false,
+  mutating: false,
   error: "",
 };
 
@@ -92,38 +93,29 @@ const transactionSlice = createSlice({
       })
 
       .addCase(createTransaction.pending, (state) => {
-        state.loading = true;
+        state.mutating = true;
         state.error = "";
       })
-      .addCase(createTransaction.fulfilled, (state, action) => {
-        state.loading = false;
+      .addCase(createTransaction.fulfilled, (state) => {
+        state.mutating = false;
         state.error = "";
 
-        const created = action.payload;
-
-        state.transactions.data = [created, ...(state.transactions.data || [])];
-
-        const p = state.transactions.pagination;
-        if (p && typeof p.total === "number") {
-          p.total += 1;
-          p.totalPages = Math.ceil(p.total / (p.limit || 20));
-        }
         notifications.show({
           title: "Log Created",
           classNames: classes,
         });
       })
       .addCase(createTransaction.rejected, (state, action) => {
-        state.loading = false;
+        state.mutating = false;
         state.error = action.payload || "Create failed";
       })
 
       .addCase(updateTransaction.pending, (state) => {
-        state.loading = true;
+        state.mutating = true;
         state.error = "";
       })
       .addCase(updateTransaction.fulfilled, (state, action) => {
-        state.loading = false;
+        state.mutating = false;
         state.error = "";
 
         const updated = action.payload;
@@ -137,16 +129,16 @@ const transactionSlice = createSlice({
         });
       })
       .addCase(updateTransaction.rejected, (state, action) => {
-        state.loading = false;
+        state.mutating = false;
         state.error = action.payload || "Update failed";
       })
 
       .addCase(deleteTransaction.pending, (state) => {
-        state.loading = true;
+        state.mutating = true;
         state.error = "";
       })
       .addCase(deleteTransaction.fulfilled, (state, action) => {
-        state.loading = false;
+        state.mutating = false;
         state.error = "";
 
         const id = action.payload;
@@ -161,7 +153,7 @@ const transactionSlice = createSlice({
         });
       })
       .addCase(deleteTransaction.rejected, (state, action) => {
-        state.loading = false;
+        state.mutating = false;
         state.error = action.payload || "Delete failed";
       });
   },

@@ -1,18 +1,21 @@
 import {
   Badge,
   Box,
-  Card,
   Container,
   Flex,
   Grid,
   Group,
-  Progress,
+  Paper,
   Select,
+  Stack,
   Text,
   Title,
-  Tooltip,
 } from "@mantine/core";
-import { IoCalendarOutline } from "react-icons/io5";
+import {
+  IoCalendarOutline,
+  IoDocumentTextOutline,
+  IoTimeOutline,
+} from "react-icons/io5";
 import ContributionChart from "../components/charts/ContributionChart";
 import OverviewCard from "../components/OverviewCard";
 import ComparisonChart from "../components/charts/ComparisonChart";
@@ -32,6 +35,8 @@ import BudgetsChart from "../components/charts/BudgetsChart";
 import ActivityChart from "../components/charts/ActivityChart";
 import { getInsights } from "../store/slices/insightsSlice";
 import { Helmet } from "react-helmet";
+import { getAccounts } from "../store/slices/accountsSlice";
+import { getCategories } from "../store/slices/categorySlice";
 
 const DashboardPage = () => {
   const dispatch = useDispatch();
@@ -39,12 +44,16 @@ const DashboardPage = () => {
   const { dashboard, monthlyComparison, loading } = useSelector(
     (state) => state.dashboard,
   );
-  const { categories, categoriesLoading } = useSelector(
+  const { categories, loading: categoriesLoading } = useSelector(
     (state) => state.categories,
   );
-  const { accounts, accountsLoading } = useSelector((state) => state.accounts);
+  const { accounts, loading: accountsLoading } = useSelector(
+    (state) => state.accounts,
+  );
   const { currentYear, currentMonth } = useSelector((state) => state.app);
-  const { activePeriods, logsLoading } = useSelector((state) => state.logs);
+  const { activePeriods, loading: logsLoading } = useSelector(
+    (state) => state.logs,
+  );
   const { insights, loading: insightLoading } = useSelector(
     (state) => state.insights,
   );
@@ -52,6 +61,7 @@ const DashboardPage = () => {
   const authUser = useSelector((state) => state.auth.user);
   const token = authUser?.token || null;
   const [opened, setOpened] = useState(false);
+  const [setupReady, setSetupReady] = useState(false);
 
   const isAuthed = !!token;
   const accountsCount = accounts?.length || 0;
@@ -63,26 +73,47 @@ const DashboardPage = () => {
     Number(currentYear) === now.getFullYear() &&
     Number(currentMonth) === now.getMonth() + 1;
   const showSetup =
+    setupReady &&
     isCurrentMonthAndYear &&
     (accountsCount === 0 || categoriesCount === 0 || !hasTransactions);
+
   useEffect(() => {
-    dispatch(getDashboard({ year: currentYear, month: currentMonth }));
-    dispatch(
-      getComparisons({
-        yearA: currentYear,
-        monthA: currentMonth - 1,
-        yearB: currentYear,
-        monthB: currentMonth,
-      }),
-    );
-    dispatch(getActivePeriods());
-    dispatch(
-      getTransactions({
-        year: currentYear,
-        month: currentMonth,
-      }),
-    );
-    dispatch(getInsights({ year: currentYear, month: currentMonth }));
+    let cancelled = false;
+    const currentMonthNumber = Number(currentMonth);
+    const currentYearNumber = Number(currentYear);
+    const previousMonth = currentMonthNumber === 1 ? 12 : currentMonthNumber - 1;
+    const previousYear =
+      currentMonthNumber === 1 ? currentYearNumber - 1 : currentYearNumber;
+
+    Promise.allSettled([
+      dispatch(getDashboard({ year: currentYear, month: currentMonth })),
+      dispatch(
+        getComparisons({
+          yearA: previousYear,
+          monthA: previousMonth,
+          yearB: currentYearNumber,
+          monthB: currentMonthNumber,
+        }),
+      ),
+      dispatch(getActivePeriods()),
+      dispatch(
+        getTransactions({
+          year: currentYear,
+          month: currentMonth,
+        }),
+      ),
+      dispatch(getInsights({ year: currentYear, month: currentMonth })),
+      dispatch(getAccounts()),
+      dispatch(getCategories()),
+    ]).finally(() => {
+      if (!cancelled) {
+        setSetupReady(true);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [currentMonth, currentYear, dispatch]);
 
   return (
@@ -93,7 +124,7 @@ const DashboardPage = () => {
       {isAuthed && (
         <AddRecord expenseOpened={opened} setExpenseOpened={setOpened} />
       )}
-      {loading || categoriesLoading || accountsLoading || logsLoading ? (
+      {!setupReady || loading || categoriesLoading || accountsLoading || logsLoading ? (
         <Loading title="Loading Dashboard" />
       ) : (
         <>
@@ -148,51 +179,104 @@ const DashboardPage = () => {
                 <BudgetsChart summary={dashboard?.budgets?.summary} />
               </Grid.Col>
 
-              <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
+              <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 12 }}>
                 <ContributionChart
                   categoryBreakdown={dashboard?.categoryBreakdown}
                 />
               </Grid.Col>
 
-              <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 6 }}>
-                <Card h="100%" shadow="xl" withBorder>
-                  <Flex mb="sm">
-                    <Text fw={700}>Most Recent transactions</Text>
-                  </Flex>
-                  {dashboard?.recentTransactions?.map((tx) => (
-                    <Flex
-                      key={tx._id}
-                      justify="space-between"
-                      align="center"
-                      py="md"
-                    >
-                      <Flex align="center" gap="xs">
-                        <Text size="sm" fw={600}>
-                          {tx.name}
-                        </Text>
-                        {tx.categoryName !== "" && (
-                          <Badge
-                            size="xs"
-                            variant="dot"
-                            color={tx.categoryColor}
-                          >
-                            {tx.categoryName}
-                          </Badge>
-                        )}
-                      </Flex>
+              <Grid.Col span={{ xs: 12, sm: 6, md: 6, lg: 6, xl: 12 }}>
+                <Paper
+                  h="100%"
+                  withBorder
+                  radius="1.5rem"
+                  p="md"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02) 42%, rgba(255,255,255,0.01))",
+                  }}
+                >
+                  <Stack h="100%" gap="md">
+                    <Group justify="space-between" align="flex-start" wrap="nowrap">
+                      <Group gap="sm" align="flex-start" wrap="nowrap">
+                        <Paper
+                          withBorder
+                          radius="xl"
+                          p="xs"
+                          style={{ background: "rgba(255,255,255,0.05)" }}
+                        >
+                          <IoDocumentTextOutline size={18} />
+                        </Paper>
+                        <Box>
+                          <Text size="xs" fw={700} tt="uppercase" c="dimmed">
+                            Live feed
+                          </Text>
+                          <Text fw={700} size="lg">
+                            Most Recent Transactions
+                          </Text>
+                          <Text size="sm" c="dimmed">
+                            The latest entries recorded for this month.
+                          </Text>
+                        </Box>
+                      </Group>
+                      <Badge variant="light">
+                        {dashboard?.recentTransactions?.length || 0} shown
+                      </Badge>
+                    </Group>
 
-                      <Flex align="center" gap="sm">
-                        <Text size="xs" c="dimmed">
-                          {moment(tx.date).format("MMM D")}
-                        </Text>
+                    <Paper withBorder radius="1.25rem" p="md" style={{ flex: 1 }}>
+                      {dashboard?.recentTransactions?.length ? (
+                        <Stack gap="sm">
+                          {dashboard.recentTransactions.map((tx) => (
+                            <Paper
+                              key={tx._id}
+                              withBorder
+                              radius="xl"
+                              p="sm"
+                              style={{
+                                background:
+                                  "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))",
+                              }}
+                            >
+                              <Group justify="space-between" align="center" wrap="nowrap">
+                                <Stack gap={2} style={{ minWidth: 0 }}>
+                                  <Group gap="xs" wrap="wrap">
+                                    <Text size="sm" fw={700}>
+                                      {tx.name}
+                                    </Text>
+                                    {tx.categoryName !== "" && (
+                                      <Badge
+                                        size="xs"
+                                        variant="light"
+                                        color={tx.categoryColor}
+                                      >
+                                        {tx.categoryName}
+                                      </Badge>
+                                    )}
+                                  </Group>
+                                  <Group gap={6}>
+                                    <IoTimeOutline size={12} />
+                                    <Text size="xs" c="dimmed">
+                                      {moment(tx.date).format("MMM D")}
+                                    </Text>
+                                  </Group>
+                                </Stack>
 
-                        <Text size="sm" fw={600}>
-                          ${Number(tx.amount).toFixed(2)}
+                                <Text size="sm" fw={700}>
+                                  ${Number(tx.amount).toFixed(2)}
+                                </Text>
+                              </Group>
+                            </Paper>
+                          ))}
+                        </Stack>
+                      ) : (
+                        <Text size="sm" c="dimmed">
+                          No transactions for this period yet.
                         </Text>
-                      </Flex>
-                    </Flex>
-                  ))}
-                </Card>
+                      )}
+                    </Paper>
+                  </Stack>
+                </Paper>
               </Grid.Col>
               <Grid.Col span={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
                 <ActivityChart />
