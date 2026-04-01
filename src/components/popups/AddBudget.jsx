@@ -16,8 +16,22 @@ import {
   IoGridOutline,
 } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
-import { getMonthOptions, getYearOptions } from "../../utils/getCurrentPeriod";
 import { createBudget, getBudgets } from "../../store/slices/budgetsSlice";
+
+const MONTH_OPTIONS = [
+  { value: "1", label: "January" },
+  { value: "2", label: "February" },
+  { value: "3", label: "March" },
+  { value: "4", label: "April" },
+  { value: "5", label: "May" },
+  { value: "6", label: "June" },
+  { value: "7", label: "July" },
+  { value: "8", label: "August" },
+  { value: "9", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
+];
 
 const AddBudget = ({
   opened,
@@ -29,7 +43,11 @@ const AddBudget = ({
   const dispatch = useDispatch();
   const { categories } = useSelector((state) => state.categories);
   const { currentYear, currentMonth } = useSelector((state) => state.app);
-  const { activePeriods } = useSelector((state) => state.logs);
+  const currentCalendarYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 7 }, (_, index) => {
+    const year = currentCalendarYear - 3 + index;
+    return { value: String(year), label: String(year) };
+  });
 
   function normalizeCategoryId(categoryId) {
     if (!categoryId) return "";
@@ -100,10 +118,6 @@ const AddBudget = ({
     setOpened(false);
   }
 
-  const selectedYear = form.values.year;
-  const monthOptions = getMonthOptions(activePeriods, selectedYear);
-  const yearOptions = getYearOptions(activePeriods);
-
   return (
     <Modal
       opened={opened}
@@ -151,7 +165,7 @@ const AddBudget = ({
             label="Month"
             leftSection={<IoCalendarOutline />}
             placeholder="Select Month"
-            data={monthOptions}
+            data={MONTH_OPTIONS}
             allowDeselect={false}
             {...form.getInputProps("month")}
           />
