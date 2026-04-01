@@ -1,5 +1,6 @@
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import LoginPage from "./LoginPage";
 import { createTestStore, renderWithProviders } from "../test/test-utils";
 
