@@ -27,16 +27,12 @@ jobs:
 
       - name: Install client deps
         run: npm install
-        working-directory: /
 
       - name: Lint client
         run: npm run lint --if-present
-        working-directory: /
 
       - name: Test client
         run: npm test --if-present
-        working-directory: /
 
       - name: Build client
         run: npm run build --if-present
-        working-directory: /
