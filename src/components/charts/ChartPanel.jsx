@@ -1,12 +1,17 @@
-import { Badge, Box, Group, Paper, Stack, Text, ThemeIcon } from "@mantine/core";
-
-const ACCENT_TONES = {
-  lime: "rgba(163, 230, 53, 0.14)",
-  blue: "rgba(96, 165, 250, 0.14)",
-  orange: "rgba(251, 146, 60, 0.14)",
-  pink: "rgba(244, 114, 182, 0.14)",
-  gray: "rgba(255, 255, 255, 0.05)",
-};
+import {
+  Badge,
+  Box,
+  Button,
+  Collapse,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  ThemeIcon,
+} from "@mantine/core";
+import { useState } from "react";
+import { IoArrowDown, IoArrowUp } from "react-icons/io5";
+import { ACCENT_TONES } from "../../utils/accents";
 
 const ChartPanel = ({
   icon,
@@ -15,8 +20,12 @@ const ChartPanel = ({
   description,
   action,
   accent = "lime",
+  collapsible = true,
+  defaultCollapsed = false,
   children,
 }) => {
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
+
   return (
     <Paper
       h="100%"
@@ -58,13 +67,44 @@ const ChartPanel = ({
               ) : null}
             </Box>
           </Group>
-
-          {action ? <Badge variant="light">{action}</Badge> : null}
+          <Group gap="xs" align="center">
+            {typeof action === "string" ? (
+              <Badge variant="light">{action}</Badge>
+            ) : (
+              action
+            )}
+            {collapsible ? (
+              <Button
+                size="xs"
+                radius="xl"
+                variant="subtle"
+                onClick={() => setCollapsed((value) => !value)}
+                leftSection={
+                  collapsed ? (
+                    <IoArrowDown size={14} />
+                  ) : (
+                    <IoArrowUp size={14} />
+                  )
+                }
+                styles={{
+                  root: {
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    color: "inherit",
+                  },
+                }}
+              >
+                {collapsed ? "Expand" : "Collapse"}
+              </Button>
+            ) : null}
+          </Group>
         </Group>
 
-        <Paper withBorder radius="1.25rem" p="md" style={{ flex: 1 }}>
-          {children}
-        </Paper>
+        <Collapse in={!collapsed}>
+          <Paper withBorder radius="1.25rem" p="md" style={{ flex: 1 }}>
+            {children}
+          </Paper>
+        </Collapse>
       </Stack>
     </Paper>
   );

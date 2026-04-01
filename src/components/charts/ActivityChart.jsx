@@ -1,5 +1,5 @@
 import { Heatmap } from "@mantine/charts";
-import { Box, Group, Paper, Select, Stack, Text } from "@mantine/core";
+import { Box, Flex, Group, Paper, Select, Stack, Text } from "@mantine/core";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../Loading";
 import { getYearOptions } from "../../utils/getCurrentPeriod";
@@ -89,7 +89,7 @@ const ActivityChart = () => {
           </Paper>
         </Group>
 
-        <Box style={{ overflowX: "auto" }}>
+        <Flex justify="center" style={{ overflowX: "auto" }}>
           <Heatmap
             mt="md"
             startDate={startDate}
@@ -105,7 +105,7 @@ const ActivityChart = () => {
             }
             data={formatHeatmapData(heatmap)}
           />
-        </Box>
+        </Flex>
       </Stack>
     </ChartPanel>
   );

@@ -12,7 +12,7 @@ import { DonutChart } from "@mantine/charts";
 import { IoPieChartOutline } from "react-icons/io5";
 import ChartPanel from "./ChartPanel";
 
-const ContributionChart = ({ categoryBreakdown = [] }) => {
+const ContributionChart = ({ categoryBreakdown = [], periodLabel }) => {
   const [mode, setMode] = useState("percent");
 
   const { totalSum, pieData, topCategory } = useMemo(() => {
@@ -38,7 +38,7 @@ const ContributionChart = ({ categoryBreakdown = [] }) => {
       title="Category Contributions"
       eyebrow="Spending mix"
       accent="orange"
-      description="See which categories dominate this month and how much each one contributes to the overall expense picture."
+      description={`See which categories dominate ${periodLabel || "the selected period"} and how much each one contributes to the overall expense picture.`}
       action={
         <SegmentedControl
           size="xs"
@@ -60,12 +60,13 @@ const ContributionChart = ({ categoryBreakdown = [] }) => {
               withLabelsLine={false}
               withLabels={false}
               withTooltip
+              tooltipDataSource="segment"
               size={220}
               thickness={28}
-              chartLabel={`$${totalSum.toFixed(0)}`}
+              chartLabel={`Total $${totalSum.toFixed(0)}`}
             />
             <Text size="sm" c="dimmed">
-              Total tracked expenses this month
+              Total tracked expenses for {periodLabel || "the selected period"}
             </Text>
           </Stack>
 

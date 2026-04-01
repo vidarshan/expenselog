@@ -149,8 +149,8 @@ function BudgetedList({
           </Text>
           <Title order={4}>Tracked categories</Title>
         </Box>
-        <Badge size="lg" variant="light">
-          {budgetedCount}
+        <Badge size="md" variant="light">
+          {budgetedCount} shown
         </Badge>
       </Group>
 
@@ -169,11 +169,6 @@ function BudgetedList({
                   radius="xl"
                   p="md"
                   h="100%"
-                  style={{
-                    cursor: "pointer",
-                    background:
-                      "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
-                  }}
                   onClick={() =>
                     onEdit({
                       year,
@@ -191,7 +186,8 @@ function BudgetedList({
                       <Box>
                         <Text fw={700}>{item.categoryName}</Text>
                         <Text size="sm" c="dimmed">
-                          ${item.spent.toFixed(2)} spent of ${item.limit.toFixed(2)}
+                          ${item.spent.toFixed(2)} spent of $
+                          {item.limit.toFixed(2)}
                         </Text>
                       </Box>
                       {getStatusBadge(status)}
@@ -209,7 +205,8 @@ function BudgetedList({
                         {percent.toFixed(0)}% used
                       </Text>
                       <Text size="sm" c={remaining < 0 ? "red" : "dimmed"}>
-                        {remaining < 0 ? "Over by" : "Remaining"}: ${Math.abs(remaining).toFixed(2)}
+                        {remaining < 0 ? "Over by" : "Remaining"}: $
+                        {Math.abs(remaining).toFixed(2)}
                       </Text>
                     </Group>
                   </Stack>
@@ -356,7 +353,7 @@ export default function BudgetsPage() {
               "linear-gradient(160deg, rgba(244, 114, 182, 0.12), rgba(255, 255, 255, 0.02) 42%, rgba(255, 255, 255, 0.01))",
           }}
         >
-          <Group justify="space-between" align="end">
+          <Group justify="space-between" align="center">
             <Box>
               <Text size="xs" fw={700} tt="uppercase" c="dimmed">
                 Budget planning
@@ -367,7 +364,12 @@ export default function BudgetsPage() {
               </Text>
             </Box>
 
-            <Button leftSection={<IoAddOutline />} radius="xl" size="md" onClick={openCreate}>
+            <Button
+              leftSection={<IoAddOutline />}
+              radius="xl"
+              size="md"
+              onClick={openCreate}
+            >
               Create Budget
             </Button>
           </Group>
@@ -378,16 +380,6 @@ export default function BudgetsPage() {
         ) : (
           <>
             <SummaryCards summary={summary} />
-
-            <Alert
-              icon={<IoInformationCircleSharp />}
-              title="How budgets work"
-              radius="xl"
-              color="gray"
-            >
-              Set a monthly limit for each category. Budgeted categories show live usage and status updates automatically. Spending without a category budget remains visible under unbudgeted spending.
-            </Alert>
-
             <Paper withBorder radius="1.5rem" p="md">
               <Group justify="space-between" align="end" wrap="wrap">
                 <Box>
@@ -395,6 +387,12 @@ export default function BudgetsPage() {
                     Controls
                   </Text>
                   <Text fw={700}>Refine the current budget view</Text>
+                  <Alert title="How budgets work" radius="md" color="gray">
+                    Set a monthly limit for each category. Budgeted categories
+                    show live usage and status updates automatically. Spending
+                    without a category budget remains visible under unbudgeted
+                    spending.
+                  </Alert>
                 </Box>
                 <Flex gap="xs" wrap="wrap">
                   <PeriodPicker value={period} onChange={setPeriod} />

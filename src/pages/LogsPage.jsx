@@ -23,6 +23,7 @@ import {
   IoArrowDownSharp,
   IoArrowUpSharp,
   IoCalendarOutline,
+  IoDownloadOutline,
   IoDocumentTextOutline,
 } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
@@ -38,6 +39,7 @@ import {
 import { setMonth, setYear } from "../store/slices/appSlice";
 import { getAccounts } from "../store/slices/accountsSlice";
 import AddRecord from "../components/popups/AddRecord";
+import DownloadReport from "../components/popups/DownloadReport";
 import Loading from "../components/Loading";
 import EmptyContainer from "../components/EmptyContainer";
 
@@ -47,6 +49,7 @@ const LogsPage = () => {
   const [txMode, setTxMode] = useState("create");
   const [selectedTx, setSelectedTx] = useState(null);
   const [activePage, setActivePage] = useState(1);
+  const [reportOpened, setReportOpened] = useState(false);
 
   const { transactions, loading } = useSelector((state) => state.transactions);
   const { activePeriods } = useSelector((state) => state.logs);
@@ -160,6 +163,13 @@ const LogsPage = () => {
         mode={txMode}
         transaction={selectedTx}
       />
+      <DownloadReport
+        opened={reportOpened}
+        onClose={() => setReportOpened(false)}
+        activePeriods={activePeriods}
+        defaultYear={currentYear}
+        defaultMonth={currentMonth}
+      />
 
       <Stack gap="lg">
         <Paper
@@ -168,7 +178,7 @@ const LogsPage = () => {
           p="lg"
           style={{
             background:
-              "linear-gradient(160deg, rgba(163, 230, 53, 0.12), rgba(255, 255, 255, 0.02) 42%, rgba(255, 255, 255, 0.01))",
+              "linear-gradient(160deg, rgba(251, 146, 60, 0.14), rgba(255, 255, 255, 0.02) 42%, rgba(255, 255, 255, 0.01))",
           }}
         >
           <Group justify="space-between" align="end">
@@ -185,7 +195,7 @@ const LogsPage = () => {
         </Paper>
 
         <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
-          <Paper withBorder radius="xl" p="md">
+          <Paper withBorder radius="lg" p="md">
             <Text size="xs" c="dimmed">
               Period
             </Text>
@@ -193,7 +203,7 @@ const LogsPage = () => {
               {monthLabel} {currentYear}
             </Text>
           </Paper>
-          <Paper withBorder radius="xl" p="md">
+          <Paper withBorder radius="lg" p="md">
             <Text size="xs" c="dimmed">
               Visible records
             </Text>
@@ -201,7 +211,7 @@ const LogsPage = () => {
               {transactions.data.length}
             </Text>
           </Paper>
-          <Paper withBorder radius="xl" p="md">
+          <Paper withBorder radius="lg" p="md">
             <Text size="xs" c="dimmed">
               Total records
             </Text>
@@ -211,7 +221,7 @@ const LogsPage = () => {
           </Paper>
         </SimpleGrid>
 
-        <Paper withBorder radius="1.5rem" p="md">
+        <Paper withBorder radius="lg" p="md">
           <Group justify="space-between" align="end" wrap="wrap">
             <Box>
               <Text size="xs" fw={700} tt="uppercase" c="dimmed">

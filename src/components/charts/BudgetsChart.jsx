@@ -6,7 +6,7 @@ function formatMoney(value) {
   return `$${Number(value || 0).toFixed(2)}`;
 }
 
-function BudgetInsightsCard({ summary }) {
+function BudgetInsightsCard({ summary, periodLabel }) {
   const totalLimit = Number(summary?.totalLimit || 0);
   const totalSpent = Number(
     summary?.totalSpentBudgeted ?? summary?.totalSpent ?? 0,
@@ -57,7 +57,7 @@ function BudgetInsightsCard({ summary }) {
       eyebrow="Monthly budgets"
       accent="lime"
       action={totalLimit > 0 ? `${Math.round((totalSpent / totalLimit) * 100)}% used` : "No limit"}
-      description="Track how much of your planned budget has been spent, what is left, and whether this month has started to run hot."
+      description={`Track how much of your planned budget has been spent, what is left, and whether ${periodLabel || "the selected period"} has started to run hot.`}
     >
       <Stack gap="lg" h="100%">
         <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
@@ -119,7 +119,7 @@ function BudgetInsightsCard({ summary }) {
             </>
           ) : (
             <Text size="sm" c="dimmed">
-              No budget limits set for this month.
+              No budget limits set for {periodLabel || "the selected period"}.
             </Text>
           )}
         </Stack>

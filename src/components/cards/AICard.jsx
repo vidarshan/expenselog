@@ -24,6 +24,7 @@ import {
   IoSparklesOutline,
   IoTrendingUpOutline,
 } from "react-icons/io5";
+import { ACCENT_TONES } from "../../utils/accents";
 
 const sevColor = (severity) =>
   severity === "high" ? "red" : severity === "medium" ? "yellow" : "green";
@@ -46,7 +47,7 @@ function SectionBlock({ icon, title, children, iconStyles }) {
 
 function InfoCard({ title, children, paperStyle }) {
   return (
-    <Paper p="sm" radius="md" withBorder style={paperStyle}>
+    <Paper p="sm" radius="lg" withBorder style={paperStyle}>
       <Stack gap={6}>
         <Text fw={700} size="sm">
           {title}
@@ -58,7 +59,7 @@ function InfoCard({ title, children, paperStyle }) {
 }
 
 export function AIInsightsCard({ title = "AI Insights", content, loading }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   const behavioralInsights = content?.behavioral_insights || [];
   const rootCauseHypotheses = content?.root_cause_hypotheses || [];
@@ -73,19 +74,6 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
     riskFlags.length +
     (forecast ? 1 : 0) +
     (nextBestMove ? 1 : 0);
-
-  const cardStyle = {
-    background: `
-      radial-gradient(circle at top left, rgba(255,105,180,0.18), transparent 28%),
-      radial-gradient(circle at top right, rgba(255,159,67,0.16), transparent 26%),
-      linear-gradient(135deg, rgba(255,255,255,0.09) 0%, rgba(255,192,203,0.07) 45%, rgba(255,165,0,0.08) 100%)
-    `,
-    border: "1px solid rgba(255,160,140,0.2)",
-    boxShadow:
-      "0 0 0 1px rgba(255,255,255,0.03) inset, 0 12px 36px rgba(0,0,0,0.14)",
-    backdropFilter: "blur(12px)",
-    overflow: "hidden",
-  };
 
   const innerPaperStyle = {
     background: "rgba(255,255,255,0.06)",
@@ -130,11 +118,16 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
       border: "1px solid rgba(255,160,140,0.14)",
     },
   };
-
-  console.log(riskFlags);
-
   return (
-    <Card radius="1.5rem" withBorder p="lg" style={cardStyle}>
+    <Paper
+      h="100%"
+      withBorder
+      radius="1.5rem"
+      p="md"
+      style={{
+        background: `linear-gradient(180deg, ${ACCENT_TONES["pink"] || ACCENT_TONES.gray}, rgba(255, 255, 255, 0.02) 42%, rgba(255, 255, 255, 0.01))`,
+      }}
+    >
       <Stack gap="lg">
         <Group justify="space-between" align="flex-start" wrap="nowrap">
           <Group gap="sm" wrap="nowrap">
@@ -332,7 +325,7 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
                       <Paper
                         key={index}
                         p="sm"
-                        radius="md"
+                        radius="lg"
                         withBorder
                         style={innerPaperStyle}
                       >
@@ -407,6 +400,6 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
           </Collapse>
         )}
       </Stack>
-    </Card>
+    </Paper>
   );
 }

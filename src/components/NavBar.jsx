@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   Divider,
+  Flex,
   Group,
   NavLink,
   Paper,
@@ -36,38 +37,48 @@ import AddRecord from "./popups/AddRecord";
 import SidebarBalanceCard from "./cards/SidebarBalanceCard";
 import Profile from "./popups/Profile";
 import Loading from "./Loading";
-import { FiSidebar } from "react-icons/fi";
+import {
+  FiCheckSquare,
+  FiGrid,
+  FiHome,
+  FiInbox,
+  FiList,
+  FiMoon,
+  FiSidebar,
+  FiSliders,
+  FiSun,
+} from "react-icons/fi";
 
 const NAV_ITEMS = [
   {
     label: "Dashboard",
     description: "Overview and recent activity",
     path: "/dashboard",
-    icon: <IoHomeOutline size={18} />,
+    icon: <FiHome size={18} />,
   },
   {
     label: "Logs",
     description: "Track and edit entries",
     path: "/logs",
-    icon: <IoListOutline size={18} />,
+    icon: <FiList size={18} />,
   },
   {
     label: "Budgets",
     description: "Monthly limits and progress",
     path: "/budgets",
-    icon: <IoCheckboxOutline size={18} />,
+    icon: <FiSliders size={18} />,
   },
   {
     label: "Accounts",
     description: "Balances and account details",
     path: "/accounts",
-    icon: <IoCardOutline size={18} />,
+    icon: <FiInbox size={18} />,
   },
   {
     label: "Categories",
     description: "Organize spending",
     path: "/categories",
-    icon: <IoCheckboxOutline size={18} />,
+    icon: <FiGrid size={18} />,
   },
 ];
 
@@ -164,7 +175,7 @@ const NavBar = ({ opened, close, expanded, isDesktop, onToggleExpand }) => {
           <ActionIcon
             size={44}
             radius="lg"
-            variant={pathname === item.path ? "light" : "white"}
+            variant={pathname === item.path ? "light" : "transparent"}
             color={pathname === item.path ? "lime" : "gray"}
             onClick={() => goTo(item.path)}
           >
@@ -255,16 +266,14 @@ const NavBar = ({ opened, close, expanded, isDesktop, onToggleExpand }) => {
             </Stack>
           ) : (
             <Group>
-              <Stack gap={6}>
-                <Group justify="space-between" align="flex-start" wrap="nowrap">
-                  <Logo
-                    titleSize={4}
-                    logoSize={22}
-                    withTitle
-                    onClick={() => goTo("/")}
-                  />
-                </Group>
-              </Stack>
+              <Flex w="100%" justify="center">
+                <Logo
+                  titleSize={4}
+                  logoSize={22}
+                  withTitle
+                  onClick={() => goTo("/")}
+                />
+              </Flex>
             </Group>
           )}
 
@@ -357,11 +366,7 @@ const NavBar = ({ opened, close, expanded, isDesktop, onToggleExpand }) => {
                       setColorScheme(colorScheme === "dark" ? "light" : "dark")
                     }
                   >
-                    {colorScheme === "light" ? (
-                      <IoCloudyNightOutline />
-                    ) : (
-                      <IoPartlySunnyOutline />
-                    )}
+                    {colorScheme === "light" ? <FiMoon /> : <FiSun />}
                   </ActionIcon>
                 </Tooltip>
               </Group>

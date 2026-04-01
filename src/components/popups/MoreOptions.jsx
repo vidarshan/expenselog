@@ -16,7 +16,7 @@ const MoreOptions = ({ options }) => {
     >
       <Popover.Target>
         <ActionIcon
-          variant="filled"
+          variant="transparent"
           color="gray"
           onClick={(e) => {
             e.stopPropagation();

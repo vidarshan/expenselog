@@ -85,8 +85,9 @@ const HomePage = () => {
 
             <Text fw={500} size="lg" c="dimmed" maw={620} lh={1.7}>
               ExpenseLog helps you log transactions, review account balances,
-              watch spending trends, and get useful signals from your data
-              without turning the app into a chore.
+              watch spending trends, download polished monthly or yearly
+              reports, and get useful signals from your data without turning the
+              app into a chore.
             </Text>
 
             <Group>
@@ -126,8 +127,8 @@ const HomePage = () => {
                   label: "Monthly summaries and trends",
                 },
                 {
-                  value: "Actionable AI",
-                  label: "Highlights worth paying attention to",
+                  value: "Downloadable reports",
+                  label: "Export monthly or yearly PDF-ready summaries",
                 },
               ].map((item) => (
                 <Paper key={item.value} withBorder radius="lg" p="md">
@@ -360,7 +361,7 @@ const HomePage = () => {
             icon={<IoTrendingUpOutline size={20} />}
             color="pink"
             title="Monthly & Yearly Reports"
-            desc="Review summaries across time and see how your spending and income shift month to month."
+            desc="Generate branded monthly or yearly reports with charts, budgets, activity, and transaction history ready for export."
           />
         </Grid.Col>
         <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
@@ -412,7 +413,10 @@ const HomePage = () => {
               ["Dashboard", "Preview monthly totals, trends, and cards."],
               ["Logs", "Review recent entries and transaction history."],
               ["Budgets", "Watch category limits and remaining balances."],
-              ["Insights", "See generated observations and suggestions."],
+              [
+                "Reports",
+                "Export monthly or yearly summaries as polished printable reports.",
+              ],
             ].map(([title, desc]) => (
               <Paper key={title} withBorder radius="lg" p="md">
                 <Stack h="100%">
@@ -549,7 +553,7 @@ const HomePage = () => {
                           ["Salary", "+$2,400"],
                           ["Transport", "-$19.00"],
                         ].map(([item, amount]) => (
-                          <Paper radius="md" withBorder>
+                          <Paper key={item} radius="md" withBorder>
                             <Group
                               key={item}
                               justify="space-between"
@@ -610,27 +614,39 @@ const HomePage = () => {
                       </Stack>
                     )}
 
-                    {title === "Insights" && (
+                    {title === "Reports" && (
                       <Stack gap="xs">
-                        <Paper>
-                          <Paper p="sm" withBorder radius="lg" mb="sm">
-                            <Text size="sm" fw={700}>
-                              Food spending is trending up.
-                            </Text>
-                            <Text size="xs" c="dimmed" mt={4}>
-                              You’ve spent more on takeout this week than usual.
-                            </Text>
-                          </Paper>
-
-                          <Paper p="sm" withBorder radius="lg">
-                            <Text size="xs" tt="uppercase" c="indigo" fw={700}>
-                              Suggestion
-                            </Text>
-                            <Text size="sm" fw={600}>
-                              Reduce dining out by 15% to stay within target.
-                            </Text>
-                          </Paper>
+                        <Paper p="sm" withBorder radius="lg">
+                          <Text size="xs" tt="uppercase" c="dimmed" fw={700}>
+                            Export preview
+                          </Text>
+                          <Text size="sm" fw={700} mt={4}>
+                            March 2026 Financial Report
+                          </Text>
+                          <Text size="xs" c="dimmed" mt={4}>
+                            Includes charts, budgets, spending activity, and
+                            transaction history.
+                          </Text>
                         </Paper>
+
+                        <Group grow>
+                          <Paper p="sm" withBorder radius="lg">
+                            <Text size="xs" c="dimmed">
+                              Type
+                            </Text>
+                            <Text size="sm" fw={700} mt={4}>
+                              Monthly / Yearly
+                            </Text>
+                          </Paper>
+                          <Paper p="sm" withBorder radius="lg">
+                            <Text size="xs" c="dimmed">
+                              Output
+                            </Text>
+                            <Text size="sm" fw={700} mt={4}>
+                              PDF-ready
+                            </Text>
+                          </Paper>
+                        </Group>
                       </Stack>
                     )}
                   </Paper>

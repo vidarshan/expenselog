@@ -192,15 +192,14 @@ const AddRecord = ({
         A record represents a financial transaction. Add income to track money
         you receive, or expenses to track money you spend.
       </Alert>
-      <form
-        onSubmit={form.onSubmit((values) => addOrEditTransaction(values))}
-      >
+      <form onSubmit={form.onSubmit((values) => addOrEditTransaction(values))}>
         <Tabs
           mt="xs"
           variant="pills"
           key={form.key("type")}
           {...form.getInputProps("type")}
           defaultValue="expense"
+          color="gray"
         >
           <Tabs.List grow>
             <Tabs.Tab value="expense" leftSection={<IoArrowDown />}>

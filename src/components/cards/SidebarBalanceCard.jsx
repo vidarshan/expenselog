@@ -1,4 +1,5 @@
 import { ActionIcon, Flex, Group, Paper, Text, Tooltip } from "@mantine/core";
+import { FiBox, FiCreditCard, FiDollarSign } from "react-icons/fi";
 import {
   IoBusinessOutline,
   IoCardOutline,
@@ -7,10 +8,10 @@ import {
 
 const SidebarBalanceCard = ({ title, balance, type }) => {
   function getTypeMeta(type) {
-    if (type === "cash") return { icon: <IoCashOutline size={16} /> };
-    if (type === "credit") return { icon: <IoCardOutline size={16} /> };
+    if (type === "cash") return { icon: <FiDollarSign size={16} /> };
+    if (type === "credit") return { icon: <FiCreditCard size={16} /> };
 
-    return { icon: <IoBusinessOutline size={16} /> };
+    return { icon: <FiBox size={16} /> };
   }
 
   const meta = getTypeMeta(type);
@@ -23,7 +24,7 @@ const SidebarBalanceCard = ({ title, balance, type }) => {
             color={
               type === "cash" ? "lime" : type === "credit" ? "grape" : "blue"
             }
-            variant="filled"
+            variant="light"
             radius="md"
           >
             {meta.icon}

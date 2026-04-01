@@ -77,7 +77,12 @@ const CategoriesPage = () => {
       </Table.Td>
       <Table.Td>
         <Group gap="xs" justify="flex-end" wrap="nowrap">
-          <Button size="xs" radius="xl" variant="light" onClick={() => openEdit(element)}>
+          <Button
+            size="xs"
+            radius="xl"
+            variant="light"
+            onClick={() => openEdit(element)}
+          >
             Edit
           </Button>
           <Button
@@ -120,7 +125,7 @@ const CategoriesPage = () => {
               "linear-gradient(160deg, rgba(96, 165, 250, 0.12), rgba(255, 255, 255, 0.02) 42%, rgba(255, 255, 255, 0.01))",
           }}
         >
-          <Group justify="space-between" align="end">
+          <Group justify="space-between" align="center">
             <Box>
               <Text size="xs" fw={700} tt="uppercase" c="dimmed">
                 Transaction organization
@@ -130,14 +135,19 @@ const CategoriesPage = () => {
                 Manage the labels and colors that keep your logs readable.
               </Text>
             </Box>
-            <Button leftSection={<IoAddOutline />} radius="xl" size="md" onClick={openCreate}>
+            <Button
+              leftSection={<IoAddOutline />}
+              radius="xl"
+              size="md"
+              onClick={openCreate}
+            >
               Create Category
             </Button>
           </Group>
         </Paper>
 
         <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
-          <Paper withBorder radius="xl" p="md">
+          <Paper withBorder radius="lg" p="md">
             <Text size="xs" c="dimmed">
               Total categories
             </Text>
@@ -145,7 +155,7 @@ const CategoriesPage = () => {
               {categories.length}
             </Text>
           </Paper>
-          <Paper withBorder radius="xl" p="md">
+          <Paper withBorder radius="lg" p="md">
             <Text size="xs" c="dimmed">
               Color-coded
             </Text>
@@ -153,7 +163,7 @@ const CategoriesPage = () => {
               Yes
             </Text>
           </Paper>
-          <Paper withBorder radius="xl" p="md">
+          <Paper withBorder radius="lg" p="md">
             <Text size="xs" c="dimmed">
               Last updated
             </Text>
@@ -175,7 +185,8 @@ const CategoriesPage = () => {
                 <Box>
                   <Text fw={700}>Category Library</Text>
                   <Text size="sm" c="dimmed">
-                    Edit names, keep colors consistent, and remove categories you no longer use.
+                    Edit names, keep colors consistent, and remove categories
+                    you no longer use.
                   </Text>
                 </Box>
               </Group>
