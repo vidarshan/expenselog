@@ -47,6 +47,7 @@ import {
   FiSidebar,
   FiSliders,
   FiSun,
+  FiX,
 } from "react-icons/fi";
 
 const NAV_ITEMS = [
@@ -151,6 +152,7 @@ const NavBar = ({ opened, close, expanded, isDesktop, onToggleExpand }) => {
   };
 
   const compactDesktop = isDesktop && !expanded;
+  const isMobile = !isDesktop;
 
   const renderExpandToggle = () =>
     isDesktop ? (
@@ -255,6 +257,26 @@ const NavBar = ({ opened, close, expanded, isDesktop, onToggleExpand }) => {
             paddingRight: compactDesktop ? 0 : 4,
           }}
         >
+          {isMobile ? (
+            <Group justify="space-between" align="center">
+              <Logo
+                titleSize={4}
+                logoSize={22}
+                withTitle
+                onClick={() => goTo("/")}
+              />
+              <ActionIcon
+                size="lg"
+                variant="subtle"
+                color="gray"
+                aria-label="Close navigation"
+                onClick={close}
+              >
+                <FiX />
+              </ActionIcon>
+            </Group>
+          ) : null}
+
           {compactDesktop ? (
             <Stack align="center" gap="xs">
               <Logo
@@ -313,7 +335,7 @@ const NavBar = ({ opened, close, expanded, isDesktop, onToggleExpand }) => {
                 </Paper>
               )}
 
-              {compactDesktop ? null : (
+              {compactDesktop || isMobile ? null : (
                 <Paper withBorder radius="lg" p="sm">
                   <Stack gap="xs">
                     <Group justify="space-between">
@@ -347,6 +369,24 @@ const NavBar = ({ opened, close, expanded, isDesktop, onToggleExpand }) => {
                   </Stack>
                 </Paper>
               )}
+
+              {isMobile ? (
+                <Paper withBorder radius="lg" p="sm">
+                  <Group justify="space-between" wrap="nowrap">
+                    <Box>
+                      <Text size="xs" fw={700} c="dimmed">
+                        ACCOUNTS
+                      </Text>
+                      <Text size="sm">
+                        {accounts.length > 0
+                          ? `${accounts.length} account${accounts.length === 1 ? "" : "s"} available`
+                          : "No accounts yet"}
+                      </Text>
+                    </Box>
+                    <Badge variant="light">{accounts.length}</Badge>
+                  </Group>
+                </Paper>
+              ) : null}
 
               <Divider />
 
@@ -386,7 +426,7 @@ const NavBar = ({ opened, close, expanded, isDesktop, onToggleExpand }) => {
           ) : (
             <Tooltip
               label="Manage profile"
-              position="right"
+              position={compactDesktop ? "right" : "top"}
               withArrow
               disabled={!compactDesktop}
             >

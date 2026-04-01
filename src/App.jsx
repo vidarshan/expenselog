@@ -47,7 +47,7 @@ function App() {
         transitionDuration={220}
         transitionTimingFunction="ease"
         navbar={{
-          width: navbarExpanded ? 280 : 88,
+          width: isDesktop ? (navbarExpanded ? 280 : 88) : 312,
           breakpoint: "sm",
           collapsed: { mobile: !opened, desktop: false },
         }}
