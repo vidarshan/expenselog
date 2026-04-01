@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import DashboardPage from "./pages/DashboardPage";
 import HomePage from "./pages/HomePage";
