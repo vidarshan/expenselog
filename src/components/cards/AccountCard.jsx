@@ -1,6 +1,5 @@
 import {
   Badge,
-  Button,
   Card,
   Flex,
   Group,
@@ -12,9 +11,7 @@ import {
   IoBusinessOutline,
   IoCardOutline,
   IoCashOutline,
-  IoPencilOutline,
 } from "react-icons/io5";
-import MoreOptions from "../popups/MoreOptions";
 
 function money(value) {
   return Number(value || 0).toLocaleString(undefined, {
@@ -47,7 +44,7 @@ function getTypeMeta(type) {
   };
 }
 
-const AccountCard = ({ account, onEdit, onSelect }) => {
+const AccountCard = ({ account, onSelect }) => {
   const meta = getTypeMeta(account?.type);
   const isCredit = account?.type === "credit";
 
@@ -61,7 +58,7 @@ const AccountCard = ({ account, onEdit, onSelect }) => {
     >
       <Group justify="space-between" align="flex-start">
         <Group align="flex-start">
-          <ThemeIcon color={meta.color} variant="filled" size="lg" radius="xl">
+          <ThemeIcon color={meta.color} variant="light" size="lg" radius="md">
             {meta.icon}
           </ThemeIcon>
 
@@ -93,22 +90,6 @@ const AccountCard = ({ account, onEdit, onSelect }) => {
             </Text>
             <Text fw={700}>${money(account?.currentBalance)}</Text>
           </Stack>
-
-          <MoreOptions
-            options={({ close }) => (
-              <Button
-                variant="filled"
-                leftSection={<IoPencilOutline />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  close();
-                  onEdit?.();
-                }}
-              >
-                Edit Account
-              </Button>
-            )}
-          />
         </Flex>
       </Group>
     </Card>

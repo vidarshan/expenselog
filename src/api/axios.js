@@ -25,7 +25,7 @@ export const setupInterceptors = (dispatch) => {
       if (status === 401) {
         const path = window.location.pathname;
         const isAuthRoute =
-          path.startsWith("/login") || path.startsWith("/register");
+          path.startsWith("/login") || path.startsWith("/signup");
 
         dispatch(logout());
 

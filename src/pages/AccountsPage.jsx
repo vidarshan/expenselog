@@ -3,6 +3,7 @@ import {
   Button,
   Container,
   Group,
+  Paper,
   SimpleGrid,
   Stack,
   Text,
@@ -49,7 +50,7 @@ const AccountsPage = () => {
   };
 
   return (
-    <Container size="lg" py="md">
+    <Container size="xl" py="md">
       <Helmet>
         <title>Accounts | ExpenseLog</title>
       </Helmet>
@@ -63,18 +64,36 @@ const AccountsPage = () => {
       />
 
       <Stack gap="md">
-        <Group justify="space-between" align="center">
-          <Box>
-            <Title order={2}>Accounts</Title>
-            <Text c="dimmed" size="sm">
-              Bank, Credit and Cash
-            </Text>
-          </Box>
+        <Paper
+          withBorder
+          radius="1.75rem"
+          p="lg"
+          style={{
+            background:
+              "linear-gradient(160deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02) 42%, rgba(255, 255, 255, 0.01))",
+          }}
+        >
+          <Group justify="space-between" align="center">
+            <Box>
+              <Text size="xs" fw={700} tt="uppercase" c="dimmed">
+                Account management
+              </Text>
+              <Title order={2}>Accounts</Title>
+              <Text c="dimmed" size="sm" mt={4}>
+                Manage your bank, cash, and credit accounts in one place.
+              </Text>
+            </Box>
 
-          <Button leftSection={<IoAddOutline />} onClick={openCreate}>
-            Create Account
-          </Button>
-        </Group>
+            <Button
+              leftSection={<IoAddOutline />}
+              radius="xl"
+              size="md"
+              onClick={openCreate}
+            >
+              Create Account
+            </Button>
+          </Group>
+        </Paper>
 
         {loading ? (
           <Loading title="Loading accounts..." />

@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { DatePickerInput, TimePicker } from "@mantine/dates";
 import { isInRange, isNotEmpty, useForm } from "@mantine/form";
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   IoAppsOutline,
   IoArrowDown,
@@ -20,7 +20,6 @@ import {
   IoCalendarOutline,
   IoCardOutline,
   IoCashOutline,
-  IoInformationCircle,
   IoTextOutline,
   IoTimeOutline,
 } from "react-icons/io5";
@@ -44,6 +43,11 @@ const AddRecord = ({
   const dispatch = useDispatch();
   const { categories } = useSelector((state) => state.categories);
   const { currentYear, currentMonth } = useSelector((state) => state.app);
+  const { accounts } = useSelector((state) => state.accounts);
+  const transactionsPagination = useSelector(
+    (state) => state.transactions.transactions.pagination,
+  );
+  const [saving, setSaving] = useState(false);
 
   function ymdToLocalDate(value) {
     if (!value) return null;
@@ -64,19 +68,21 @@ const AddRecord = ({
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const { accounts } = useSelector((state) => state.accounts);
+
+  const getDefaultValues = () => ({
+    type: "expense",
+    amount: 0,
+    name: "",
+    category: "",
+    date: today,
+    time: getCurrentTime(),
+    notes: "",
+    accountId: "",
+  });
+
   const form = useForm({
     mode: "controlled",
-    initialValues: {
-      type: "expense",
-      amount: 0,
-      name: "",
-      category: "",
-      date: today,
-      time: getCurrentTime(),
-      notes: "",
-      accountId: "",
-    },
+    initialValues: getDefaultValues(),
     validate: {
       name: isNotEmpty("Name cannot be empty"),
       amount: isInRange({ min: 1 }, "Enter a value more than 0"),
@@ -89,44 +95,58 @@ const AddRecord = ({
     },
   });
 
-  const addOrEditTransaction = async (_type, values) => {
-    const payload = {
-      name: values.name,
-      amount: Number(values.amount) || 0,
-      type: values.type,
-      accountId: values.accountId,
-      categoryId: values.type === "expense" ? values.category : undefined,
-      date: values.date,
-      notes: values.notes,
-      time: values.time,
-    };
+  const addOrEditTransaction = async (values) => {
+    try {
+      setSaving(true);
 
-    if (mode === "create") {
-      await dispatch(createTransaction(payload)).unwrap();
-    } else {
-      await dispatch(
-        updateTransaction({ id: transaction._id, patch: payload }),
-      ).unwrap();
+      const payload = {
+        name: values.name,
+        amount: Number(values.amount) || 0,
+        type: values.type,
+        accountId: values.accountId,
+        categoryId: values.type === "expense" ? values.category : undefined,
+        date: values.date,
+        notes: values.notes,
+        time: values.time,
+      };
+
+      if (mode === "create") {
+        await dispatch(createTransaction(payload)).unwrap();
+      } else {
+        await dispatch(
+          updateTransaction({ id: transaction._id, patch: payload }),
+        ).unwrap();
+      }
+
+      await Promise.all([
+        dispatch(
+          getTransactions({
+            year: currentYear,
+            month: currentMonth,
+            page: transactionsPagination?.page || 1,
+            limit: transactionsPagination?.limit || 20,
+          }),
+        ),
+        dispatch(getDashboard({ year: currentYear, month: currentMonth })),
+        dispatch(getAccounts()),
+        dispatch(
+          getBudgets({
+            year: currentYear,
+            month: currentMonth,
+          }),
+        ),
+      ]);
+
+      form.reset();
+      setExpenseOpened(false);
+    } finally {
+      setSaving(false);
     }
+  };
 
-    await dispatch(
-      getTransactions({
-        year: currentYear,
-        month: currentMonth,
-        page: 1,
-        limit: 20,
-      }),
-    );
-    await dispatch(getDashboard({ year: currentYear, month: currentMonth }));
-    await dispatch(getAccounts());
-    dispatch(
-      getBudgets({
-        year: currentYear,
-        month: currentMonth,
-      }),
-    );
-
-    form.reset();
+  const closeRecordModal = () => {
+    form.setValues(getDefaultValues());
+    form.clearErrors();
     setExpenseOpened(false);
   };
 
@@ -145,27 +165,25 @@ const AddRecord = ({
         accountId: transaction.accountId ?? "",
       });
     } else {
-      form.setValues({
-        type: "expense",
-        amount: 0,
-        name: "",
-        category: "",
-        date: today,
-        time: getCurrentTime(),
-        notes: "",
-        accountId: "",
-      });
+      form.setValues(getDefaultValues());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expenseOpened, mode, transaction]);
 
   useEffect(() => {
-    dispatch(getCategories());
-  }, [dispatch]);
+    if (!expenseOpened) return;
+    if (!categories.length) {
+      dispatch(getCategories());
+    }
+    if (!accounts.length) {
+      dispatch(getAccounts());
+    }
+  }, [accounts.length, categories.length, dispatch, expenseOpened]);
+
   return (
     <Modal
       opened={expenseOpened}
-      onClose={() => setExpenseOpened(false)}
+      onClose={closeRecordModal}
       title={mode === "edit" ? "Edit Record" : "Add Record"}
       centered
       closeOnClickOutside={false}
@@ -174,17 +192,14 @@ const AddRecord = ({
         A record represents a financial transaction. Add income to track money
         you receive, or expenses to track money you spend.
       </Alert>
-      <form
-        onSubmit={form.onSubmit((values) =>
-          addOrEditTransaction("add", values),
-        )}
-      >
+      <form onSubmit={form.onSubmit((values) => addOrEditTransaction(values))}>
         <Tabs
           mt="xs"
           variant="pills"
           key={form.key("type")}
           {...form.getInputProps("type")}
           defaultValue="expense"
+          color="gray"
         >
           <Tabs.List grow>
             <Tabs.Tab value="expense" leftSection={<IoArrowDown />}>
@@ -316,13 +331,16 @@ const AddRecord = ({
         </Tabs>
         <Flex justify="flex-end" mt="md">
           <Button
-            onClick={() => setExpenseOpened(false)}
+            onClick={closeRecordModal}
             variant="light"
             mr="xs"
+            type="button"
           >
             Cancel
           </Button>
-          <Button type="submit">{mode === "edit" ? "Save" : "Create"}</Button>
+          <Button type="submit" loading={saving}>
+            {mode === "edit" ? "Save" : "Create"}
+          </Button>
         </Flex>
       </form>
     </Modal>

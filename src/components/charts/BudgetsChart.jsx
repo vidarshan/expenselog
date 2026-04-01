@@ -1,34 +1,12 @@
-import { Card, Group, Progress, Stack, Text, Tooltip } from "@mantine/core";
-
-function groupTopItems(items, key, max = 4) {
-  const sorted = [...items]
-    .filter((item) => Number(item[key] || 0) > 0)
-    .sort((a, b) => Number(b[key] || 0) - Number(a[key] || 0));
-
-  const top = sorted.slice(0, max);
-  const rest = sorted.slice(max);
-
-  const otherValue = rest.reduce(
-    (sum, item) => sum + Number(item[key] || 0),
-    0,
-  );
-
-  if (otherValue > 0) {
-    top.push({
-      categoryId: "other",
-      categoryName: "Other",
-      [key]: otherValue,
-    });
-  }
-
-  return top;
-}
+import { Group, Paper, Progress, SimpleGrid, Stack, Text, Tooltip } from "@mantine/core";
+import { IoWalletOutline } from "react-icons/io5";
+import ChartPanel from "./ChartPanel";
 
 function formatMoney(value) {
   return `$${Number(value || 0).toFixed(2)}`;
 }
 
-function BudgetInsightsCard({ summary, items }) {
+function BudgetInsightsCard({ summary, periodLabel }) {
   const totalLimit = Number(summary?.totalLimit || 0);
   const totalSpent = Number(
     summary?.totalSpentBudgeted ?? summary?.totalSpent ?? 0,
@@ -37,7 +15,6 @@ function BudgetInsightsCard({ summary, items }) {
   const spentWithinBudget = Math.min(totalSpent, totalLimit);
   const remaining = Math.max(totalLimit - totalSpent, 0);
   const overspent = Math.max(totalSpent - totalLimit, 0);
-
   const usageBase = overspent > 0 ? totalLimit + overspent : totalLimit;
 
   const usageSections =
@@ -47,7 +24,7 @@ function BudgetInsightsCard({ summary, items }) {
             ? {
                 key: "spent",
                 label: "Spent",
-                tooltip: `Spent – ${formatMoney(spentWithinBudget)}`,
+                tooltip: `Spent - ${formatMoney(spentWithinBudget)}`,
                 value: (spentWithinBudget / usageBase) * 100,
                 color: "lime",
               }
@@ -56,7 +33,7 @@ function BudgetInsightsCard({ summary, items }) {
             ? {
                 key: "remaining",
                 label: "Left",
-                tooltip: `Remaining – ${formatMoney(remaining)}`,
+                tooltip: `Remaining - ${formatMoney(remaining)}`,
                 value: (remaining / usageBase) * 100,
                 color: "gray",
               }
@@ -65,7 +42,7 @@ function BudgetInsightsCard({ summary, items }) {
             ? {
                 key: "overspent",
                 label: "Over",
-                tooltip: `Overspent – ${formatMoney(overspent)}`,
+                tooltip: `Overspent - ${formatMoney(overspent)}`,
                 value: (overspent / usageBase) * 100,
                 color: "red",
               }
@@ -73,33 +50,40 @@ function BudgetInsightsCard({ summary, items }) {
         ].filter(Boolean)
       : [];
 
-  const topSpent = groupTopItems(items || [], "spent", 4);
-  const topLimit = groupTopItems(items || [], "limit", 4);
-
-  const totalTopSpent = topSpent.reduce(
-    (sum, item) => sum + Number(item.spent || 0),
-    0,
-  );
-  const totalTopLimit = topLimit.reduce(
-    (sum, item) => sum + Number(item.limit || 0),
-    0,
-  );
-
   return (
-    <Card withBorder radius="lg" p="md">
-      <Stack gap="lg">
-        <Stack gap="xs">
-          <Text fw={700}>Budget Insights</Text>
-          <Text size="sm" c="dimmed">
-            See your overall budget usage and which categories make up the most
-            spending and budget allocation this month.
-          </Text>
-        </Stack>
+    <ChartPanel
+      icon={<IoWalletOutline size={20} />}
+      title="Budget Usage"
+      eyebrow="Monthly budgets"
+      accent="lime"
+      action={totalLimit > 0 ? `${Math.round((totalSpent / totalLimit) * 100)}% used` : "No limit"}
+      description={`Track how much of your planned budget has been spent, what is left, and whether ${periodLabel || "the selected period"} has started to run hot.`}
+    >
+      <Stack gap="lg" h="100%">
+        <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
+          {[
+            { label: "Planned", value: formatMoney(totalLimit) },
+            { label: "Spent", value: formatMoney(totalSpent) },
+            {
+              label: overspent > 0 ? "Over budget" : "Remaining",
+              value: formatMoney(overspent > 0 ? overspent : remaining),
+            },
+          ].map((item) => (
+            <Paper key={item.label} withBorder radius="lg" p="sm">
+              <Text size="xs" c="dimmed">
+                {item.label}
+              </Text>
+              <Text fw={700} mt={4}>
+                {item.value}
+              </Text>
+            </Paper>
+          ))}
+        </SimpleGrid>
 
         <Stack gap="xs">
           <Group justify="space-between">
             <Text fw={600} size="sm">
-              Overall Budget Usage
+              Overall budget usage
             </Text>
             <Text size="sm" c="dimmed">
               {formatMoney(totalSpent)} of {formatMoney(totalLimit)}
@@ -108,7 +92,7 @@ function BudgetInsightsCard({ summary, items }) {
 
           {totalLimit > 0 ? (
             <>
-              <Progress.Root size={18} radius="xl">
+              <Progress.Root size={20} radius="xl">
                 {usageSections.map((section) => (
                   <Tooltip key={section.key} label={section.tooltip}>
                     <Progress.Section
@@ -121,28 +105,26 @@ function BudgetInsightsCard({ summary, items }) {
                 ))}
               </Progress.Root>
 
-              <Group justify="space-between">
+              <Group justify="space-between" mt={4}>
                 <Text size="sm" c="dimmed">
                   {overspent > 0
                     ? `You are over budget by ${formatMoney(overspent)}`
                     : `${formatMoney(remaining)} left in budget`}
                 </Text>
 
-                <Text size="sm" fw={600} c={overspent > 0 ? "red" : "dimmed"}>
-                  {totalLimit > 0
-                    ? `${Math.round((totalSpent / totalLimit) * 100)}% used`
-                    : "0% used"}
+                <Text size="sm" fw={700} c={overspent > 0 ? "red" : "lime"}>
+                  {overspent > 0 ? "Needs attention" : "On track"}
                 </Text>
               </Group>
             </>
           ) : (
             <Text size="sm" c="dimmed">
-              No budget limits set for this month.
+              No budget limits set for {periodLabel || "the selected period"}.
             </Text>
           )}
         </Stack>
       </Stack>
-    </Card>
+    </ChartPanel>
   );
 }
 

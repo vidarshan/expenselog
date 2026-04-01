@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { IoTrendingDown, IoTrendingUp } from "react-icons/io5";
 
-const OverviewCard = ({ summary }) => {
+const OverviewCard = ({ summary, periodLabel }) => {
   const { expenses, income, net, savingsRate } = summary;
   return (
     <Grid>
@@ -27,15 +27,15 @@ const OverviewCard = ({ summary }) => {
           <Stack spacing="xs">
             <Flex gap={10} align="center">
               <ThemeIcon
-                color={income ? "green" : "red"}
-                variant="filled"
+                color={income ? "lime" : "red"}
+                variant="light"
                 size="xl"
               >
                 {income > 0 ? <IoTrendingUp /> : <IoTrendingDown />}
               </ThemeIcon>
               <Flex direction="column">
                 <Text size="sm" c="dimmed">
-                  Income
+                  Income{periodLabel ? ` • ${periodLabel}` : ""}
                 </Text>
                 <Title order={3}>${income?.toFixed(2)}</Title>
               </Flex>
@@ -55,15 +55,15 @@ const OverviewCard = ({ summary }) => {
           <Stack spacing="xs">
             <Flex gap={10} align="center">
               <ThemeIcon
-                color={expenses ? "green" : "red"}
-                variant="filled"
+                color={expenses ? "lime" : "red"}
+                variant="light"
                 size="xl"
               >
                 {expenses > 0 ? <IoTrendingUp /> : <IoTrendingDown />}
               </ThemeIcon>
               <Flex direction="column">
                 <Text size="sm" c="dimmed">
-                  Expenses
+                  Expenses{periodLabel ? ` • ${periodLabel}` : ""}
                 </Text>
                 <Title order={3}>${expenses?.toFixed(2)}</Title>
               </Flex>
@@ -88,15 +88,15 @@ const OverviewCard = ({ summary }) => {
             <Stack spacing="xs">
               <Flex gap={10} align="center">
                 <ThemeIcon
-                  color={savingsRate > 0 ? "green" : "red"}
-                  variant="filled"
+                  color={savingsRate > 0 ? "lime" : "red"}
+                  variant="light"
                   size="xl"
                 >
                   {savingsRate > 0 ? <IoTrendingUp /> : <IoTrendingDown />}
                 </ThemeIcon>
                 <Flex direction="column">
                   <Text size="sm" c="dimmed">
-                    Savings Rate
+                    Savings Rate{periodLabel ? ` • ${periodLabel}` : ""}
                   </Text>
                   <Title order={3}>{savingsRate}%</Title>
                 </Flex>
@@ -122,15 +122,15 @@ const OverviewCard = ({ summary }) => {
             <Stack spacing="xs">
               <Flex align="center" gap={10}>
                 <ThemeIcon
-                  color={net > 0 ? "green" : "red"}
-                  variant="filled"
+                  color={net > 0 ? "lime" : "red"}
+                  variant="light"
                   size="xl"
                 >
                   {net > 0 ? <IoTrendingUp /> : <IoTrendingDown />}
                 </ThemeIcon>
                 <Flex direction="column">
                   <Text size="sm" c="dimmed">
-                    Net Gain
+                    Net Gain{periodLabel ? ` • ${periodLabel}` : ""}
                   </Text>
                   <Title order={3}>${net.toFixed(2)}</Title>
                 </Flex>

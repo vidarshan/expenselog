@@ -9,7 +9,6 @@ import "@mantine/notifications/styles.css";
 
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
-import { AuthProvider } from "./context/AuthContext.jsx";
 import { store } from "./store/index.js";
 import { Provider } from "react-redux";
 import { setupInterceptors } from "./api/axios.js";
@@ -20,9 +19,7 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
+        <App />
       </BrowserRouter>
     </Provider>
   </StrictMode>,
