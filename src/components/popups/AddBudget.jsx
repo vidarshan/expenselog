@@ -16,6 +16,7 @@ import {
   IoGridOutline,
 } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
+import { getCategories } from "../../store/slices/categorySlice";
 import { createBudget, getBudgets } from "../../store/slices/budgetsSlice";
 
 const MONTH_OPTIONS = [
@@ -96,6 +97,13 @@ const AddBudget = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, mode, budget, currentYear, currentMonth]);
+
+  useEffect(() => {
+    if (!opened) return;
+    if (!categories.length) {
+      dispatch(getCategories());
+    }
+  }, [categories.length, dispatch, opened]);
 
   async function handleSubmit(values) {
     const payload = {
