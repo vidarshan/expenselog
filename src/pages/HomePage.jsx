@@ -30,7 +30,6 @@ import {
   IoSparklesOutline,
   IoTrendingUpOutline,
 } from "react-icons/io5";
-import Feature from "../components/Feature";
 import Logo from "../components/Logo";
 import { NAVBAR_HEIGHT } from "../data/mockdata";
 import { useSelector } from "react-redux";
@@ -41,6 +40,56 @@ const HomePage = () => {
 
   const token = authUser?.token || null;
   const isAuthed = !!token;
+  const featureItems = [
+    {
+      icon: <IoCalendarOutline size={18} />,
+      color: "lime",
+      eyebrow: "Daily flow",
+      title: "Income & expense tracking",
+      desc: "Log income and spending in one place, then review the month without digging through cluttered screens.",
+      stat: "Fast entry",
+    },
+    {
+      icon: <IoAppsOutline size={18} />,
+      color: "orange",
+      eyebrow: "Structure",
+      title: "Category-based organization",
+      desc: "Keep transactions grouped in a way that makes patterns visible and reports easier to scan.",
+      stat: "Clear labels",
+    },
+    {
+      icon: <IoTrendingUpOutline size={18} />,
+      color: "pink",
+      eyebrow: "Reporting",
+      title: "Monthly & yearly reports",
+      desc: "Generate polished summaries with charts, budget context, and transaction history ready for export.",
+      stat: "Printable output",
+    },
+    {
+      icon: <IoBarChartOutline size={18} />,
+      color: "gray",
+      eyebrow: "Visuals",
+      title: "Interactive visualizations",
+      desc: "Use charts and comparisons to understand where money goes and how the period changed over time.",
+      stat: "Trend-aware",
+    },
+    {
+      icon: <IoCashOutline size={18} />,
+      color: "red",
+      eyebrow: "Accounts",
+      title: "Account-aware tracking",
+      desc: "See balances across cash, bank, and credit accounts while you continue logging activity.",
+      stat: "Balance visible",
+    },
+    {
+      icon: <IoSparklesOutline size={18} />,
+      color: "blue",
+      eyebrow: "Insights",
+      title: "AI-powered insights",
+      desc: "Spot unusual spending, budget pressure, and patterns that deserve another look before they snowball.",
+      stat: "Smart prompts",
+    },
+  ];
   const GRAPH_ITEMS = [
     { value: 38, color: "#3b5bdb" },
     { value: 72, color: "#e8590c" },
@@ -339,56 +388,68 @@ const HomePage = () => {
         </Text>
       </Stack>
 
-      <Grid gutter={20}>
-        <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
-          <Feature
-            icon={<IoCalendarOutline />}
-            color="green"
-            title="Income & Expense Tracking"
-            desc="Log all your income sources and expenses in one place. See your financial flow clearly."
-          />
-        </Grid.Col>
-        <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
-          <Feature
-            icon={<IoAppsOutline size={20} />}
-            color="orange"
-            title="Category-Based Organization"
-            desc="Group transactions into categories so patterns are easier to spot and review."
-          />
-        </Grid.Col>
-        <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
-          <Feature
-            icon={<IoTrendingUpOutline size={20} />}
-            color="pink"
-            title="Monthly & Yearly Reports"
-            desc="Generate branded monthly or yearly reports with charts, budgets, activity, and transaction history ready for export."
-          />
-        </Grid.Col>
-        <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
-          <Feature
-            icon={<IoBarChartOutline size={20} />}
-            color="gray"
-            title="Interactive Visualizations"
-            desc="Charts and comparisons make spending distribution and changes easier to understand."
-          />
-        </Grid.Col>
-        <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
-          <Feature
-            icon={<IoCashOutline size={20} />}
-            color="red"
-            title="Account-Aware Tracking"
-            desc="Keep balances visible across cash, bank, and credit accounts while you log activity."
-          />
-        </Grid.Col>
-        <Grid.Col span={{ xs: 12, sm: 6, md: 4 }}>
-          <Feature
-            icon={<IoSparklesOutline size={20} />}
-            color="blue"
-            title="AI-Powered Insights"
-            desc="Get prompts about overspending, budget pressure, and unusual patterns worth checking."
-          />
-        </Grid.Col>
-      </Grid>
+      <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
+        {featureItems.map((item) => (
+          <Paper
+            key={item.title}
+            withBorder
+            radius="xl"
+            p="lg"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02) 42%, rgba(255,255,255,0.01))",
+            }}
+          >
+            <Stack h="100%" gap="lg">
+              <Group justify="space-between" align="flex-start" wrap="nowrap">
+                <Group gap="sm" align="flex-start" wrap="nowrap">
+                  <ThemeIcon
+                    size={42}
+                    radius="xl"
+                    variant="light"
+                    color={item.color}
+                    mt={2}
+                  >
+                    {item.icon}
+                  </ThemeIcon>
+                  <Box>
+                    <Text size="xs" fw={700} tt="uppercase" c="dimmed">
+                      {item.eyebrow}
+                    </Text>
+                    <Title order={4} mt={4}>
+                      {item.title}
+                    </Title>
+                  </Box>
+                </Group>
+                <Badge variant="light" color={item.color} radius="xl">
+                  {item.stat}
+                </Badge>
+              </Group>
+
+              <Text c="dimmed" lh={1.7}>
+                {item.desc}
+              </Text>
+
+              <Paper
+                withBorder
+                radius="lg"
+                p="sm"
+                mt="auto"
+                style={{ background: "rgba(255,255,255,0.03)" }}
+              >
+                <Group justify="space-between" wrap="nowrap">
+                  <Text size="xs" fw={700} tt="uppercase" c="dimmed">
+                    Included
+                  </Text>
+                  <Text size="sm" fw={700}>
+                    Core workflow
+                  </Text>
+                </Group>
+              </Paper>
+            </Stack>
+          </Paper>
+        ))}
+      </SimpleGrid>
 
       <Divider my="xl" />
 

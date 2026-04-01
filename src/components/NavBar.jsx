@@ -246,7 +246,10 @@ const NavBar = ({ opened, close, expanded, isDesktop, onToggleExpand }) => {
       )}
 
       <Stack h="100%" justify="space-between" gap="md">
-        <Stack gap={compactDesktop ? "lg" : "md"}>
+        <Stack
+          gap={compactDesktop ? "lg" : "md"}
+          align={compactDesktop ? "center" : "stretch"}
+        >
           {isMobile ? (
             <Group justify="space-between" align="center">
               <Logo
