@@ -221,6 +221,9 @@ const DashboardPage = () => {
     periodMode === "monthly" ? insightLoading : false;
   const hasTransactions =
     (displayDashboard?.recentTransactions?.length || 0) > 0;
+  const hasAnyTransactionHistory = activePeriods.some(
+    (period) => (period?.months?.length || 0) > 0,
+  );
   const isCurrentMonthAndYear =
     Number(currentYear) === now.getFullYear() &&
     Number(currentMonth) === now.getMonth() + 1;
@@ -228,7 +231,9 @@ const DashboardPage = () => {
     periodMode === "monthly" &&
     setupReady &&
     isCurrentMonthAndYear &&
-    (accountsCount === 0 || categoriesCount === 0 || !hasTransactions);
+    (accountsCount === 0 ||
+      categoriesCount === 0 ||
+      !hasAnyTransactionHistory);
 
   useEffect(() => {
     let cancelled = false;

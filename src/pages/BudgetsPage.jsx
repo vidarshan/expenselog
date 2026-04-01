@@ -31,6 +31,7 @@ import { getBudgets } from "../store/slices/budgetsSlice";
 import AddBudget from "../components/popups/AddBudget";
 import Loading from "../components/Loading";
 import { Helmet } from "react-helmet";
+import { FiPlus } from "react-icons/fi";
 
 const MONTHS = [
   { value: "1", label: "Jan" },
@@ -365,7 +366,7 @@ export default function BudgetsPage() {
             </Box>
 
             <Button
-              leftSection={<IoAddOutline />}
+              leftSection={<FiPlus />}
               radius="xl"
               size="md"
               onClick={openCreate}

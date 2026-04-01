@@ -21,6 +21,7 @@ import AddCategory from "../components/popups/AddCategory";
 import moment from "moment";
 import Loading from "../components/Loading";
 import { Helmet } from "react-helmet";
+import { FiPlus } from "react-icons/fi";
 
 const CategoriesPage = () => {
   const dispatch = useDispatch();
@@ -136,7 +137,7 @@ const CategoriesPage = () => {
               </Text>
             </Box>
             <Button
-              leftSection={<IoAddOutline />}
+              leftSection={<FiPlus />}
               radius="xl"
               size="md"
               onClick={openCreate}

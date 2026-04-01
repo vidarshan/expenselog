@@ -44,6 +44,7 @@ import {
   FiInbox,
   FiList,
   FiMoon,
+  FiPlus,
   FiSidebar,
   FiSliders,
   FiSun,
@@ -245,18 +246,7 @@ const NavBar = ({ opened, close, expanded, isDesktop, onToggleExpand }) => {
       )}
 
       <Stack h="100%" justify="space-between" gap="md">
-        <Stack
-          className="sidebar-scroll"
-          gap={compactDesktop ? "lg" : "md"}
-          align={compactDesktop ? "center" : "stretch"}
-          style={{
-            flex: 1,
-            minHeight: 0,
-            overflowY: "auto",
-            overflowX: "hidden",
-            paddingRight: compactDesktop ? 0 : 4,
-          }}
-        >
+        <Stack gap={compactDesktop ? "lg" : "md"}>
           {isMobile ? (
             <Group justify="space-between" align="center">
               <Logo
@@ -300,31 +290,46 @@ const NavBar = ({ opened, close, expanded, isDesktop, onToggleExpand }) => {
           )}
 
           {isAuthed ? (
-            <>
-              {compactDesktop ? (
-                <Tooltip label="Create Log" position="right" withArrow>
-                  <ActionIcon
-                    size={48}
-                    radius="lg"
-                    variant="filled"
-                    color="lime"
-                    onClick={() => setRecordOpened(true)}
-                  >
-                    <IoAddOutline />
-                  </ActionIcon>
-                </Tooltip>
-              ) : (
-                <Button
-                  leftSection={<IoAddOutline />}
+            compactDesktop ? (
+              <Tooltip label="Create Log" position="right" withArrow>
+                <ActionIcon
+                  size={48}
+                  radius="lg"
+                  variant="filled"
+                  color="lime"
                   onClick={() => setRecordOpened(true)}
-                  fullWidth
-                  size="md"
-                  radius="xl"
                 >
-                  Create Log
-                </Button>
-              )}
+                  <FiPlus />
+                </ActionIcon>
+              </Tooltip>
+            ) : (
+              <Button
+                leftSection={<FiPlus />}
+                onClick={() => setRecordOpened(true)}
+                fullWidth
+                size="md"
+                radius="xl"
+              >
+                Create Log
+              </Button>
+            )
+          ) : null}
+        </Stack>
 
+        <Stack
+          className="sidebar-scroll"
+          gap={compactDesktop ? "lg" : "md"}
+          align={compactDesktop ? "center" : "stretch"}
+          style={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: "auto",
+            overflowX: "hidden",
+            paddingRight: compactDesktop ? 0 : 4,
+          }}
+        >
+          {isAuthed ? (
+            <>
               {compactDesktop ? (
                 <Stack gap="sm" align="center">
                   {NAV_ITEMS.map(renderNavItem)}

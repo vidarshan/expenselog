@@ -18,6 +18,7 @@ import EmptyContainer from "../components/EmptyContainer";
 import AccountCard from "../components/cards/AccountCard";
 import Loading from "../components/Loading";
 import { Helmet } from "react-helmet";
+import { FiPlus } from "react-icons/fi";
 
 const AccountsPage = () => {
   const dispatch = useDispatch();
@@ -85,7 +86,7 @@ const AccountsPage = () => {
             </Box>
 
             <Button
-              leftSection={<IoAddOutline />}
+              leftSection={<FiPlus />}
               radius="xl"
               size="md"
               onClick={openCreate}

@@ -2,7 +2,6 @@ import {
   Badge,
   Box,
   Button,
-  Card,
   Collapse,
   Divider,
   Group,
@@ -16,6 +15,7 @@ import {
 import { useState } from "react";
 import {
   IoAlertCircleOutline,
+  IoArrowForward,
   IoArrowDown,
   IoArrowUp,
   IoCheckmarkCircleOutline,
@@ -28,6 +28,9 @@ import { ACCENT_TONES } from "../../utils/accents";
 
 const sevColor = (severity) =>
   severity === "high" ? "red" : severity === "medium" ? "yellow" : "green";
+
+const pluralize = (count, singular, plural = `${singular}s`) =>
+  `${count} ${count === 1 ? singular : plural}`;
 
 function SectionBlock({ icon, title, children, iconStyles }) {
   return (
@@ -74,6 +77,43 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
     riskFlags.length +
     (forecast ? 1 : 0) +
     (nextBestMove ? 1 : 0);
+  const highestRisk = riskFlags.find((item) => item.severity === "high");
+  const mediumRisk = riskFlags.find((item) => item.severity === "medium");
+  const priorityRisk = highestRisk || mediumRisk || riskFlags[0];
+  const primarySummary = nextBestMove?.message
+    ? nextBestMove.message
+    : priorityRisk?.message
+      ? priorityRisk.message
+      : behavioralInsights[0]?.message ||
+        forecast?.message ||
+        "Add a few more transactions this period to unlock stronger insight quality.";
+  const statusTone = priorityRisk
+    ? priorityRisk.severity === "high"
+      ? { color: "red", label: "Needs attention" }
+      : { color: "yellow", label: "Watch closely" }
+    : insightCount > 0
+      ? { color: "green", label: "Stable pattern" }
+      : { color: "gray", label: "Still learning" };
+  const summaryStats = [
+    {
+      label: "What stood out",
+      value:
+        insightCount > 0
+          ? pluralize(behavioralInsights.length, "pattern")
+          : "No signals yet",
+    },
+    {
+      label: "Primary concern",
+      value:
+        riskFlags.length > 0
+          ? pluralize(riskFlags.length, "risk flag")
+          : "None detected",
+    },
+    {
+      label: "Action ready",
+      value: nextBestMove?.title || "Waiting for more data",
+    },
+  ];
 
   const innerPaperStyle = {
     background: "rgba(255,255,255,0.06)",
@@ -118,6 +158,13 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
       border: "1px solid rgba(255,160,140,0.14)",
     },
   };
+
+  const summaryPanelStyle = {
+    ...innerPaperStyle,
+    background:
+      "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)",
+  };
+
   return (
     <Paper
       h="100%"
@@ -145,7 +192,7 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
                 {title}
               </Text>
               <Text size="sm" c="dimmed">
-                Personalized financial signals and recommendations
+                A simpler read on what changed, why it matters, and what to do next
               </Text>
             </Box>
           </Group>
@@ -160,9 +207,60 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
             }
             styles={actionButtonStyles}
           >
-            {collapsed ? "Expand" : "Collapse"}
+            {collapsed ? "Show details" : "Hide details"}
           </Button>
         </Group>
+
+        <Paper p="md" radius="xl" withBorder style={summaryPanelStyle}>
+          <Stack gap="md">
+            <Group justify="space-between" align="flex-start" wrap="wrap">
+              <Box maw={560}>
+                <Group gap="xs" mb={6}>
+                  <Badge color={statusTone.color} variant="light">
+                    {statusTone.label}
+                  </Badge>
+                  <Text size="xs" c="dimmed">
+                    Start here
+                  </Text>
+                </Group>
+                <Text fw={800} size="lg" lh={1.3}>
+                  {nextBestMove?.title || priorityRisk?.title || "Main takeaway"}
+                </Text>
+                <Text size="sm" mt={6} c="dimmed">
+                  {primarySummary}
+                </Text>
+              </Box>
+
+              <Badge
+                variant="light"
+                size="lg"
+                radius="xl"
+                styles={accentBadgeStyles}
+              >
+                {insightCount} total signals
+              </Badge>
+            </Group>
+
+            <Group grow align="stretch">
+              {summaryStats.map((item) => (
+                <Paper
+                  key={item.label}
+                  p="sm"
+                  radius="lg"
+                  withBorder
+                  style={innerPaperStyle}
+                >
+                  <Text size="xs" c="dimmed">
+                    {item.label}
+                  </Text>
+                  <Text fw={700} size="sm" mt={6}>
+                    {item.value}
+                  </Text>
+                </Paper>
+              ))}
+            </Group>
+          </Stack>
+        </Paper>
 
         <Group grow>
           <Paper p="sm" radius="lg" withBorder style={innerPaperStyle}>
@@ -205,9 +303,29 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
             <Stack gap="lg">
               <Divider style={{ borderColor: "rgba(255,255,255,0.08)" }} />
 
+              {nextBestMove ? (
+                <SectionBlock
+                  icon={<IoRocketOutline />}
+                  title="Recommended next step"
+                  iconStyles={iconStyles}
+                >
+                  <InfoCard
+                    title={nextBestMove.title}
+                    paperStyle={innerPaperStyle}
+                  >
+                    <Text size="sm">{nextBestMove.message}</Text>
+                    {nextBestMove.first_step_today ? (
+                      <Badge variant="light" styles={accentBadgeStyles}>
+                        Today: {nextBestMove.first_step_today}
+                      </Badge>
+                    ) : null}
+                  </InfoCard>
+                </SectionBlock>
+              ) : null}
+
               <SectionBlock
                 icon={<IoSparklesOutline />}
-                title="What I noticed"
+                title="What changed"
                 iconStyles={iconStyles}
               >
                 {behavioralInsights.length ? (
@@ -236,7 +354,7 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
 
               <SectionBlock
                 icon={<IoSearchOutline />}
-                title="Possible root causes"
+                title="Why this may be happening"
                 iconStyles={iconStyles}
               >
                 {rootCauseHypotheses.length ? (
@@ -265,7 +383,7 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
 
               <SectionBlock
                 icon={<IoCheckmarkCircleOutline />}
-                title="Micro challenges"
+                title="Small experiment to try"
                 iconStyles={iconStyles}
               >
                 {microChallenges.length ? (
@@ -298,6 +416,15 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
                             </Badge>
                           ) : null}
 
+                          {item.first_step_today ? (
+                            <Group gap={4}>
+                              <IoArrowForward size={14} />
+                              <Text size="xs" c="dimmed">
+                                First step: {item.first_step_today}
+                              </Text>
+                            </Group>
+                          ) : null}
+
                           {item.why ? (
                             <Text size="xs" c="dimmed">
                               {item.why}
@@ -316,7 +443,7 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
 
               <SectionBlock
                 icon={<IoAlertCircleOutline />}
-                title="Risk signals"
+                title="What to watch"
                 iconStyles={iconStyles}
               >
                 {riskFlags.length ? (
@@ -363,7 +490,7 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
               {forecast ? (
                 <SectionBlock
                   icon={<IoTrendingUpOutline />}
-                  title="Forecast"
+                  title="What happens if the pattern continues"
                   iconStyles={iconStyles}
                 >
                   <InfoCard title={forecast.title} paperStyle={innerPaperStyle}>
@@ -377,25 +504,6 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
                 </SectionBlock>
               ) : null}
 
-              {nextBestMove ? (
-                <SectionBlock
-                  icon={<IoRocketOutline />}
-                  title="Next best move"
-                  iconStyles={iconStyles}
-                >
-                  <InfoCard
-                    title={nextBestMove.title}
-                    paperStyle={innerPaperStyle}
-                  >
-                    <Text size="sm">{nextBestMove.message}</Text>
-                    {nextBestMove.first_step_today ? (
-                      <Badge variant="light" styles={accentBadgeStyles}>
-                        Today: {nextBestMove.first_step_today}
-                      </Badge>
-                    ) : null}
-                  </InfoCard>
-                </SectionBlock>
-              ) : null}
             </Stack>
           </Collapse>
         )}
