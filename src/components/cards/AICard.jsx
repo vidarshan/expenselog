@@ -19,6 +19,7 @@ import {
   IoArrowDown,
   IoArrowUp,
   IoCheckmarkCircleOutline,
+  IoRefreshOutline,
   IoRocketOutline,
   IoSearchOutline,
   IoSparklesOutline,
@@ -61,7 +62,12 @@ function InfoCard({ title, children, paperStyle }) {
   );
 }
 
-export function AIInsightsCard({ title = "AI Insights", content, loading }) {
+export function AIInsightsCard({
+  title = "AI Insights",
+  content,
+  loading,
+  onRegenerate,
+}) {
   const [collapsed, setCollapsed] = useState(true);
 
   const behavioralInsights = content?.behavioral_insights || [];
@@ -197,18 +203,33 @@ export function AIInsightsCard({ title = "AI Insights", content, loading }) {
             </Box>
           </Group>
 
-          <Button
-            size="xs"
-            radius="xl"
-            variant="subtle"
-            onClick={() => setCollapsed((value) => !value)}
-            leftSection={
-              collapsed ? <IoArrowDown size={14} /> : <IoArrowUp size={14} />
-            }
-            styles={actionButtonStyles}
-          >
-            {collapsed ? "Show details" : "Hide details"}
-          </Button>
+          <Group gap="xs">
+            {onRegenerate ? (
+              <Button
+                size="xs"
+                radius="xl"
+                variant="subtle"
+                onClick={onRegenerate}
+                leftSection={<IoRefreshOutline size={14} />}
+                loading={loading}
+                styles={actionButtonStyles}
+              >
+                Regenerate
+              </Button>
+            ) : null}
+            <Button
+              size="xs"
+              radius="xl"
+              variant="subtle"
+              onClick={() => setCollapsed((value) => !value)}
+              leftSection={
+                collapsed ? <IoArrowDown size={14} /> : <IoArrowUp size={14} />
+              }
+              styles={actionButtonStyles}
+            >
+              {collapsed ? "Show details" : "Hide details"}
+            </Button>
+          </Group>
         </Group>
 
         <Paper p="md" radius="xl" withBorder style={summaryPanelStyle}>

@@ -9,11 +9,11 @@ const initialState = {
 
 export const getInsights = createAsyncThunk(
   "insights/get",
-  async ({ year, month }, thunkAPI) => {
+  async ({ year, month, forceRefresh = false }, thunkAPI) => {
     try {
       const m = `${year}-${String(month).padStart(2, "0")}`;
       const res = await api.get("/insights", {
-        params: { month: m },
+        params: { month: m, forceRefresh },
       });
       return res.data;
     } catch (err) {

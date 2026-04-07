@@ -219,6 +219,14 @@ const DashboardPage = () => {
   const displayInsights = periodMode === "monthly" ? insights : null;
   const displayInsightLoading =
     periodMode === "monthly" ? insightLoading : false;
+  const handleRegenerateInsights = () =>
+    dispatch(
+      getInsights({
+        year: currentYear,
+        month: currentMonth,
+        forceRefresh: true,
+      }),
+    );
   const hasTransactions =
     (displayDashboard?.recentTransactions?.length || 0) > 0;
   const hasAnyTransactionHistory = activePeriods.some(
@@ -441,6 +449,7 @@ const DashboardPage = () => {
                   <AIInsightsCard
                     content={displayInsights}
                     loading={displayInsightLoading}
+                    onRegenerate={handleRegenerateInsights}
                   />
                 </Grid.Col>
               ) : null}

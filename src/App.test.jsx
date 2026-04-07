@@ -201,4 +201,47 @@ describe("App routes", () => {
     expect(screen.queryByPlaceholderText(/select month/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/personalized financial signals/i)).not.toBeInTheDocument();
   });
+
+  it("forces a fresh insights request when regenerate is clicked", async () => {
+    setupDashboardApiMocks();
+
+    const preloadedState = {
+      auth: {
+        user: {
+          token: "token",
+          username: "Vidarshan",
+          salary: { fixed: { amount: 0 }, type: "fixed", variable: [] },
+        },
+        loading: false,
+        error: "",
+      },
+      app: {
+        currentYear: "2026",
+        currentMonth: "3",
+        loading: false,
+        error: "",
+      },
+    };
+
+    renderWithProviders(<DashboardPage />, {
+      route: "/dashboard",
+      store: createTestStore(preloadedState),
+    });
+
+    expect(
+      await screen.findByText(
+        /review spending, budgets, and activity for march 2026/i,
+      ),
+    ).toBeInTheDocument();
+
+    api.get.mockClear();
+
+    await userEvent.click(screen.getByRole("button", { name: /regenerate/i }));
+
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith("/insights", {
+        params: { month: "2026-03", forceRefresh: true },
+      });
+    });
+  });
 });

@@ -390,16 +390,7 @@ const HomePage = () => {
 
       <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
         {featureItems.map((item) => (
-          <Paper
-            key={item.title}
-            withBorder
-            radius="xl"
-            p="lg"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02) 42%, rgba(255,255,255,0.01))",
-            }}
-          >
+          <Paper key={item.title} withBorder radius="xl" p="lg">
             <Stack h="100%" gap="lg">
               <Group justify="space-between" align="flex-start" wrap="nowrap">
                 <Group gap="sm" align="flex-start" wrap="nowrap">
@@ -429,23 +420,6 @@ const HomePage = () => {
               <Text c="dimmed" lh={1.7}>
                 {item.desc}
               </Text>
-
-              <Paper
-                withBorder
-                radius="lg"
-                p="sm"
-                mt="auto"
-                style={{ background: "rgba(255,255,255,0.03)" }}
-              >
-                <Group justify="space-between" wrap="nowrap">
-                  <Text size="xs" fw={700} tt="uppercase" c="dimmed">
-                    Included
-                  </Text>
-                  <Text size="sm" fw={700}>
-                    Core workflow
-                  </Text>
-                </Group>
-              </Paper>
             </Stack>
           </Paper>
         ))}

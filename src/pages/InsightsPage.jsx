@@ -24,6 +24,14 @@ const InsightsPage = () => {
   const { currentYear, currentMonth } = useSelector((state) => state.app);
   const { activePeriods } = useSelector((state) => state.logs);
   const { insights, loading, error } = useSelector((state) => state.insights);
+  const handleRegenerateInsights = () =>
+    dispatch(
+      getInsights({
+        year: currentYear,
+        month: currentMonth,
+        forceRefresh: true,
+      }),
+    );
 
   useEffect(() => {
     dispatch(getActivePeriods());
@@ -88,6 +96,7 @@ const InsightsPage = () => {
               title={`AI Insights for ${currentMonth}/${currentYear}`}
               content={insights}
               loading={loading}
+              onRegenerate={handleRegenerateInsights}
             />
           )}
         </Grid.Col>
