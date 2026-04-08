@@ -33,6 +33,7 @@ import {
 } from "../../store/slices/transactionsSlice";
 import { getDashboard } from "../../store/slices/dashboardSlice";
 import { getBudgets } from "../../store/slices/budgetsSlice";
+import { getActivePeriods } from "../../store/slices/logSlice";
 
 const AddRecord = ({
   expenseOpened,
@@ -135,6 +136,7 @@ const AddRecord = ({
             month: currentMonth,
           }),
         ),
+        dispatch(getActivePeriods()),
       ]);
 
       form.reset();

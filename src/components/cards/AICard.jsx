@@ -240,9 +240,6 @@ export function AIInsightsCard({
                   <Badge color={statusTone.color} variant="light">
                     {statusTone.label}
                   </Badge>
-                  <Text size="xs" c="dimmed">
-                    Start here
-                  </Text>
                 </Group>
                 <Text fw={800} size="lg" lh={1.3}>
                   {nextBestMove?.title || priorityRisk?.title || "Main takeaway"}
