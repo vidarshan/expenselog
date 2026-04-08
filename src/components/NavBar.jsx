@@ -430,7 +430,7 @@ const NavBar = ({ opened, close, expanded, isDesktop, onToggleExpand }) => {
         </Stack>
         {isAuthed ? (
           authLoading ? (
-            <Loading h="auto" size="xs" title="Loading profile" />
+            <Loading h="auto" size="xs" title="" />
           ) : (
             <Tooltip
               label="Manage profile"
